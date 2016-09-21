@@ -54,7 +54,7 @@ namespace Acceleratio.XCellKit
         public void GeneratePivotCacheRecords()
         {
             records.Count = (UInt32Value)(UInt32)listRecord.Count;
-            SpredsheetPivotCacheDefinition.cacheDefinition.RecordCount = records.Count;
+            SpreadsheetPivotCacheDefinition.cacheDefinition.RecordCount = records.Count;
             foreach (var item in listRecord)
             {
                 records.Append(item);

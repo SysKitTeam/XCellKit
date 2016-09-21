@@ -9,7 +9,7 @@ using X14 = DocumentFormat.OpenXml.Office2010.Excel;
 
 namespace Acceleratio.XCellKit
 {
-    class SpredsheetPivotCacheDefinition
+    class SpreadsheetPivotCacheDefinition
     {
         private List<StringItem> listStringItem;
         public static PivotCacheDefinition cacheDefinition;
@@ -21,7 +21,7 @@ namespace Acceleratio.XCellKit
 
         /*Constructor that initialize the main PivotCacheDefinition element,
           sets the id and record count and initialize CacheFields variable*/
-        public SpredsheetPivotCacheDefinition(string id)
+        public SpreadsheetPivotCacheDefinition(string id)
         {
             cacheDefinition = new PivotCacheDefinition()
             {

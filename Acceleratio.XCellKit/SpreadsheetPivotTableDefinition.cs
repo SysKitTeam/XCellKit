@@ -11,6 +11,11 @@ namespace Acceleratio.XCellKit
     class SpreadsheetPivotTableDefinition
     {
         private Location location;
+        private PivotFields fields;
+        private RowFields rowFields;
+        private RowItems rowItems;
+        private ColumnItems columnItems;
+        private DataFields dataFields;
         private PivotTableDefinition definition;
         private List<PivotField> listPivotField;
         private List<Items> listItems;
@@ -18,6 +23,7 @@ namespace Acceleratio.XCellKit
         private List<Field> listField;
         private List<RowItem> listRowItem;
         private List<DataField> listDataField;
+        private PivotTableStyle tableStyle;
 
 
         public SpreadsheetPivotTableDefinition(string name, int cacheID)
@@ -79,7 +85,7 @@ namespace Acceleratio.XCellKit
         */
         public void ListPivotFieldToPivotFields()
         {
-            PivotFields fields = new PivotFields() { Count = (UInt32Value)(UInt32)listPivotField.Count };
+            fields = new PivotFields() { Count = (UInt32Value)(UInt32)listPivotField.Count };
             foreach (var field in listPivotField)
             {
                 fields.Append(field);
@@ -100,7 +106,7 @@ namespace Acceleratio.XCellKit
         */
         public void ListFieldToRowFields()
         {
-            RowFields rowFields = new RowFields() { Count = (UInt32Value)(UInt32)listField.Count };
+            rowFields = new RowFields() { Count = (UInt32Value)(UInt32)listField.Count };
             foreach (var field in listField)
             {
                 rowFields.Append(field);
@@ -135,7 +141,7 @@ namespace Acceleratio.XCellKit
         */
         public void ListRowItemToRowItems()
         {
-            RowItems rowItems = new RowItems() { Count = (UInt32Value)(UInt32)listRowItem.Count };
+            rowItems = new RowItems() { Count = (UInt32Value)(UInt32)listRowItem.Count };
             foreach (var item in listRowItem)
             {
                 rowItems.Append(item);
@@ -149,7 +155,7 @@ namespace Acceleratio.XCellKit
         */
         public void ListRowItemToColumnItems()
         {
-            ColumnItems columnItems = new ColumnItems() { Count = (UInt32Value)(UInt32)listRowItem.Count };
+            columnItems = new ColumnItems() { Count = (UInt32Value)(UInt32)listRowItem.Count };
             foreach (var item in listRowItem)
             {
                 columnItems.Append(item);
@@ -170,9 +176,13 @@ namespace Acceleratio.XCellKit
             listDataField.Add(dataField);
         }
 
+        /*
+        Initialize DataFields variable and appends all of the data fields in the list to data fields
+        and clears the listRowItem
+        */
         public void ListDataFieldToDataFields()
         {
-            DataFields dataFields = new DataFields() { Count = (UInt32Value)(UInt32)listDataField.Count };
+            dataFields = new DataFields() { Count = (UInt32Value)(UInt32)listDataField.Count };
             foreach (var item in listDataField)
             {
                 dataFields.Append(item);
@@ -180,6 +190,32 @@ namespace Acceleratio.XCellKit
             listDataField.Clear();
         }
 
+        //Initialize PivotTableStyle variable and sets some of the initial values
+        public void Style(string name, bool showRowHeaders, bool showColumnHeaders, bool showRowStripes, bool showColumnStripes, bool showLastColumn)
+        {
+            tableStyle = new PivotTableStyle()
+            {
+                Name = name,
+                ShowRowHeaders = showRowHeaders,
+                ShowColumnHeaders = showColumnHeaders,
+                ShowColumnStripes = showColumnStripes,
+                ShowRowStripes = showRowStripes,
+                ShowLastColumn = showLastColumn
+            };
+        }
 
+        //Appends all the elements to the pivot table definition and returns it
+        public PivotTableDefinition GeneratePivotTableDefinition()
+        {
+            definition.Append(location);
+            definition.Append(fields);
+            definition.Append(rowFields);
+            definition.Append(rowItems);
+            definition.Append(columnItems);
+            definition.Append(dataFields);
+            definition.Append(tableStyle);
+
+            return definition;
+        }
     }
 }

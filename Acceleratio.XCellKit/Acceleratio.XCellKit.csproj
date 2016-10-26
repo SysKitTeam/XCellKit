@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SpreadsheetConditionalFormatting.cs" />
     <Compile Include="SpredsheetCell.cs" />
     <Compile Include="SpredsheetHelper.cs" />
     <Compile Include="SpredsheetHyperLink.cs" />

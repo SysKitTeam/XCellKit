@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Drawing;
+using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Drawing.Spreadsheet;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 
@@ -19,6 +22,7 @@ namespace Acceleratio.XCellKit
             _tables = new Dictionary<SpredsheetLocation, SpredsheetTable>();
             _rows = new Dictionary<SpredsheetLocation, SpredsheetRow>();
             _maxNumberOfCharsPerColumn = new Dictionary<int, int>();
+            _charts = new Dictionary<SpredsheetLocation, SpredsheetChart>();
         }
 
         public SpredsheetWorksheet(string name, List<int> columnsIndexToTrackAutoWidht)
@@ -60,6 +64,12 @@ namespace Acceleratio.XCellKit
                 AddRow(row, columnIndex, rowIndex);
                 rowIndex++;
             }
+        }
+
+        private Dictionary<SpredsheetLocation, SpredsheetChart> _charts;
+        public void AddChart(SpredsheetChart chart, int columnIndex, int rowIndex)
+        {
+            _charts[new SpredsheetLocation(rowIndex, columnIndex)] = chart;
         }
 
         private void trackMaxChars(int columnIndex, SpredsheetCell cell)
@@ -108,13 +118,16 @@ namespace Acceleratio.XCellKit
         public void WriteWorksheet(OpenXmlWriter writer, WorksheetPart part, SpredsheetStylesManager stylesManager, ref int tableCount)
         {
             var hyperLinksManager = new SpredsheetHyperlinkManager();
-            writer.WriteStartElement(new Worksheet());
+            var newWorksheet = part.Worksheet = new Worksheet();
+            writer.WriteStartElement(newWorksheet);
             writeFrozenFirstColumn(writer);
             writeColumns(writer);
             writeSheetData(writer, stylesManager, hyperLinksManager);
             writeHyperlinks(writer, hyperLinksManager);
             writeTables(writer, part, ref tableCount);
             writer.WriteEndElement();
+            newWorksheet.Append(new SheetData());
+            writeChart(part);
         }
 
         private void writeFrozenFirstColumn(OpenXmlWriter writer)
@@ -190,6 +203,69 @@ namespace Acceleratio.XCellKit
                 tableCount++;
             }
             writer.WriteEndElement();
+        }
+
+        public void writeChart(WorksheetPart part)
+        {
+            foreach (var singleChart in _charts)
+            {
+                DrawingsPart drawingsPart = part.AddNewPart<DrawingsPart>();
+                part.Worksheet.Append(new Drawing()
+                { Id = part.GetIdOfPart(drawingsPart) });
+                part.Worksheet.Save();
+
+                // Add a new chart and set the chart language to English-US.
+                ChartPart chartPart = drawingsPart.AddNewPart<ChartPart>();
+                chartPart.ChartSpace = new ChartSpace();
+                chartPart.ChartSpace.Append(new EditingLanguage() { Val = new StringValue("en-US") });
+
+                var spredSheetChart = singleChart.Value;
+                spredSheetChart.CreateExcel(chartPart.ChartSpace);
+
+                // Save the chart part.
+                chartPart.ChartSpace.Save();
+
+                // Position the chart on the worksheet using a TwoCellAnchor object and append a GraphicFrame to the TwoCellAnchor object..
+                setChartLocation(drawingsPart, chartPart, singleChart.Key);
+
+                // Save the WorksheetDrawing object.
+                drawingsPart.WorksheetDrawing.Save();
+            }
+        }
+
+        private void setChartLocation(DrawingsPart drawingsPart, ChartPart chartPart, SpredsheetLocation location)
+        {
+            drawingsPart.WorksheetDrawing = new WorksheetDrawing();
+            TwoCellAnchor twoCellAnchor = drawingsPart.WorksheetDrawing.AppendChild<TwoCellAnchor>(new TwoCellAnchor());
+
+            // Pozicija charta.
+            twoCellAnchor.Append(new DocumentFormat.OpenXml.Drawing.Spreadsheet.FromMarker(new ColumnId(location.ColumnIndex.ToString()),
+                new ColumnOffset("581025"),
+                new RowId(location.RowIndex.ToString()),
+                new RowOffset("114300")));
+            twoCellAnchor.Append(new DocumentFormat.OpenXml.Drawing.Spreadsheet.ToMarker(new ColumnId((location.ColumnIndex + 19).ToString()),
+                new ColumnOffset("276225"),
+                new RowId((location.RowIndex + 15).ToString()),
+                new RowOffset("0")));
+
+            DocumentFormat.OpenXml.Drawing.Spreadsheet.GraphicFrame graphicFrame =
+                twoCellAnchor.AppendChild<DocumentFormat.OpenXml.
+                    Drawing.Spreadsheet.GraphicFrame>(new DocumentFormat.OpenXml.Drawing.
+                    Spreadsheet.GraphicFrame());
+            graphicFrame.Macro = "";
+
+            // Ime charta.
+            graphicFrame.Append(new DocumentFormat.OpenXml.Drawing.Spreadsheet.NonVisualGraphicFrameProperties(
+                new DocumentFormat.OpenXml.Drawing.Spreadsheet.NonVisualDrawingProperties() { Id = new UInt32Value(2u), Name = "Chart 1" },
+                new DocumentFormat.OpenXml.Drawing.Spreadsheet.NonVisualGraphicFrameDrawingProperties()));
+
+            graphicFrame.Append(new Transform(new Offset() { X = 0L, Y = 0L },
+                new Extents() { Cx = 0L, Cy = 0L }));
+
+            graphicFrame.Append(new Graphic(new GraphicData(new ChartReference() { Id = drawingsPart.GetIdOfPart(chartPart) })
+                { Uri = "http://schemas.openxmlformats.org/drawingml/2006/chart" }));
+
+            twoCellAnchor.Append(new ClientData());
         }
 
         private double _maxWidthOfFontChar = 7d;

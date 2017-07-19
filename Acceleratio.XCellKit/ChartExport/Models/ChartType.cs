@@ -1,4 +1,4 @@
-﻿namespace Acceleratio.XCellKit.ExcelExport
+﻿namespace Acceleratio.XCellKit
 {
     public enum ChartTypeEnum
     {

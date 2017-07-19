@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 
-namespace Acceleratio.XCellKit.ExcelExport
+namespace Acceleratio.XCellKit
 {
     public class ReportExport
     {
@@ -41,31 +41,31 @@ namespace Acceleratio.XCellKit.ExcelExport
             this.Title = title;
         }
 
-        public void CreateExcel()
-        {
-            try
-            {
-                using (var stream = ExportData.OpenEntryStreamForWriting())
-                {
-                    if (ChartType == ChartTypeEnum.Gantt)
-                    {
-                        ExportData.InsertData(stream, ReportData);
+        //public void CreateExcel()
+        //{
+        //    try
+        //    {
+        //        using (var stream = ExportData.OpenEntryStreamForWriting())
+        //        {
+        //            if (ChartType == ChartTypeEnum.Gantt)
+        //            {
+        //                ExportData.InsertData(stream, ReportData);
 
-                        Charts charts = new Charts(this);
-                        charts.InsertGanttChartInSpreadsheet(stream, "Graph");
-                    }
-                    else
-                    {
-                        ExportData.InsertData(stream, ReportData);
-                        Charts charts = new Charts(this);
-                        charts.InsertChartInSpreadsheet(stream);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                var test = e;
-            }
-        }
+        //                ChartCreator charts = new ChartCreator(this);
+        //                charts.InsertGanttChartInSpreadsheet(stream, "Graph");
+        //            }
+        //            else
+        //            {
+        //                ExportData.InsertData(stream, ReportData);
+        //                ChartCreator charts = new ChartCreator(this);
+        //                charts.InsertChartInSpreadsheet(stream);
+        //            }
+        //        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        var test = e;
+        //    }
+        //}
     }
 }

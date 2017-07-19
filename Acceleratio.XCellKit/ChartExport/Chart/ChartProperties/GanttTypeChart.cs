@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using Outline = DocumentFormat.OpenXml.Drawing.Outline;
 using Values = DocumentFormat.OpenXml.Drawing.Charts.Values;
 
-namespace Acceleratio.XCellKit.ExcelExport.Helpers
+namespace Acceleratio.XCellKit.Helpers
 {
     public static class GanttTypeChart
     {

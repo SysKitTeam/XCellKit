@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using Chart = DocumentFormat.OpenXml.Drawing.Charts.Chart;
 
-namespace Acceleratio.XCellKit.ExcelExport
+namespace Acceleratio.XCellKit
 {
     public abstract class ChartPropertiesSetup
     {

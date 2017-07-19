@@ -169,46 +169,6 @@ namespace Acceleratio.XCellKit.Helpers
         }
 
         /// <summary>
-        /// Position the chart on the worksheet using a TwoCellAnchor object and append a GraphicFrame to the TwoCellAnchor object.
-        /// </summary>
-        public static TwoCellAnchor TwoCellAnchor(DrawingsPart drawingsPart, ChartPart chartPart)
-        {
-            drawingsPart.WorksheetDrawing = new WorksheetDrawing();
-            TwoCellAnchor twoCellAnchor = drawingsPart.WorksheetDrawing.AppendChild<TwoCellAnchor>(new TwoCellAnchor());
-
-            // Pozicija charta.
-            twoCellAnchor.Append(new DocumentFormat.OpenXml.Drawing.Spreadsheet.FromMarker(new ColumnId("1"),
-                new ColumnOffset("581025"),
-                new RowId("1"),
-                new RowOffset("114300")));
-            twoCellAnchor.Append(new DocumentFormat.OpenXml.Drawing.Spreadsheet.ToMarker(new ColumnId("20"),
-                new ColumnOffset("276225"),
-                new RowId("16"),
-                new RowOffset("0")));
-
-            DocumentFormat.OpenXml.Drawing.Spreadsheet.GraphicFrame graphicFrame =
-                twoCellAnchor.AppendChild<DocumentFormat.OpenXml.
-                    Drawing.Spreadsheet.GraphicFrame>(new DocumentFormat.OpenXml.Drawing.
-                    Spreadsheet.GraphicFrame());
-            graphicFrame.Macro = "";
-
-            // Ime charta.
-            graphicFrame.Append(new DocumentFormat.OpenXml.Drawing.Spreadsheet.NonVisualGraphicFrameProperties(
-                new DocumentFormat.OpenXml.Drawing.Spreadsheet.NonVisualDrawingProperties() { Id = new UInt32Value(2u), Name = "Chart 1" },
-                new DocumentFormat.OpenXml.Drawing.Spreadsheet.NonVisualGraphicFrameDrawingProperties()));
-
-            graphicFrame.Append(new Transform(new Offset() { X = 0L, Y = 0L },
-                new Extents() { Cx = 0L, Cy = 0L }));
-
-            graphicFrame.Append(new Graphic(new GraphicData(new ChartReference() { Id = drawingsPart.GetIdOfPart(chartPart) })
-                { Uri = "http://schemas.openxmlformats.org/drawingml/2006/chart" }));
-
-            twoCellAnchor.Append(new ClientData());
-
-            return twoCellAnchor;
-        }
-
-        /// <summary>
         /// Create and insert data to Axis
         /// </summary>
         public static void SetChartAxis(OpenXmlCompositeElement barChartSeries1, OpenXmlCompositeElement barChartSeries2, List<GanttData> data)

@@ -55,7 +55,6 @@
     <Compile Include="ChartExport\Models\ChartModel.cs" />
     <Compile Include="ChartExport\Models\ChartType.cs" />
     <Compile Include="ChartExport\Models\GanttData.cs" />
-    <Compile Include="ChartExport\ReportExport.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SpredsheetChart.cs" />
     <Compile Include="SpredsheetCell.cs" />

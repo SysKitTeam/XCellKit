@@ -39,7 +39,7 @@ namespace Acceleratio.XCellKit
             this.Title = title;
         }
 
-        public Chart CreateExcel(ChartSpace chartSpace)
+        public Chart CreateChart(ChartSpace chartSpace)
         {
             ChartCreator charts = new ChartCreator(this);
             return ChartType == ChartTypeEnum.Gantt ? charts.CreateGanttDrawing(chartSpace) : charts.CreateDrawing(chartSpace);

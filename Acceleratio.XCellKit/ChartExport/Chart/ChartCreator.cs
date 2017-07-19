@@ -16,111 +16,17 @@ namespace Acceleratio.XCellKit
         {
 
         }
-        ///// <summary>
-        ///// Creates, designes and places chart into a sheet.
-        ///// Calls overrideable methods for displaying the chart based on ChartType.
-        ///// </summary>
-        //public void InsertChartInSpreadsheet(Stream stream)
-        //{
-        //    using (SpreadsheetDocument document = SpreadsheetDocument.Open(stream, true))
-        //    {
-        //        #region Chart Container - Same for all chart types
-        //        WorksheetPart worksheetPart = createNewSheet(document, "Graph");
-
-        //        // Add a new drawing to the worksheet.
-        //        DrawingsPart drawingsPart = worksheetPart.AddNewPart<DrawingsPart>();
-        //        worksheetPart.Worksheet.Append(new Drawing()
-        //        { Id = worksheetPart.GetIdOfPart(drawingsPart) });
-        //        worksheetPart.Worksheet.Save();
-
-        //        // Add a new chart and set the chart language to English-US.
-        //        ChartPart chartPart = drawingsPart.AddNewPart<ChartPart>();
-        //        chartPart.ChartSpace = new ChartSpace(new EditingLanguage() { Val = new StringValue("en-US") });
-        //        Chart chartContainer = chartPart.ChartSpace.AppendChild<DocumentFormat.OpenXml.Drawing.Charts.Chart>(
-        //            new DocumentFormat.OpenXml.Drawing.Charts.Chart());
-        //        chartContainer.AppendChild<AutoTitleDeleted>(new AutoTitleDeleted() { Val = false });
-
-        //        // Create a new clustered column chart.
-        //        PlotArea plotArea = chartContainer.AppendChild<PlotArea>(new PlotArea());
-        //        #endregion
-
-        //        ChartPropertiesSetup chartPropertySetter;
-        //        switch (ChartType)
-        //        {
-        //            case ChartTypeEnum.Bar:
-        //                chartPropertySetter = new BarTypeChart();
-        //                break;
-        //            case ChartTypeEnum.Line:
-        //                chartPropertySetter = new LineTypeChart();
-        //                break;
-        //            case ChartTypeEnum.Pie:
-        //                chartPropertySetter = new PieTypeChart();
-        //                break;
-        //            default:
-        //                chartPropertySetter = new BarTypeChart();
-        //                break;
-        //        }
-
-        //        // Set chart title
-        //        chartContainer.AppendChild<Title>(chartPropertySetter.SetTitle(Title));
-
-        //        uint chartSeriesCounter = 0;
-        //        foreach (var chartDataSeriesGrouped in ChartData.GroupBy(x => x.Series))
-        //        {
-        //            // CHART BODY - Depends on chart type.
-        //            OpenXmlCompositeElement chart;
-        //            OpenXmlCompositeElement chartSeries;
-
-        //            // Set chart and series depending on type.
-        //            chartPropertySetter.ChartAndChartSeries(chartDataSeriesGrouped.Key, chartSeriesCounter, plotArea, out chart, out chartSeries);
-
-        //            // Every method from chartPropertySetter can be overriden to customize chart export.
-        //            chartPropertySetter.SetChartShapeProperties(chartSeries);
-        //            chartPropertySetter.SetChartAxis(chart, chartSeries, chartDataSeriesGrouped.ToList());
-
-        //            chartSeriesCounter++;
-        //        }
-
-        //        // Add the Category Axis (X axis).
-        //        chartPropertySetter.SetLineCategoryAxis(plotArea);
-
-        //        // Add the Value Axis (Y axis).
-        //        chartPropertySetter.SetValueAxis(plotArea, title: AxisTitle);
-
-        //        chartPropertySetter.SetLegend(chartContainer);
-
-        //        // Save the chart part.
-        //        chartPart.ChartSpace.Save();
-
-        //        // Position the chart on the worksheet using a TwoCellAnchor object and append a GraphicFrame to the TwoCellAnchor object..
-        //        chartPropertySetter.SetTwoCellAnchor(drawingsPart, chartPart);
-
-        //        // END - Save the WorksheetDrawing object.
-        //        drawingsPart.WorksheetDrawing.Save();
-        //    }
-        //}
 
         /// <summary>
         /// Creates a gantt chart.
         /// </summary>
         public Chart CreateGanttDrawing(ChartSpace chartSpace)
         {
-            // Add a new drawing to the worksheet.
-            //DrawingsPart drawingsPart = WorkSheetPart.AddNewPart<DrawingsPart>();
-            //WorkSheetPart.Worksheet.Append(new DocumentFormat.OpenXml.Spreadsheet.Drawing()
-            //    { Id = WorkSheetPart.GetIdOfPart(drawingsPart) });
-            //WorkSheetPart.Worksheet.Save();
-
-            //// Add a new chart and set the chart language to English-US.
-            //ChartPart chartPart = drawingsPart.AddNewPart<ChartPart>();
-            //chartPart.ChartSpace = new ChartSpace();
-            //chartPart.ChartSpace.Append(new EditingLanguage() { Val = new StringValue("en-US") });
-            //DocumentFormat.OpenXml.Drawing.Charts.Chart chart = chartPart.ChartSpace.AppendChild<DocumentFormat.OpenXml.Drawing.Charts.Chart>(
-            //    new DocumentFormat.OpenXml.Drawing.Charts.Chart());
-            Chart chart = new Chart();
+            Chart chartContainer = chartSpace.AppendChild<Chart>(new Chart());
+            chartContainer.AppendChild<AutoTitleDeleted>(new AutoTitleDeleted() { Val = false });
 
             // Create a new clustered column chart.
-            PlotArea plotArea = chart.AppendChild<PlotArea>(new PlotArea());
+            PlotArea plotArea = chartContainer.AppendChild<PlotArea>(new PlotArea());
             Layout layout1 = plotArea.AppendChild<Layout>(new Layout());
             BarChart barChart = plotArea.AppendChild<BarChart>(new BarChart());
             barChart.Append(new BarDirection() { Val = BarDirectionValues.Bar });
@@ -152,18 +58,9 @@ namespace Acceleratio.XCellKit
             // Add the Value Axis (Y axis).
             GanttTypeChart.SetGanttValueAxis(plotArea);
 
-            chart.Append(new PlotVisibleOnly() { Val = new BooleanValue(true) });
+            chartContainer.Append(new PlotVisibleOnly() { Val = new BooleanValue(true) });
 
-            return chart;
-
-            // Save the chart part.
-            //chartPart.ChartSpace.Save();
-
-            //// Position the chart on the worksheet using a TwoCellAnchor object and append a GraphicFrame to the TwoCellAnchor object..
-            //GanttTypeChart.TwoCellAnchor(drawingsPart, chartPart);
-
-            //// Save the WorksheetDrawing object.
-            //drawingsPart.WorksheetDrawing.Save();
+            return chartContainer;
         }
 
 
@@ -173,17 +70,6 @@ namespace Acceleratio.XCellKit
         /// </summary>
         public Chart CreateDrawing(ChartSpace chartSpace)
         {
-            //DrawingsPart drawingsPart = WorkSheetPart.AddNewPart<DrawingsPart>();
-            //WorkSheetPart.Worksheet.Append(new Drawing()
-            //    { Id = WorkSheetPart.GetIdOfPart(drawingsPart) });
-            //WorkSheetPart.Worksheet.Save();
-
-            //// Add a new chart and set the chart language to English-US.
-            //ChartPart chartPart = drawingsPart.AddNewPart<ChartPart>();
-            //chartPart.ChartSpace = new ChartSpace(new EditingLanguage() { Val = new StringValue("en-US") });
-            //Chart chartContainer = chartPart.ChartSpace.AppendChild<DocumentFormat.OpenXml.Drawing.Charts.Chart>(
-            //    new DocumentFormat.OpenXml.Drawing.Charts.Chart());
-            //chartContainer.AppendChild<AutoTitleDeleted>(new AutoTitleDeleted() { Val = false });
             Chart chartContainer = chartSpace.AppendChild<Chart>(new Chart());
             chartContainer.AppendChild<AutoTitleDeleted>(new AutoTitleDeleted() { Val = false });
 
@@ -236,14 +122,6 @@ namespace Acceleratio.XCellKit
             chartPropertySetter.SetLegend(chartContainer);
 
             return chartContainer;
-
-            //// Save the chart part.
-            //chartPart.ChartSpace.Save();
-
-            //// Position the chart on the worksheet using a TwoCellAnchor object and append a GraphicFrame to the TwoCellAnchor object..
-            //chartPropertySetter.SetTwoCellAnchor(drawingsPart, chartPart);
-
-            //drawingsPart.WorksheetDrawing.Save();
         }
 
         /// <summary>

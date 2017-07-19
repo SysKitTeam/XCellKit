@@ -118,16 +118,15 @@ namespace Acceleratio.XCellKit
         public void WriteWorksheet(OpenXmlWriter writer, WorksheetPart part, SpredsheetStylesManager stylesManager, ref int tableCount)
         {
             var hyperLinksManager = new SpredsheetHyperlinkManager();
-            var newWorksheet = part.Worksheet = new Worksheet();
+            var newWorksheet = new Worksheet();
             writer.WriteStartElement(newWorksheet);
             writeFrozenFirstColumn(writer);
             writeColumns(writer);
             writeSheetData(writer, stylesManager, hyperLinksManager);
             writeHyperlinks(writer, hyperLinksManager);
+            writeChart(writer, part);
             writeTables(writer, part, ref tableCount);
             writer.WriteEndElement();
-            newWorksheet.Append(new SheetData());
-            writeChart(part);
         }
 
         private void writeFrozenFirstColumn(OpenXmlWriter writer)
@@ -205,31 +204,22 @@ namespace Acceleratio.XCellKit
             writer.WriteEndElement();
         }
 
-        public void writeChart(WorksheetPart part)
+        public void writeChart(OpenXmlWriter writer, WorksheetPart part)
         {
             foreach (var singleChart in _charts)
             {
                 DrawingsPart drawingsPart = part.AddNewPart<DrawingsPart>();
-                part.Worksheet.Append(new Drawing()
-                { Id = part.GetIdOfPart(drawingsPart) });
-                part.Worksheet.Save();
 
-                // Add a new chart and set the chart language to English-US.
+                writer.WriteStartElement(new Drawing() { Id = part.GetIdOfPart(drawingsPart) });
+                writer.WriteEndElement();
+
                 ChartPart chartPart = drawingsPart.AddNewPart<ChartPart>();
                 chartPart.ChartSpace = new ChartSpace();
                 chartPart.ChartSpace.Append(new EditingLanguage() { Val = new StringValue("en-US") });
 
-                var spredSheetChart = singleChart.Value;
-                spredSheetChart.CreateExcel(chartPart.ChartSpace);
+                singleChart.Value.CreateChart(chartPart.ChartSpace);
 
-                // Save the chart part.
-                chartPart.ChartSpace.Save();
-
-                // Position the chart on the worksheet using a TwoCellAnchor object and append a GraphicFrame to the TwoCellAnchor object..
                 setChartLocation(drawingsPart, chartPart, singleChart.Key);
-
-                // Save the WorksheetDrawing object.
-                drawingsPart.WorksheetDrawing.Save();
             }
         }
 

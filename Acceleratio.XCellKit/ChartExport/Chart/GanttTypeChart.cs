@@ -4,6 +4,8 @@ using DocumentFormat.OpenXml.Drawing.Charts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DocumentFormat.OpenXml.Drawing.Spreadsheet;
+using DocumentFormat.OpenXml.Packaging;
 using Outline = DocumentFormat.OpenXml.Drawing.Outline;
 using Values = DocumentFormat.OpenXml.Drawing.Charts.Values;
 
@@ -223,6 +225,41 @@ namespace Acceleratio.XCellKit.Helpers
 
                 i++;
             }
+        }
+
+        public void SetChartLocation(DrawingsPart drawingsPart, ChartPart chartPart, SpredsheetLocation location)
+        {
+            drawingsPart.WorksheetDrawing = new WorksheetDrawing();
+            TwoCellAnchor twoCellAnchor = drawingsPart.WorksheetDrawing.AppendChild<TwoCellAnchor>(new TwoCellAnchor());
+
+            // Pozicija charta.
+            twoCellAnchor.Append(new DocumentFormat.OpenXml.Drawing.Spreadsheet.FromMarker(new ColumnId(location.ColumnIndex.ToString()),
+                new ColumnOffset("581025"),
+                new RowId(location.RowIndex.ToString()),
+                new RowOffset("114300")));
+            twoCellAnchor.Append(new DocumentFormat.OpenXml.Drawing.Spreadsheet.ToMarker(new ColumnId((location.ColumnIndex + 19).ToString()),
+                new ColumnOffset("276225"),
+                new RowId((location.RowIndex + 15).ToString()),
+                new RowOffset("0")));
+
+            DocumentFormat.OpenXml.Drawing.Spreadsheet.GraphicFrame graphicFrame =
+                twoCellAnchor.AppendChild<DocumentFormat.OpenXml.
+                    Drawing.Spreadsheet.GraphicFrame>(new DocumentFormat.OpenXml.Drawing.
+                    Spreadsheet.GraphicFrame());
+            graphicFrame.Macro = "";
+
+            // Ime charta.
+            graphicFrame.Append(new DocumentFormat.OpenXml.Drawing.Spreadsheet.NonVisualGraphicFrameProperties(
+                new DocumentFormat.OpenXml.Drawing.Spreadsheet.NonVisualDrawingProperties() { Id = new UInt32Value(2u), Name = "Chart 1" },
+                new DocumentFormat.OpenXml.Drawing.Spreadsheet.NonVisualGraphicFrameDrawingProperties()));
+
+            graphicFrame.Append(new Transform(new Offset() { X = 0L, Y = 0L },
+                new Extents() { Cx = 0L, Cy = 0L }));
+
+            graphicFrame.Append(new Graphic(new GraphicData(new ChartReference() { Id = drawingsPart.GetIdOfPart(chartPart) })
+                { Uri = "http://schemas.openxmlformats.org/drawingml/2006/chart" }));
+
+            twoCellAnchor.Append(new ClientData());
         }
 
         /// <summary>

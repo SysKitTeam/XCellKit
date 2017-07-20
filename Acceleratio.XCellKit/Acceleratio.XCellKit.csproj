@@ -46,16 +46,18 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ChartExport\Chart\ChartCreator.cs" />
-    <Compile Include="ChartExport\Chart\ChartProperties\BarTypeChart.cs" />
-    <Compile Include="ChartExport\Chart\ChartProperties\ChartPropertiesSetup.cs" />
-    <Compile Include="ChartExport\Chart\ChartProperties\GanttTypeChart.cs" />
-    <Compile Include="ChartExport\Chart\ChartProperties\LineTypeChart.cs" />
-    <Compile Include="ChartExport\Chart\ChartProperties\PieTypeChart.cs" />
+    <Compile Include="ChartExport\Chart\BarTypeChart.cs" />
+    <Compile Include="ChartExport\Chart\ChartPropertiesSetup.cs" />
+    <Compile Include="ChartExport\Chart\GanttTypeChart.cs" />
+    <Compile Include="ChartExport\Chart\LineTypeChart.cs" />
+    <Compile Include="ChartExport\Chart\PieTypeChart.cs" />
     <Compile Include="ChartExport\Models\ChartModel.cs" />
     <Compile Include="ChartExport\Models\ChartSettings.cs" />
-    <Compile Include="ChartExport\Models\ChartType.cs" />
     <Compile Include="ChartExport\Models\GanttData.cs" />
+    <Compile Include="BarSpredsheetChart.cs" />
+    <Compile Include="PieSpredsheetChart.cs" />
+    <Compile Include="LineSpredsheetChart.cs" />
+    <Compile Include="GanttSpredsheetChart.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SpredsheetChart.cs" />
     <Compile Include="SpredsheetCell.cs" />

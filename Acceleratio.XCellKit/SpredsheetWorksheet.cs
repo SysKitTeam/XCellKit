@@ -204,7 +204,7 @@ namespace Acceleratio.XCellKit
             writer.WriteEndElement();
         }
 
-        public void writeChart(OpenXmlWriter writer, WorksheetPart part)
+        private void writeChart(OpenXmlWriter writer, WorksheetPart part)
         {
             foreach (var singleChart in _charts)
             {

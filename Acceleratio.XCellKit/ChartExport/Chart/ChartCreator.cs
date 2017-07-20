@@ -1,15 +1,14 @@
-﻿using DocumentFormat.OpenXml;
+﻿using Acceleratio.XCellKit.Helpers;
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Drawing.Charts;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
-using System.IO;
 using System.Linq;
-using Acceleratio.XCellKit.Helpers;
 using Chart = DocumentFormat.OpenXml.Drawing.Charts.Chart;
 
 namespace Acceleratio.XCellKit
 {
-    public class ChartCreator : SpredsheetChart
+    internal class ChartCreator : SpredsheetChart
     {
         public ChartCreator(SpredsheetChart export)
             : base(export)
@@ -45,18 +44,20 @@ namespace Acceleratio.XCellKit
                 new Order() { Val = new UInt32Value(1u) },
                 new SeriesText(new NumericValue() { Text = "Time Spent" })));
 
-            GanttTypeChart.SetChartShapeProperties(barChartSeries1, visible: false);
-            GanttTypeChart.SetChartShapeProperties(barChartSeries2, colorPoints: (uint)GanttData.Count);
-            GanttTypeChart.SetChartAxis(barChartSeries1, barChartSeries2, GanttData);
+            GanttTypeChart ganttChart = new GanttTypeChart(Settings);
+
+            ganttChart.SetChartShapeProperties(barChartSeries1, visible: false);
+            ganttChart.SetChartShapeProperties(barChartSeries2, colorPoints: (uint)GanttData.Count);
+            ganttChart.SetChartAxis(barChartSeries1, barChartSeries2, GanttData);
 
             barChart.Append(new AxisId() { Val = new UInt32Value(48650112u) });
             barChart.Append(new AxisId() { Val = new UInt32Value(48672768u) });
 
             // Add the Category Axis (X axis).
-            GanttTypeChart.SetGanttCategoryAxis(plotArea);
+            ganttChart.SetGanttCategoryAxis(plotArea);
 
             // Add the Value Axis (Y axis).
-            GanttTypeChart.SetGanttValueAxis(plotArea);
+            ganttChart.SetGanttValueAxis(plotArea);
 
             chartContainer.Append(new PlotVisibleOnly() { Val = new BooleanValue(true) });
 
@@ -92,9 +93,10 @@ namespace Acceleratio.XCellKit
                     chartPropertySetter = new BarTypeChart();
                     break;
             }
+            chartPropertySetter.SetValues(Settings);
 
             // Set chart title
-            chartContainer.AppendChild<Title>(chartPropertySetter.SetTitle(Title));
+            chartContainer.AppendChild(chartPropertySetter.SetTitle(chartPropertySetter.Title));
 
             uint chartSeriesCounter = 0;
             foreach (var chartDataSeriesGrouped in ChartData.GroupBy(x => x.Series))
@@ -117,7 +119,7 @@ namespace Acceleratio.XCellKit
             chartPropertySetter.SetLineCategoryAxis(plotArea);
 
             // Add the Value Axis (Y axis).
-            chartPropertySetter.SetValueAxis(plotArea, title: AxisTitle);
+            chartPropertySetter.SetValueAxis(plotArea);
 
             chartPropertySetter.SetLegend(chartContainer);
 

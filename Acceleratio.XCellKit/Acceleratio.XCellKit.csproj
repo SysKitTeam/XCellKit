@@ -53,6 +53,7 @@
     <Compile Include="ChartExport\Chart\ChartProperties\LineTypeChart.cs" />
     <Compile Include="ChartExport\Chart\ChartProperties\PieTypeChart.cs" />
     <Compile Include="ChartExport\Models\ChartModel.cs" />
+    <Compile Include="ChartExport\Models\ChartSettings.cs" />
     <Compile Include="ChartExport\Models\ChartType.cs" />
     <Compile Include="ChartExport\Models\GanttData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

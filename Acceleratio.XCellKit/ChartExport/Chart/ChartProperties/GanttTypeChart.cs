@@ -1,21 +1,37 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.Drawing.Charts;
-using DocumentFormat.OpenXml.Drawing.Spreadsheet;
-using DocumentFormat.OpenXml.Packaging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Outline = DocumentFormat.OpenXml.Drawing.Outline;
 using Values = DocumentFormat.OpenXml.Drawing.Charts.Values;
 
 namespace Acceleratio.XCellKit.Helpers
 {
-    public static class GanttTypeChart
+    internal class GanttTypeChart
     {
+        public GanttTypeChart(ChartSettings chartSettings)
+        {
+            this.chartSettings = new ChartSettings
+            {
+                Title = chartSettings.Title ?? "",
+                AxisX = chartSettings.AxisX ?? true,
+                AxisXTitle = chartSettings.AxisXTitle ?? "",
+                AxisY = chartSettings.AxisY ?? true,
+                AxisYTitle = chartSettings.AxisYTitle ?? "",
+                Height = chartSettings.Height ?? 0,
+                Legend = chartSettings.Legend ?? true,
+                SeriesColor = chartSettings.SeriesColor ?? ColourValues.ToList(),
+                Width = chartSettings.Width ?? 0
+            };
+        }
+        public ChartSettings chartSettings { get; set; }
+
         /// <summary>
         /// Distinct colors for gantt bars. There might be some property instead of this.
         /// </summary>
-        private static string[] ColourValues = new string[] {
+        private string[] ColourValues = new string[] {
             "800000", "008000", "000080", "808000", "800080", "008080", "808080",
             "C00000", "00C000", "0000C0", "C0C000", "C000C0", "00C0C0", "C0C0C0",
             "400000", "004000", "000040", "404000", "400040", "004040", "404040",
@@ -28,7 +44,7 @@ namespace Acceleratio.XCellKit.Helpers
         /// <summary>
         /// Set display, width, color and fill of borders and data (line, bar etc.) in chart.
         /// </summary>
-        public static ChartShapeProperties SetChartShapeProperties(OpenXmlCompositeElement chartSeries, bool visible = true, uint colorPoints = 0)
+        public ChartShapeProperties SetChartShapeProperties(OpenXmlCompositeElement chartSeries, bool visible = true, uint colorPoints = 0)
         {
             ChartShapeProperties chartShapeProperties1 = new ChartShapeProperties();
 
@@ -67,7 +83,7 @@ namespace Acceleratio.XCellKit.Helpers
         /// <summary>
         /// Distinct color for each bar.
         /// </summary>
-        private static DataPoint colorChartLines(uint lineIndex)
+        private DataPoint colorChartLines(uint lineIndex)
         {
             DataPoint dataPoint = new DataPoint();
             Index index = new Index() { Val = lineIndex };
@@ -96,7 +112,7 @@ namespace Acceleratio.XCellKit.Helpers
         /// <summary>
         /// Design settings for X axis.
         /// </summary>
-        public static CategoryAxis SetGanttCategoryAxis(PlotArea plotArea, bool hide = false)
+        public CategoryAxis SetGanttCategoryAxis(PlotArea plotArea, bool hide = false)
         {
             return plotArea.AppendChild<CategoryAxis>(new CategoryAxis(new AxisId()
                     { Val = new UInt32Value(48650112u) }, new Scaling(new Orientation()
@@ -119,7 +135,7 @@ namespace Acceleratio.XCellKit.Helpers
         /// <summary>
         /// Design settings for Y axis.
         /// </summary>
-        public static ValueAxis SetGanttValueAxis(PlotArea plotArea)
+        public ValueAxis SetGanttValueAxis(PlotArea plotArea)
         {
             MajorGridlines majorGridlines1 = new MajorGridlines();
             ChartShapeProperties chartShapeProperties2 = new ChartShapeProperties();
@@ -171,7 +187,7 @@ namespace Acceleratio.XCellKit.Helpers
         /// <summary>
         /// Create and insert data to Axis
         /// </summary>
-        public static void SetChartAxis(OpenXmlCompositeElement barChartSeries1, OpenXmlCompositeElement barChartSeries2, List<GanttData> data)
+        public void SetChartAxis(OpenXmlCompositeElement barChartSeries1, OpenXmlCompositeElement barChartSeries2, List<GanttData> data)
         {
             uint i = 0;
             // Y axis - prvi bar je za početnu poziciju (ne prikazuje se)
@@ -200,10 +216,10 @@ namespace Acceleratio.XCellKit.Helpers
                     .AppendChild<NumericValue>(new NumericValue(key.Name));
 
                 numberLiteral1.AppendChild<NumericPoint>(new NumericPoint() { Index = new UInt32Value(i) })
-                    .Append(new NumericValue(GanttTypeChart.CalculateExcelTime(key.Start).ToString()));
+                    .Append(new NumericValue(CalculateExcelTime(key.Start).ToString()));
 
                 numberLiteral2.AppendChild<NumericPoint>(new NumericPoint() { Index = new UInt32Value(i) })
-                    .Append(new NumericValue(GanttTypeChart.CalculateExcelTime(key.End.Subtract(key.Start)).ToString()));
+                    .Append(new NumericValue(CalculateExcelTime(key.End.Subtract(key.Start)).ToString()));
 
                 i++;
             }
@@ -212,7 +228,7 @@ namespace Acceleratio.XCellKit.Helpers
         /// <summary>
         /// Turns TimeSpan to double that excel uses for time values.
         /// </summary>
-        public static double CalculateExcelTime(TimeSpan time)
+        public double CalculateExcelTime(TimeSpan time)
         {
             return time.TotalSeconds / 86400;
         }

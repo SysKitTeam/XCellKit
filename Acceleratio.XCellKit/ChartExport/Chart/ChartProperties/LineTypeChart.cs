@@ -4,7 +4,7 @@ using DocumentFormat.OpenXml.Drawing.Charts;
 
 namespace Acceleratio.XCellKit
 {
-    public class LineTypeChart : ChartPropertiesSetup
+    internal class LineTypeChart : ChartPropertiesSetup
     {
         public override void ChartAndChartSeries(string title, uint seriesNumber, PlotArea plotArea,
             out OpenXmlCompositeElement chart, out OpenXmlCompositeElement chartSeries)

@@ -1,16 +1,72 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.Drawing.Charts;
-using DocumentFormat.OpenXml.Drawing.Spreadsheet;
-using DocumentFormat.OpenXml.Packaging;
 using System;
 using System.Collections.Generic;
 using Chart = DocumentFormat.OpenXml.Drawing.Charts.Chart;
 
 namespace Acceleratio.XCellKit
 {
-    public abstract class ChartPropertiesSetup
+    internal abstract class ChartPropertiesSetup
     {
+        /// <summary>
+        /// Set chart title
+        /// </summary>
+        public virtual string Title { get; set; } = "";
+
+        /// <summary>
+        /// Set X Axis Title.
+        /// </summary>
+        public virtual string AxisXTitle { get; set; } = "";
+
+        /// <summary>
+        /// Set Y Axis Title
+        /// </summary>
+        public virtual string AxisYTitle { get; set; } = "";
+
+        /// <summary>
+        /// Set chart Height
+        /// </summary>
+        public virtual int Height { get; set; }
+
+        /// <summary>
+        /// Set chart Width
+        /// </summary>
+        public virtual int Width { get; set; }
+
+        /// <summary>
+        /// Set color for each series.
+        /// </summary>
+        public virtual List<string> SeriesColor { get; set; }
+
+        /// <summary>
+        /// Set if Legend is visible
+        /// </summary>
+        public virtual bool Legend { get; set; } = true;
+
+        /// <summary>
+        /// Set if X Axis is visible
+        /// </summary>
+        public virtual bool AxisX { get; set; } = true;
+
+        /// <summary>
+        /// Set if Y Axis is visible
+        /// </summary>
+        public virtual bool AxisY { get; set; } = true;
+
+        public void SetValues(ChartSettings settings)
+        {
+            this.Title = settings.Title ?? this.Title;
+            this.AxisX = settings.AxisX ?? this.AxisX;
+            this.AxisXTitle = settings.AxisXTitle ?? this.AxisXTitle;
+            this.AxisY = settings.AxisY ?? this.AxisY;
+            this.AxisYTitle = settings.AxisYTitle ?? this.AxisYTitle;
+            this.Height = settings.Height ?? this.Height;
+            this.Legend = settings.Legend ?? this.Legend;
+            this.SeriesColor = settings.SeriesColor ?? this.SeriesColor;
+            this.Width = settings.Width ?? this.Width;
+        }
+
         /// <summary>
         /// Create chart and chart sries depending on ChartType
         /// </summary>
@@ -107,9 +163,7 @@ namespace Acceleratio.XCellKit
         /// <summary>
         /// Design settings for Y axis.
         /// </summary>
-        /// <param name="title">Optional parameter to set axis title</param>
-        /// <param name="hide">Optiional parameter to set axis visiblity</param>
-        public virtual ValueAxis SetValueAxis(PlotArea plotArea, string title = "", bool hide = false)
+        public virtual ValueAxis SetValueAxis(PlotArea plotArea)
         {
             // Postavljanje Gridline-a.
             MajorGridlines majorGridlines = new MajorGridlines();
@@ -130,7 +184,7 @@ namespace Acceleratio.XCellKit
                     Val = new EnumValue<DocumentFormat.OpenXml.Drawing.Charts.OrientationValues>(
                         DocumentFormat.OpenXml.Drawing.Charts.OrientationValues.MinMax)
                 }),
-                new Delete() { Val = hide },
+                new Delete() { Val = !this.AxisY },
                 new AxisPosition() { Val = new EnumValue<AxisPositionValues>(AxisPositionValues.Left) },
                 majorGridlines,
                 new MajorTickMark() { Val = TickMarkValues.None },
@@ -147,9 +201,9 @@ namespace Acceleratio.XCellKit
                 new Crosses() { Val = new EnumValue<CrossesValues>(CrossesValues.AutoZero) },
                 new CrossBetween() { Val = new EnumValue<CrossBetweenValues>(CrossBetweenValues.Between) }));
 
-            if (title.Length > 0)
+            if (this.AxisYTitle.Length > 0)
             {
-                valueAxis.Append(SetTitle(title));
+                valueAxis.Append(SetTitle(this.AxisYTitle));
             }
 
             return valueAxis;
@@ -160,7 +214,7 @@ namespace Acceleratio.XCellKit
         /// </summary>
         /// <param name="title">Optional parameter to set axis title</param>
         /// <param name="hide">Optiional parameter to set axis visiblity</param>
-        public virtual CategoryAxis SetLineCategoryAxis(PlotArea plotArea, string title = "", bool hide = false)
+        public virtual CategoryAxis SetLineCategoryAxis(PlotArea plotArea)
         {
             var categoryAxis = plotArea.AppendChild<CategoryAxis>(new CategoryAxis(new AxisId()
                     { Val = new UInt32Value(48650112u) }, new Scaling(new Orientation()
@@ -168,7 +222,7 @@ namespace Acceleratio.XCellKit
                     Val = new EnumValue<DocumentFormat.
                         OpenXml.Drawing.Charts.OrientationValues>(DocumentFormat.OpenXml.Drawing.Charts.OrientationValues.MinMax)
                 }),
-                new Delete() { Val = hide },
+                new Delete() { Val = !this.AxisX },
                 new AxisPosition() { Val = new EnumValue<AxisPositionValues>(AxisPositionValues.Bottom) },
                 new MajorTickMark() { Val = TickMarkValues.None },
                 new MinorTickMark() { Val = TickMarkValues.Outside },
@@ -178,9 +232,9 @@ namespace Acceleratio.XCellKit
                 new AutoLabeled() { Val = new BooleanValue(true) },
                 new LabelAlignment() { Val = new EnumValue<LabelAlignmentValues>(LabelAlignmentValues.Center) },
                 new LabelOffset() { Val = new UInt16Value((ushort)100) }));
-            if (title.Length > 0)
+            if (this.AxisXTitle.Length > 0)
             {
-                categoryAxis.Append(SetTitle(title));
+                categoryAxis.Append(SetTitle(this.AxisXTitle));
             }
 
             return categoryAxis;
@@ -191,12 +245,17 @@ namespace Acceleratio.XCellKit
         /// </summary>
         public virtual void SetLegend(Chart chart)
         {
-            // Add the chart Legend.
-            Legend legend = chart.AppendChild<Legend>(new Legend(new LegendPosition() { Val = new EnumValue<LegendPositionValues>(LegendPositionValues.Bottom) },
-                new Layout()));
-            legend.Append(new Overlay() { Val = false });
+            if (this.Legend)
+            {
+                // Add the chart Legend.
+                Legend legend = chart.AppendChild<Legend>(
+                    new Legend(
+                        new LegendPosition() {Val = new EnumValue<LegendPositionValues>(LegendPositionValues.Bottom)},
+                        new Layout()));
+                legend.Append(new Overlay() {Val = false});
 
-            chart.Append(new PlotVisibleOnly() { Val = new BooleanValue(true) });
+                chart.Append(new PlotVisibleOnly() {Val = new BooleanValue(true)});
+            }
         }
 
         /// <summary>

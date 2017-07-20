@@ -3,7 +3,7 @@ using DocumentFormat.OpenXml.Drawing.Charts;
 
 namespace Acceleratio.XCellKit
 {
-    public class BarTypeChart : ChartPropertiesSetup
+    internal class BarTypeChart : ChartPropertiesSetup
     {
         public override void ChartAndChartSeries(string title, uint seriesNumber, PlotArea plotArea,
             out OpenXmlCompositeElement chart, out OpenXmlCompositeElement chartSeries)
@@ -22,6 +22,6 @@ namespace Acceleratio.XCellKit
                 new SeriesText(new NumericValue() { Text = title })));
         }
 
-        // Override any ChartPropertiesSetup method here.
+        // Override any ChartPropertiesSetup method/properties here.
     }
 }

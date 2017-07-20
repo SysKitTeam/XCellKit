@@ -3,8 +3,11 @@ using DocumentFormat.OpenXml.Drawing.Charts;
 
 namespace Acceleratio.XCellKit
 {
-    public class PieTypeChart : ChartPropertiesSetup
+    internal class PieTypeChart : ChartPropertiesSetup
     {
+        public override bool AxisX { get; set; } = false;
+        public override bool AxisY { get; set; } = false;
+
         public override void ChartAndChartSeries(string title, uint seriesNumber, PlotArea plotArea,
             out OpenXmlCompositeElement chart, out OpenXmlCompositeElement chartSeries)
         {
@@ -17,22 +20,6 @@ namespace Acceleratio.XCellKit
                 new Index() { Val = new UInt32Value(seriesNumber) },
                 new Order() { Val = new UInt32Value(seriesNumber) },
                 new SeriesText(new NumericValue() { Text = title })));
-        }
-
-        /// <summary>
-        /// Hide X axis because it is not used for PieChart.
-        /// </summary>
-        public override CategoryAxis SetLineCategoryAxis(PlotArea plotArea, string title = "", bool hide = false)
-        {
-            return base.SetLineCategoryAxis(plotArea, hide: true);
-        }
-
-        /// <summary>
-        /// Hide Y axis because it is not used for PieChart.
-        /// </summary>
-        public override ValueAxis SetValueAxis(PlotArea plotArea, string title = "", bool hide = false)
-        {
-            return base.SetValueAxis(plotArea, hide: true);
         }
     }
 }

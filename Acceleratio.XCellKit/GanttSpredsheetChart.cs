@@ -13,10 +13,12 @@ namespace Acceleratio.XCellKit
 {
     public class GanttSpredsheetChart : SpredsheetChart
     {
-        public GanttSpredsheetChart(List<GanttData> ganttData, ChartSettings settings)
-            : base(ganttData, settings)
-        {
+        public List<GanttData> GanttData { get; protected set; }
 
+        public GanttSpredsheetChart(List<GanttData> ganttData, ChartSettings settings)
+            : base(settings)
+        {
+            this.GanttData = ganttData;
         }
 
         internal override void CreateChart(OpenXmlWriter writer, WorksheetPart part, SpredsheetLocation location)

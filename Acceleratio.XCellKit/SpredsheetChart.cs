@@ -12,7 +12,6 @@ namespace Acceleratio.XCellKit
     public abstract class SpredsheetChart
     {
         public List<ChartModel> ChartData { get; protected set; }
-        public List<GanttData> GanttData { get; protected set; }
         public ChartSettings Settings { get; set; }
         internal ChartPropertiesSetup ChartPropertySetter { get; set; }
 
@@ -35,9 +34,8 @@ namespace Acceleratio.XCellKit
             this.Settings = settings;
         }
 
-        protected SpredsheetChart(List<GanttData> ganttData, ChartSettings settings)
+        protected SpredsheetChart(ChartSettings settings)
         {
-            this.GanttData = ganttData.Distinct().ToList();
             this.Settings = settings;
         }
 

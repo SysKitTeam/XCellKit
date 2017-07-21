@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Drawing;
+using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Drawing.Spreadsheet;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 
@@ -19,6 +22,7 @@ namespace Acceleratio.XCellKit
             _tables = new Dictionary<SpredsheetLocation, SpredsheetTable>();
             _rows = new Dictionary<SpredsheetLocation, SpredsheetRow>();
             _maxNumberOfCharsPerColumn = new Dictionary<int, int>();
+            _charts = new Dictionary<SpredsheetLocation, SpredsheetChart>();
         }
 
         public SpredsheetWorksheet(string name, List<int> columnsIndexToTrackAutoWidht)
@@ -60,6 +64,12 @@ namespace Acceleratio.XCellKit
                 AddRow(row, columnIndex, rowIndex);
                 rowIndex++;
             }
+        }
+
+        private Dictionary<SpredsheetLocation, SpredsheetChart> _charts;
+        public void AddChart(SpredsheetChart chart, int columnIndex, int rowIndex)
+        {
+            _charts[new SpredsheetLocation(rowIndex, columnIndex)] = chart;
         }
 
         private void trackMaxChars(int columnIndex, SpredsheetCell cell)
@@ -108,11 +118,13 @@ namespace Acceleratio.XCellKit
         public void WriteWorksheet(OpenXmlWriter writer, WorksheetPart part, SpredsheetStylesManager stylesManager, ref int tableCount)
         {
             var hyperLinksManager = new SpredsheetHyperlinkManager();
-            writer.WriteStartElement(new Worksheet());
+            var newWorksheet = new Worksheet();
+            writer.WriteStartElement(newWorksheet);
             writeFrozenFirstColumn(writer);
             writeColumns(writer);
             writeSheetData(writer, stylesManager, hyperLinksManager);
             writeHyperlinks(writer, hyperLinksManager);
+            writeChart(writer, part);
             writeTables(writer, part, ref tableCount);
             writer.WriteEndElement();
         }
@@ -190,6 +202,14 @@ namespace Acceleratio.XCellKit
                 tableCount++;
             }
             writer.WriteEndElement();
+        }
+
+        private void writeChart(OpenXmlWriter writer, WorksheetPart part)
+        {
+            foreach (var singleChart in _charts)
+            {
+                singleChart.Value.CreateChart(writer, part, singleChart.Key);
+            }
         }
 
         private double _maxWidthOfFontChar = 7d;

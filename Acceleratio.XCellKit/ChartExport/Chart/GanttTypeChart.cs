@@ -137,7 +137,7 @@ namespace Acceleratio.XCellKit.Helpers
         /// <summary>
         /// Design settings for Y axis.
         /// </summary>
-        public ValueAxis SetGanttValueAxis(PlotArea plotArea)
+        public ValueAxis SetGanttValueAxis(PlotArea plotArea, TimeSpan minSpan, TimeSpan maxSpan)
         {
             MajorGridlines majorGridlines1 = new MajorGridlines();
             ChartShapeProperties chartShapeProperties2 = new ChartShapeProperties();
@@ -158,7 +158,10 @@ namespace Acceleratio.XCellKit.Helpers
                         DocumentFormat.OpenXml.Drawing.Charts.OrientationValues.MinMax)
                 }, new MinAxisValue()
                 {
-                    Val = 0.37500000000000006D
+                    Val = minSpan.Hours < 8 ? 0 : 0.333333
+                }, new MaxAxisValue()
+                {
+                    Val = maxSpan.Hours > 20 ? 1 : 0.85
                 }),
                 new Delete() { Val = false },
                 new AxisPosition() { Val = new EnumValue<AxisPositionValues>(AxisPositionValues.Left) },
@@ -166,7 +169,7 @@ namespace Acceleratio.XCellKit.Helpers
                 new MajorTickMark() { Val = TickMarkValues.None },
                 new MinorTickMark() { Val = TickMarkValues.None },
                 new MajorUnit() { Val = 4.1666666666666713E-2D },
-                new DocumentFormat.OpenXml.Drawing.Charts.NumberingFormat() { FormatCode = "[$-F400]h:mm:ss\\ AM/PM", SourceLinked = false },
+                new DocumentFormat.OpenXml.Drawing.Charts.NumberingFormat() { FormatCode = "h:mm;@", SourceLinked = false },
                 new TickLabelPosition()
                 {
                     Val = new EnumValue<TickLabelPositionValues>
@@ -174,56 +177,63 @@ namespace Acceleratio.XCellKit.Helpers
                 }, new CrossingAxis() { Val = new UInt32Value(48650112U) },
                 new Crosses() { Val = new EnumValue<CrossesValues>(CrossesValues.AutoZero) },
                 new CrossBetween() { Val = new EnumValue<CrossBetweenValues>(CrossBetweenValues.Between) }));
-
-
-            //new MinAxisValue()
-            //{
-            //    Val = CalculateExcelTime(data.Min(x => x.Start.Hours > 0 ? x.Start.Subtract(new TimeSpan(1, 0, 0)) : x.Start))
-            //}),
-            //new MaxAxisValue()
-            //{
-            //    Val = CalculateExcelTime(data.Max(x => (x.End + x.Start).Add(new TimeSpan(1, 0, 0))))
-            //},
         }
 
         /// <summary>
         /// Create and insert data to Axis
         /// </summary>
-        public void SetChartAxis(OpenXmlCompositeElement barChartSeries1, OpenXmlCompositeElement barChartSeries2, List<GanttData> data)
+        //public void SetChartAxis(OpenXmlCompositeElement barChartSeries1, OpenXmlCompositeElement barChartSeries2, List<GanttData> data)
+        public void SetChartAxis(List<GanttSpredsheetChart.GanttDataPairedSeries> data, List<IGrouping<string,GanttData>> groupedData)
         {
-            uint i = 0;
-            // Y axis - prvi bar je za početnu poziciju (ne prikazuje se)
-            StringLiteral stringLiteral1 = barChartSeries1.AppendChild<CategoryAxisData>(new CategoryAxisData()).AppendChild<StringLiteral>(new StringLiteral());
-            stringLiteral1.Append(new PointCount() { Val = new UInt32Value((uint)data.Count) });
-
-            StringLiteral stringLiteral2 = barChartSeries2.AppendChild<CategoryAxisData>(new CategoryAxisData()).AppendChild<StringLiteral>(new StringLiteral());
-            stringLiteral2.Append(new PointCount() { Val = new UInt32Value((uint)data.Count) });
-
-            // X axis - prvi bar je za početnu poziciju (ne prikazuje se)
-            NumberLiteral numberLiteral1 = barChartSeries1.AppendChild<Values>(new Values()).AppendChild<NumberLiteral>(new NumberLiteral());
-            numberLiteral1.Append(new FormatCode("General"));
-            numberLiteral1.Append(new PointCount() { Val = new UInt32Value((uint)data.Count) });
-
-            NumberLiteral numberLiteral2 = barChartSeries2.AppendChild<Values>(new Values()).AppendChild<NumberLiteral>(new NumberLiteral());
-            numberLiteral2.Append(new FormatCode("General"));
-            numberLiteral2.Append(new PointCount() { Val = new UInt32Value((uint)data.Count) });
-
-            // Set values to X and Y axis.
-            foreach (GanttData key in data)
+            Dictionary<uint, TimeSpan> lastPointEnd = new Dictionary<uint, TimeSpan>();
+            foreach (var ganttDataPairedSeries in data)
             {
-                stringLiteral1.AppendChild<StringPoint>(new StringPoint() { Index = new UInt32Value(i) })
-                    .AppendChild<NumericValue>(new NumericValue(key.Name));
+                // Y axis - prvi bar je za početnu poziciju (ne prikazuje se)
+                StringLiteral stringLiteral1 = ganttDataPairedSeries.BarChartSeriesHidden.AppendChild<CategoryAxisData>(new CategoryAxisData())
+                    .AppendChild<StringLiteral>(new StringLiteral());
+                stringLiteral1.Append(new PointCount() {Val = new UInt32Value((uint)ganttDataPairedSeries.Values.Count)});
 
-                stringLiteral2.AppendChild<StringPoint>(new StringPoint() { Index = new UInt32Value(i) })
-                    .AppendChild<NumericValue>(new NumericValue(key.Name));
+                StringLiteral stringLiteral2 = ganttDataPairedSeries.BarChartSeriesValue.AppendChild<CategoryAxisData>(new CategoryAxisData())
+                    .AppendChild<StringLiteral>(new StringLiteral());
+                stringLiteral2.Append(new PointCount() {Val = new UInt32Value((uint)ganttDataPairedSeries.Values.Count)});
 
-                numberLiteral1.AppendChild<NumericPoint>(new NumericPoint() { Index = new UInt32Value(i) })
-                    .Append(new NumericValue(CalculateExcelTime(key.Start).ToString()));
+                // X axis - prvi bar je za početnu poziciju (ne prikazuje se)
+                NumberLiteral numberLiteral1 = ganttDataPairedSeries.BarChartSeriesHidden.AppendChild<Values>(new Values())
+                    .AppendChild<NumberLiteral>(new NumberLiteral());
+                numberLiteral1.Append(new FormatCode("General"));
+                numberLiteral1.Append(new PointCount() {Val = new UInt32Value((uint)ganttDataPairedSeries.Values.Count)});
 
-                numberLiteral2.AppendChild<NumericPoint>(new NumericPoint() { Index = new UInt32Value(i) })
-                    .Append(new NumericValue(CalculateExcelTime(key.End.Subtract(key.Start)).ToString()));
+                NumberLiteral numberLiteral2 = ganttDataPairedSeries.BarChartSeriesValue.AppendChild<Values>(new Values())
+                    .AppendChild<NumberLiteral>(new NumberLiteral());
+                numberLiteral2.Append(new FormatCode("General"));
+                numberLiteral2.Append(new PointCount() {Val = new UInt32Value((uint)ganttDataPairedSeries.Values.Count)});
 
-                i++;
+                // Set values to X and Y axis.
+                foreach (GanttData key in ganttDataPairedSeries.Values)
+                {
+                    var i = (uint)groupedData.FindIndex(x => x.Key == key.Name);
+
+                    stringLiteral1.AppendChild<StringPoint>(new StringPoint() {Index = new UInt32Value(i) })
+                        .AppendChild<NumericValue>(new NumericValue(key.Name));
+
+                    stringLiteral2.AppendChild<StringPoint>(new StringPoint() {Index = new UInt32Value(i)})
+                        .AppendChild<NumericValue>(new NumericValue(key.Name));
+
+                    numberLiteral1.AppendChild<NumericPoint>(new NumericPoint() { Index = new UInt32Value(i) })
+                        .Append(new NumericValue(CalculateExcelTime(lastPointEnd.ContainsKey(i) ? key.Start.Subtract(lastPointEnd[i]) : key.Start).ToString()));
+
+                    numberLiteral2.AppendChild<NumericPoint>(new NumericPoint() { Index = new UInt32Value(i) })
+                        .Append(new NumericValue(CalculateExcelTime(lastPointEnd.ContainsKey(i) ? key.End.Subtract(key.Start.Subtract(lastPointEnd[i]) + lastPointEnd[i]) : key.End.Subtract(key.Start)).ToString()));
+
+                    if (lastPointEnd.ContainsKey(i))
+                    {
+                        lastPointEnd[i] = key.End;
+                    }
+                    else
+                    {
+                        lastPointEnd.Add(i, key.End);
+                    }
+                }
             }
         }
 
@@ -234,11 +244,11 @@ namespace Acceleratio.XCellKit.Helpers
 
             // Pozicija charta.
             twoCellAnchor.Append(new DocumentFormat.OpenXml.Drawing.Spreadsheet.FromMarker(new ColumnId(location.ColumnIndex.ToString()),
-                new ColumnOffset("581025"),
+                new ColumnOffset("0"),
                 new RowId(location.RowIndex.ToString()),
                 new RowOffset("114300")));
-            twoCellAnchor.Append(new DocumentFormat.OpenXml.Drawing.Spreadsheet.ToMarker(new ColumnId((location.ColumnIndex + 19).ToString()),
-                new ColumnOffset("276225"),
+            twoCellAnchor.Append(new DocumentFormat.OpenXml.Drawing.Spreadsheet.ToMarker(new ColumnId((location.ColumnIndex + 12).ToString()),
+                new ColumnOffset("0"),
                 new RowId((location.RowIndex + 15).ToString()),
                 new RowOffset("0")));
 

@@ -44,22 +44,44 @@ namespace Acceleratio.XCellKit
             barChart.Append(new GapWidth() { Val = (UInt16Value)75U });
             barChart.Append(new Overlap() { Val = 100 });
 
-            // Create two new line series with specified name.
-            BarChartSeries barChartSeries1 = barChart.AppendChild<BarChartSeries>(new BarChartSeries(
-                new Index() { Val = new UInt32Value(0u) },
-                new Order() { Val = new UInt32Value(0u) },
-                new SeriesText(new NumericValue() { Text = "Start Date" })));
-
-            BarChartSeries barChartSeries2 = barChart.AppendChild<BarChartSeries>(new BarChartSeries(
-                new Index() { Val = new UInt32Value(1u) },
-                new Order() { Val = new UInt32Value(1u) },
-                new SeriesText(new NumericValue() { Text = "Time Spent" })));
-
             GanttTypeChart ganttChart = new GanttTypeChart(Settings);
 
-            ganttChart.SetChartShapeProperties(barChartSeries1, visible: false);
-            ganttChart.SetChartShapeProperties(barChartSeries2, colorPoints: (uint)GanttData.Count);
-            ganttChart.SetChartAxis(barChartSeries1, barChartSeries2, GanttData);
+            var groupedData = GanttData
+                .GroupBy(x => x.Name);
+
+            List<GanttDataPairedSeries> ganttDataWithSeries = new List<GanttDataPairedSeries>();
+
+            for (int i = 0; i < groupedData.Max(x => x.Count()); i++)
+            {
+                // For each series create a hidden one for spacing.
+                BarChartSeries barChartSeriesHidden = barChart.AppendChild<BarChartSeries>(new BarChartSeries(
+                    new Index() { Val = new UInt32Value((uint)(i * 2)) },
+                    new Order() { Val = new UInt32Value((uint)(i * 2)) },
+                    new SeriesText(new NumericValue() { Text = "Not Active" })));
+
+                BarChartSeries barChartSeriesValue = barChart.AppendChild<BarChartSeries>(new BarChartSeries(
+                    new Index() { Val = new UInt32Value((uint)(i * 2) + 1) },
+                    new Order() { Val = new UInt32Value((uint)(i * 2) + 1) },
+                    new SeriesText(new NumericValue() { Text = "Time Spent" })));
+
+                ganttChart.SetChartShapeProperties(barChartSeriesHidden, visible: false);
+                ganttChart.SetChartShapeProperties(barChartSeriesValue, colorPoints: (uint)GanttData.Count);
+
+                var ganttData = new List<GanttData>();
+                foreach (var data in groupedData.Where(x => x.Count() >= i + 1))
+                {
+                    ganttData.Add(data.ElementAt(i));
+                }
+
+                ganttDataWithSeries.Add(new GanttDataPairedSeries()
+                {
+                    BarChartSeriesHidden = barChartSeriesHidden,
+                    BarChartSeriesValue = barChartSeriesValue,
+                    Values = ganttData
+                });
+            }
+
+            ganttChart.SetChartAxis(ganttDataWithSeries, groupedData.ToList());
 
             barChart.Append(new AxisId() { Val = new UInt32Value(48650112u) });
             barChart.Append(new AxisId() { Val = new UInt32Value(48672768u) });
@@ -68,11 +90,18 @@ namespace Acceleratio.XCellKit
             ganttChart.SetGanttCategoryAxis(plotArea);
 
             // Add the Value Axis (Y axis).
-            ganttChart.SetGanttValueAxis(plotArea);
+            ganttChart.SetGanttValueAxis(plotArea, GanttData.Min(x => x.Start), GanttData.Max(x => x.End));
 
             chartContainer.Append(new PlotVisibleOnly() { Val = new BooleanValue(true) });
 
             ganttChart.SetChartLocation(drawingsPart, chartPart, location);
+        }
+
+        internal class GanttDataPairedSeries
+        {
+            public BarChartSeries BarChartSeriesHidden { get; set; }
+            public BarChartSeries BarChartSeriesValue { get; set; }
+            public List<GanttData> Values  { get; set; }
         }
     }
 }

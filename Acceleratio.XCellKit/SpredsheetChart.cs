@@ -60,14 +60,11 @@ namespace Acceleratio.XCellKit
             chartContainer.AppendChild(ChartPropertySetter.SetTitle(ChartPropertySetter.Title));
 
             uint chartSeriesCounter = 0;
+            OpenXmlCompositeElement chart = ChartPropertySetter.CreateChart(plotArea);
             foreach (var chartDataSeriesGrouped in ChartData.GroupBy(x => x.Series))
             {
-                // CHART BODY - Depends on chart type.
-                OpenXmlCompositeElement chart;
-                OpenXmlCompositeElement chartSeries;
-
                 // Set chart and series depending on type.
-                ChartPropertySetter.ChartAndChartSeries(chartDataSeriesGrouped.Key, chartSeriesCounter, plotArea, out chart, out chartSeries);
+                OpenXmlCompositeElement chartSeries = ChartPropertySetter.CreateChartSeries(chartDataSeriesGrouped.Key, chartSeriesCounter, chart);
 
                 // Every method from chartPropertySetter can be overriden to customize chart export.
                 ChartPropertySetter.SetChartShapeProperties(chartSeries);

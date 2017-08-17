@@ -6,18 +6,24 @@ namespace Acceleratio.XCellKit
 {
     internal class LineTypeChart : ChartPropertiesSetup
     {
-        public override void ChartAndChartSeries(string title, uint seriesNumber, PlotArea plotArea,
-            out OpenXmlCompositeElement chart, out OpenXmlCompositeElement chartSeries)
+        public override OpenXmlCompositeElement CreateChart(PlotArea plotArea)
         {
-            chart = plotArea.AppendChild<LineChart>(new LineChart());
+            var chart = plotArea.AppendChild<LineChart>(new LineChart());
             chart.Append(new Grouping() { Val = GroupingValues.Standard });
             chart.Append(new VaryColors() { Val = false });
 
+            return chart;
+        }
+
+        public override OpenXmlCompositeElement CreateChartSeries(string title, uint seriesNumber, OpenXmlCompositeElement chart)
+        {
             // Create new line series with specified name.
-            chartSeries = chart.AppendChild<LineChartSeries>(new LineChartSeries(
+            var chartSeries = chart.AppendChild<LineChartSeries>(new LineChartSeries(
                 new Index() { Val = new UInt32Value(seriesNumber) },
                 new Order() { Val = new UInt32Value(seriesNumber) },
                 new SeriesText(new NumericValue() { Text = title })));
+
+            return chartSeries;
         }
 
         /// <summary>

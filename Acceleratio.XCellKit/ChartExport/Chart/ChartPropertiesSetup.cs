@@ -59,12 +59,12 @@ namespace Acceleratio.XCellKit
         /// <summary>
         /// Create chart and chart sries depending on ChartType
         /// </summary>
-        public abstract void ChartAndChartSeries(
+        public abstract OpenXmlCompositeElement CreateChart(PlotArea plotArea);
+
+        public abstract OpenXmlCompositeElement CreateChartSeries(
             string title,
             uint seriesNumber,
-            PlotArea plotArea,
-            out OpenXmlCompositeElement chart,
-            out OpenXmlCompositeElement chartSeries);
+            OpenXmlCompositeElement chart);
 
         /// <summary>
         /// Set display, width, color and fill of borders and data (line, bar etc.) in chart.

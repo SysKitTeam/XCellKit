@@ -5,21 +5,26 @@ namespace Acceleratio.XCellKit
 {
     internal class BarTypeChart : ChartPropertiesSetup
     {
-        public override void ChartAndChartSeries(string title, uint seriesNumber, PlotArea plotArea,
-            out OpenXmlCompositeElement chart, out OpenXmlCompositeElement chartSeries)
+        public override OpenXmlCompositeElement CreateChart(PlotArea plotArea)
         {
-            chart = plotArea.AppendChild<BarChart>(new BarChart());
+            var chart = plotArea.AppendChild<BarChart>(new BarChart());
             chart.Append(new VaryColors() { Val = false });
             chart.Append(new BarDirection() { Val = BarDirectionValues.Column });
-            chart.Append(new BarGrouping() { Val = BarGroupingValues.Standard });
-            chart.Append(new GapWidth() { Val = (UInt16Value)75U });
-            chart.Append(new Overlap() { Val = 0 });
+            chart.Append(new BarGrouping() { Val = BarGroupingValues.Clustered });
 
+            return chart;
+        }
+
+
+        public override OpenXmlCompositeElement CreateChartSeries(string title, uint seriesNumber, OpenXmlCompositeElement chart)
+        {
             // Create two new line series with specified name.
-            chartSeries = chart.AppendChild<BarChartSeries>(new BarChartSeries(
+            var chartSeries = chart.AppendChild<BarChartSeries>(new BarChartSeries(
                 new Index() { Val = new UInt32Value(seriesNumber) },
                 new Order() { Val = new UInt32Value(seriesNumber) },
                 new SeriesText(new NumericValue() { Text = title })));
+
+            return chartSeries;
         }
 
         // Override any ChartPropertiesSetup method/properties here.

@@ -158,10 +158,10 @@ namespace Acceleratio.XCellKit.Helpers
                         DocumentFormat.OpenXml.Drawing.Charts.OrientationValues.MinMax)
                 }, new MinAxisValue()
                 {
-                    Val = minSpan.Hours < 8 ? 0 : 0.333333
+                    Val = 0
                 }, new MaxAxisValue()
                 {
-                    Val = maxSpan.Hours > 20 ? 1 : 0.85
+                    Val = 1
                 }),
                 new Delete() { Val = false },
                 new AxisPosition() { Val = new EnumValue<AxisPositionValues>(AxisPositionValues.Left) },

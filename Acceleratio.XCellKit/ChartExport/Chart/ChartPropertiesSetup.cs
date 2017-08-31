@@ -5,12 +5,14 @@ using System;
 using System.Collections.Generic;
 using DocumentFormat.OpenXml.Drawing.Spreadsheet;
 using DocumentFormat.OpenXml.Packaging;
+using Boolean = DocumentFormat.OpenXml.Office2013.Drawing.ChartStyle.Boolean;
 using Chart = DocumentFormat.OpenXml.Drawing.Charts.Chart;
 
 namespace Acceleratio.XCellKit
 {
     internal abstract class ChartPropertiesSetup
     {
+#region Properties
         /// <summary>
         /// Set chart title
         /// </summary>
@@ -56,6 +58,11 @@ namespace Acceleratio.XCellKit
         /// </summary>
         public virtual bool AxisY { get; set; } = true;
 
+        private bool isArgumentDate { get; set; } = false;
+
+        private int dataCount { get; set; } = 0;
+#endregion
+
         /// <summary>
         /// Create chart and chart sries depending on ChartType
         /// </summary>
@@ -94,8 +101,8 @@ namespace Acceleratio.XCellKit
         /// </summary>
         public virtual void SetChartAxis(OpenXmlCompositeElement lineChart, OpenXmlCompositeElement lineChartSeries, List<ChartModel> data)
         {
-            bool isArgumentDate = false;
-            if (data.Count > 0)
+            dataCount = data.Count;
+            if (dataCount > 0 && !isArgumentDate)
             {
                 DateTime parsedDate;
                 isArgumentDate = DateTime.TryParse(data[0].Argument, out parsedDate);
@@ -104,15 +111,15 @@ namespace Acceleratio.XCellKit
             uint i = 0;
             // X axis
             StringLiteral stringLiteral = new StringLiteral();
-            stringLiteral.Append(new PointCount() { Val = new UInt32Value((uint)data.Count) });
+            stringLiteral.Append(new PointCount() { Val = new UInt32Value((uint)dataCount) });
             NumberLiteral numberLiteralX = new NumberLiteral();
             numberLiteralX.Append(new FormatCode("mmm dd"));
-            numberLiteralX.Append(new PointCount() { Val = new UInt32Value((uint)data.Count) });
+            numberLiteralX.Append(new PointCount() { Val = new UInt32Value((uint)dataCount) });
 
             // Y axis
             NumberLiteral numberLiteralY = lineChartSeries.AppendChild<Values>(new Values()).AppendChild<NumberLiteral>(new NumberLiteral());
             numberLiteralY.Append(new FormatCode("General"));
-            numberLiteralY.Append(new PointCount() { Val = new UInt32Value((uint)data.Count) });
+            numberLiteralY.Append(new PointCount() { Val = new UInt32Value((uint)dataCount) });
 
             // Set values to X and Y axis.
             foreach (var chartModel in data)
@@ -203,24 +210,35 @@ namespace Acceleratio.XCellKit
         /// </summary>
         /// <param name="title">Optional parameter to set axis title</param>
         /// <param name="hide">Optiional parameter to set axis visiblity</param>
-        public virtual CategoryAxis SetLineCategoryAxis(PlotArea plotArea)
+        public virtual OpenXmlElement SetLineCategoryAxis(PlotArea plotArea)
         {
-            var categoryAxis = plotArea.AppendChild<CategoryAxis>(new CategoryAxis(new AxisId()
-                    { Val = new UInt32Value(48650112u) }, new Scaling(new Orientation()
+            List<OpenXmlElement> axisChildElements = new List<OpenXmlElement> () {
+                new AxisId() {Val = new UInt32Value(48650112u)},
+                new Scaling(new Orientation()
                 {
                     Val = new EnumValue<DocumentFormat.
-                        OpenXml.Drawing.Charts.OrientationValues>(DocumentFormat.OpenXml.Drawing.Charts.OrientationValues.MinMax)
+                        OpenXml.Drawing.Charts.OrientationValues>(DocumentFormat.OpenXml.Drawing.Charts
+                        .OrientationValues.MinMax)
                 }),
-                new Delete() { Val = !this.AxisX },
-                new AxisPosition() { Val = new EnumValue<AxisPositionValues>(AxisPositionValues.Bottom) },
-                new MajorTickMark() { Val = TickMarkValues.None },
-                new MinorTickMark() { Val = TickMarkValues.Outside },
-                new TickLabelPosition() { Val = new EnumValue<TickLabelPositionValues>(TickLabelPositionValues.NextTo) },
-                new CrossingAxis() { Val = new UInt32Value(48672768U) },
-                new Crosses() { Val = new EnumValue<CrossesValues>(CrossesValues.AutoZero) },
-                new AutoLabeled() { Val = new BooleanValue(true) },
-                new LabelAlignment() { Val = new EnumValue<LabelAlignmentValues>(LabelAlignmentValues.Center) },
-                new LabelOffset() { Val = new UInt16Value((ushort)100) }));
+                new Delete() {Val = !this.AxisX},
+                new AxisPosition() {Val = new EnumValue<AxisPositionValues>(AxisPositionValues.Bottom)},
+                new MajorTickMark() {Val = TickMarkValues.None},
+                new MinorTickMark() {Val = TickMarkValues.Outside},
+                new TickLabelPosition() {Val = new EnumValue<TickLabelPositionValues>(TickLabelPositionValues.NextTo)},
+                new CrossingAxis() {Val = new UInt32Value(48672768U)},
+                new Crosses() {Val = new EnumValue<CrossesValues>(CrossesValues.AutoZero)},
+                new AutoLabeled() {Val = new BooleanValue(true)},
+                new LabelAlignment() {Val = new EnumValue<LabelAlignmentValues>(LabelAlignmentValues.Center)},
+                new LabelOffset() {Val = new UInt16Value((ushort) 100)}
+            };
+
+            if (this.isArgumentDate)
+            {
+                axisChildElements.Add(new MajorUnit() {Val = dataCount > 20 ? (int) (dataCount / 10) : 1});
+            }
+
+            var categoryAxis = isArgumentDate ? (OpenXmlElement) plotArea.AppendChild(new DateAxis(axisChildElements)) : plotArea.AppendChild(new CategoryAxis(axisChildElements));
+
             if (this.AxisXTitle.Length > 0)
             {
                 categoryAxis.Append(SetTitle(this.AxisXTitle));

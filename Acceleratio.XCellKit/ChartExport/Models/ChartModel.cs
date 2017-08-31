@@ -4,7 +4,7 @@ namespace Acceleratio.XCellKit
 {
     public class ChartModel : IEquatable<ChartModel>
     {
-        public ChartModel(string series, string argument, float value)
+        public ChartModel(string series, string argument, double value)
         {
             this.Series = series;
             this.Argument = argument;
@@ -13,7 +13,7 @@ namespace Acceleratio.XCellKit
 
         public string Series { get; private set; }
         public string Argument { get; private set; }
-        public float Value { get; private set; }
+        public double Value { get; private set; }
 
         public bool Equals(ChartModel other)
         {

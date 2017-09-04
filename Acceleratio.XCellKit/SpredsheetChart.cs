@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Reflection;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Drawing.Charts;
 using DocumentFormat.OpenXml.Packaging;
@@ -12,31 +13,31 @@ namespace Acceleratio.XCellKit
     public abstract class SpredsheetChart
     {
         public List<ChartModel> ChartData { get; protected set; }
-        public ChartSettings Settings { get; set; }
+        public ChartSettings UserSettings { get; set; }
         internal ChartPropertiesSetup ChartPropertySetter { get; set; }
 
         protected void ChartPropertyValuesFromSettings()
         {
-            ChartPropertySetter.Title = Settings.Title ?? ChartPropertySetter.Title;
-            ChartPropertySetter.AxisX = Settings.AxisX ?? ChartPropertySetter.AxisX;
-            ChartPropertySetter.AxisXTitle = Settings.AxisXTitle ?? ChartPropertySetter.AxisXTitle;
-            ChartPropertySetter.AxisY = Settings.AxisY ?? ChartPropertySetter.AxisY;
-            ChartPropertySetter.AxisYTitle = Settings.AxisYTitle ?? ChartPropertySetter.AxisYTitle;
-            ChartPropertySetter.Height = Settings.Height ?? ChartPropertySetter.Height;
-            ChartPropertySetter.Legend = Settings.Legend ?? ChartPropertySetter.Legend;
-            ChartPropertySetter.SeriesColor = Settings.SeriesColor ?? ChartPropertySetter.SeriesColor;
-            ChartPropertySetter.Width = Settings.Width ?? ChartPropertySetter.Width;
+            foreach (PropertyInfo pi in typeof(ChartSettings).GetProperties())
+            {
+                if (pi.GetValue(UserSettings, null) != null)
+                {
+                    typeof(BaseChartProperties)
+                        .GetProperty(pi.Name)
+                        .SetValue(ChartPropertySetter.ChartProperties, pi.GetValue(UserSettings, null));
+                }
+            }
         }
 
         protected SpredsheetChart(List<ChartModel> chartData, ChartSettings settings)
         {
             this.ChartData = chartData.Distinct().ToList();
-            this.Settings = settings;
+            this.UserSettings = settings;
         }
 
         protected SpredsheetChart(ChartSettings settings)
         {
-            this.Settings = settings;
+            this.UserSettings = settings;
         }
 
         internal virtual void CreateChart(OpenXmlWriter writer, WorksheetPart part, SpredsheetLocation location)
@@ -57,7 +58,7 @@ namespace Acceleratio.XCellKit
             PlotArea plotArea = chartContainer.AppendChild<PlotArea>(new PlotArea());
 
             // Set chart title
-            chartContainer.AppendChild(ChartPropertySetter.SetTitle(ChartPropertySetter.Title));
+            chartContainer.AppendChild(ChartPropertySetter.SetTitle(ChartPropertySetter.ChartProperties.Title));
 
             uint chartSeriesCounter = 0;
             OpenXmlCompositeElement chart = ChartPropertySetter.CreateChart(plotArea);

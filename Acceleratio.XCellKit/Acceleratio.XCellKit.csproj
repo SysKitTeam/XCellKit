@@ -47,9 +47,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ChartExport\Chart\BarTypeChart.cs" />
+    <Compile Include="ChartExport\Chart\ChartProperties\BaseChartProperties.cs" />
     <Compile Include="ChartExport\Chart\ChartPropertiesSetup.cs" />
     <Compile Include="ChartExport\Chart\GanttTypeChart.cs" />
     <Compile Include="ChartExport\Chart\LineTypeChart.cs" />
+    <Compile Include="ChartExport\Chart\ChartProperties\PieChartProperties.cs" />
     <Compile Include="ChartExport\Chart\PieTypeChart.cs" />
     <Compile Include="ChartExport\Models\ChartModel.cs" />
     <Compile Include="ChartExport\Models\ChartSettings.cs" />

@@ -53,7 +53,7 @@ namespace Acceleratio.XCellKit
                 headerRow.AddCell(headerCell);
                 if (_maxNumberOfCharsPerColumn.Any())
                 {
-                    trackMaxChars(columnIndex + i, headerCell);
+                    trackMaxChars(columnIndex + i, headerCell, 5);
                 }
             }
 
@@ -72,10 +72,10 @@ namespace Acceleratio.XCellKit
             _charts[new SpredsheetLocation(rowIndex, columnIndex)] = chart;
         }
 
-        private void trackMaxChars(int columnIndex, SpredsheetCell cell)
+        private void trackMaxChars(int columnIndex, SpredsheetCell cell, int extraSpace = 1)
         {
             var previousMax = _maxNumberOfCharsPerColumn[columnIndex];
-            var charsCount = cell.Value.ToString().Count() + cell.Indent; 
+            var charsCount = cell.Value.ToString().Count() + cell.Indent + extraSpace; 
             if (previousMax < charsCount)
             {
                 _maxNumberOfCharsPerColumn[columnIndex] = charsCount;

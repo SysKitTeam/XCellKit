@@ -48,5 +48,15 @@ namespace Acceleratio.XCellKit
         /// Set if Y Axis is visible
         /// </summary>
         public bool? AxisY { get; set; } = null;
+
+        /// <summary>
+        /// Set Y axis format (General, Time...)
+        /// </summary>
+        public virtual string AxisYFormatCategory { get; set; } = null;
+
+        /// <summary>
+        /// Set Y axis format code.
+        /// </summary>
+        public virtual string AxisYFormatCode { get; set; } = null;
     }
 }

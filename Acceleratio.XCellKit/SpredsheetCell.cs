@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Xml;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Spreadsheet;
 
@@ -62,9 +63,9 @@ namespace Acceleratio.XCellKit
                 var typeAtt = new OpenXmlAttribute("t", null, "inlineStr");
                 openXmlAtts.Add(typeAtt);
                 writer.WriteStartElement(new Cell(), openXmlAtts);
-                
+                stringvalue = XmlConvert.EncodeName(stringvalue);
                 writer.WriteStartElement(new InlineString());
-                writer.WriteElement(new Text(stringvalue) { Space = SpaceProcessingModeValues.Preserve });
+                writer.WriteElement(new Text(stringvalue) { Space = SpaceProcessingModeValues.Preserve  });
                 writer.WriteEndElement();
                 writer.WriteEndElement();
             }

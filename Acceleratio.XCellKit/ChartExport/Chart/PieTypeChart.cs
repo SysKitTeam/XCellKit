@@ -1,12 +1,12 @@
-﻿using DocumentFormat.OpenXml;
+﻿using Acceleratio.XCellKit.ChartExport.Chart;
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Drawing.Charts;
 
 namespace Acceleratio.XCellKit
 {
     internal class PieTypeChart : ChartPropertiesSetup
     {
-        public override bool AxisX { get; set; } = false;
-        public override bool AxisY { get; set; } = false;
+        public override BaseChartProperties ChartProperties { get; set; } = new PieChartProperties();
 
         public override OpenXmlCompositeElement CreateChart(PlotArea plotArea)
         {

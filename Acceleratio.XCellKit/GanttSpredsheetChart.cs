@@ -44,7 +44,7 @@ namespace Acceleratio.XCellKit
             barChart.Append(new GapWidth() { Val = (UInt16Value)75U });
             barChart.Append(new Overlap() { Val = 100 });
 
-            GanttTypeChart ganttChart = new GanttTypeChart(Settings);
+            GanttTypeChart ganttChart = new GanttTypeChart(UserSettings);
 
             var groupedData = GanttData
                 .GroupBy(x => x.Name);

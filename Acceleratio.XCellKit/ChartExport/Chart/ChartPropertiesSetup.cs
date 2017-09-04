@@ -3,6 +3,7 @@ using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.Drawing.Charts;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using DocumentFormat.OpenXml.Drawing.Spreadsheet;
 using DocumentFormat.OpenXml.Packaging;
 using Boolean = DocumentFormat.OpenXml.Office2013.Drawing.ChartStyle.Boolean;
@@ -13,54 +14,14 @@ namespace Acceleratio.XCellKit
     internal abstract class ChartPropertiesSetup
     {
 #region Properties
-        /// <summary>
-        /// Set chart title
-        /// </summary>
-        public virtual string Title { get; set; } = "";
 
-        /// <summary>
-        /// Set X Axis Title.
-        /// </summary>
-        public virtual string AxisXTitle { get; set; } = "";
-
-        /// <summary>
-        /// Set Y Axis Title
-        /// </summary>
-        public virtual string AxisYTitle { get; set; } = "";
-
-        /// <summary>
-        /// Set chart Height
-        /// </summary>
-        public virtual int Height { get; set; }
-
-        /// <summary>
-        /// Set chart Width
-        /// </summary>
-        public virtual int Width { get; set; }
-
-        /// <summary>
-        /// Set color for each series.
-        /// </summary>
-        public virtual List<string> SeriesColor { get; set; }
-
-        /// <summary>
-        /// Set if Legend is visible
-        /// </summary>
-        public virtual bool Legend { get; set; } = true;
-
-        /// <summary>
-        /// Set if X Axis is visible
-        /// </summary>
-        public virtual bool AxisX { get; set; } = true;
-
-        /// <summary>
-        /// Set if Y Axis is visible
-        /// </summary>
-        public virtual bool AxisY { get; set; } = true;
+        public virtual BaseChartProperties ChartProperties { get; set; } = new BaseChartProperties();
 
         private bool isArgumentDate { get; set; } = false;
 
         private int dataCount { get; set; } = 0;
+
+        private double yAxisValue { get; set; } = 0;
 #endregion
 
         /// <summary>
@@ -118,8 +79,10 @@ namespace Acceleratio.XCellKit
 
             // Y axis
             NumberLiteral numberLiteralY = lineChartSeries.AppendChild<Values>(new Values()).AppendChild<NumberLiteral>(new NumberLiteral());
-            numberLiteralY.Append(new FormatCode("General"));
+            numberLiteralY.Append(new FormatCode(ChartProperties.AxisYFormatCode));
             numberLiteralY.Append(new PointCount() { Val = new UInt32Value((uint)dataCount) });
+
+            yAxisValue =  data.Max(x => x.Value) > yAxisValue ? data.Max(x => x.Value) : yAxisValue;
 
             // Set values to X and Y axis.
             foreach (var chartModel in data)
@@ -136,7 +99,7 @@ namespace Acceleratio.XCellKit
                 }
 
                 numberLiteralY.AppendChild<NumericPoint>(new NumericPoint() { Index = new UInt32Value(i) })
-                    .Append(new NumericValue(chartModel.Value.ToString()));
+                    .Append(new NumericValue(ChartProperties.AxisYFormatCategory == "Time" ? ((double)chartModel.Value / 86400).ToString() : chartModel.Value.ToString()));
 
                 i++;
             }
@@ -174,20 +137,21 @@ namespace Acceleratio.XCellKit
             chartShapeProperties.Append(outline);
             majorGridlines.Append(chartShapeProperties);
 
-            var valueAxis = plotArea.AppendChild<ValueAxis>(new ValueAxis(new AxisId() { Val = new UInt32Value(48672768u) },
+            var valueAxis = plotArea.AppendChild<ValueAxis>(new ValueAxis(
+                new AxisId() { Val = new UInt32Value(48672768u) },
                 new Scaling(new Orientation()
                 {
                     Val = new EnumValue<DocumentFormat.OpenXml.Drawing.Charts.OrientationValues>(
                         DocumentFormat.OpenXml.Drawing.Charts.OrientationValues.MinMax)
                 }),
-                new Delete() { Val = !this.AxisY },
+                new Delete() { Val = !ChartProperties.AxisY },
                 new AxisPosition() { Val = new EnumValue<AxisPositionValues>(AxisPositionValues.Left) },
                 majorGridlines,
                 new MajorTickMark() { Val = TickMarkValues.None },
                 new MinorTickMark() { Val = TickMarkValues.None },
                 new DocumentFormat.OpenXml.Drawing.Charts.NumberingFormat()
                 {
-                    FormatCode = new StringValue("General"),
+                    FormatCode = new StringValue(ChartProperties.AxisYFormatCode),
                     SourceLinked = new BooleanValue(true)
                 }, new TickLabelPosition()
                 {
@@ -197,9 +161,14 @@ namespace Acceleratio.XCellKit
                 new Crosses() { Val = new EnumValue<CrossesValues>(CrossesValues.AutoZero) },
                 new CrossBetween() { Val = new EnumValue<CrossBetweenValues>(CrossBetweenValues.Between) }));
 
-            if (this.AxisYTitle.Length > 0)
+            if (ChartProperties.AxisYTitle.Length > 0)
             {
-                valueAxis.Append(SetTitle(this.AxisYTitle));
+                valueAxis.Append(SetTitle(ChartProperties.AxisYTitle));
+            }
+
+            if (ChartProperties.AxisYFormatCategory == "Time")
+            {
+                valueAxis.Append(new MajorUnit() { Val = getMajorUnitFromSeconds((int)yAxisValue) });
             }
 
             return valueAxis;
@@ -220,7 +189,7 @@ namespace Acceleratio.XCellKit
                         OpenXml.Drawing.Charts.OrientationValues>(DocumentFormat.OpenXml.Drawing.Charts
                         .OrientationValues.MinMax)
                 }),
-                new Delete() {Val = !this.AxisX},
+                new Delete() {Val = !ChartProperties.AxisX},
                 new AxisPosition() {Val = new EnumValue<AxisPositionValues>(AxisPositionValues.Bottom)},
                 new MajorTickMark() {Val = TickMarkValues.None},
                 new MinorTickMark() {Val = TickMarkValues.Outside},
@@ -239,9 +208,9 @@ namespace Acceleratio.XCellKit
 
             var categoryAxis = isArgumentDate ? (OpenXmlElement) plotArea.AppendChild(new DateAxis(axisChildElements)) : plotArea.AppendChild(new CategoryAxis(axisChildElements));
 
-            if (this.AxisXTitle.Length > 0)
+            if (ChartProperties.AxisXTitle.Length > 0)
             {
-                categoryAxis.Append(SetTitle(this.AxisXTitle));
+                categoryAxis.Append(SetTitle(ChartProperties.AxisXTitle));
             }
 
             return categoryAxis;
@@ -252,7 +221,7 @@ namespace Acceleratio.XCellKit
         /// </summary>
         public virtual void SetLegend(Chart chart)
         {
-            if (this.Legend)
+            if (ChartProperties.Legend)
             {
                 // Add the chart Legend.
                 Legend legend = chart.AppendChild<Legend>(
@@ -325,6 +294,27 @@ namespace Acceleratio.XCellKit
         {
             DateTime date = DateTime.Parse(dateString);
             return (date - new DateTime(1899,12,30)).TotalDays.ToString();
+        }
+
+        private double getMajorUnitFromSeconds(int maxSeconds)
+        {
+            var hPoTick = (double)maxSeconds / 10 / 3600;
+
+            if (hPoTick < 1)
+            {
+                return ((hPoTick <= 0.1 ? 0.16667 : hPoTick < 0.5 ? 0.5 : 1) * 3600) / 86400;
+            }
+
+            var value = hPoTick;
+            var tick = 0;
+            while (value > 10)
+            {
+                tick++;
+                value = value / 10;
+            }
+
+            var end = value <= 2 ? 2 : value > 2 && value < 5 ? 5 : 10;
+            return (double)(end * Math.Pow(10, tick)) / 24;
         }
     }
 }

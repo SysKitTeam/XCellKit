@@ -161,7 +161,7 @@ namespace Acceleratio.XCellKit.Helpers
                     Val = 0
                 }, new MaxAxisValue()
                 {
-                    Val = 1
+                    Val = 0.99
                 }),
                 new Delete() { Val = false },
                 new AxisPosition() { Val = new EnumValue<AxisPositionValues>(AxisPositionValues.Left) },
@@ -220,10 +220,10 @@ namespace Acceleratio.XCellKit.Helpers
                         .AppendChild<NumericValue>(new NumericValue(key.Name));
 
                     numberLiteral1.AppendChild<NumericPoint>(new NumericPoint() { Index = new UInt32Value(i) })
-                        .Append(new NumericValue(CalculateExcelTime(lastPointEnd.ContainsKey(i) ? key.Start.Subtract(lastPointEnd[i]) : key.Start).ToString()));
+                        .Append(new NumericValue(CalculateExcelTime(lastPointEnd.ContainsKey(i) ? key.Start.Subtract(lastPointEnd[i]) : key.Start).ToString(System.Globalization.CultureInfo.InvariantCulture)));
 
                     numberLiteral2.AppendChild<NumericPoint>(new NumericPoint() { Index = new UInt32Value(i) })
-                        .Append(new NumericValue(CalculateExcelTime(lastPointEnd.ContainsKey(i) ? key.End.Subtract(key.Start.Subtract(lastPointEnd[i]) + lastPointEnd[i]) : key.End.Subtract(key.Start)).ToString()));
+                        .Append(new NumericValue(CalculateExcelTime(lastPointEnd.ContainsKey(i) ? key.End.Subtract(key.Start.Subtract(lastPointEnd[i]) + lastPointEnd[i]) : key.End.Subtract(key.Start)).ToString(System.Globalization.CultureInfo.InvariantCulture)));
 
                     if (lastPointEnd.ContainsKey(i))
                     {

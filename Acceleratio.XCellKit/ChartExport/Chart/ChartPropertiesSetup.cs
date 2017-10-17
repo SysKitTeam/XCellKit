@@ -47,12 +47,8 @@ namespace Acceleratio.XCellKit
 
             chartShapeProperties.Append(outline);
             chartShapeProperties.Append(new EffectList());
-            Marker marker = new Marker();
-            marker.Append(new Symbol() { Val = MarkerStyleValues.None });
 
             chartSeries.Append(chartShapeProperties);
-            chartSeries.Append(marker);
-            chartSeries.Append(new Smooth() { Val = false });
 
             return chartShapeProperties;
         }
@@ -60,7 +56,7 @@ namespace Acceleratio.XCellKit
         /// <summary>
         /// Create and insert data to Axis
         /// </summary>
-        public virtual void SetChartAxis(OpenXmlCompositeElement lineChart, OpenXmlCompositeElement lineChartSeries, List<ChartModel> data)
+        public virtual void SetChartAxis(OpenXmlCompositeElement chartSeries, List<ChartModel> data)
         {
             dataCount = data.Count;
             if (dataCount > 0 && !isArgumentDate)
@@ -78,7 +74,7 @@ namespace Acceleratio.XCellKit
             numberLiteralX.Append(new PointCount() { Val = new UInt32Value((uint)dataCount) });
 
             // Y axis
-            NumberLiteral numberLiteralY = lineChartSeries.AppendChild<Values>(new Values()).AppendChild<NumberLiteral>(new NumberLiteral());
+            NumberLiteral numberLiteralY = new NumberLiteral();
             numberLiteralY.Append(new FormatCode(ChartProperties.AxisYFormatCode));
             numberLiteralY.Append(new PointCount() { Val = new UInt32Value((uint)dataCount) });
 
@@ -94,29 +90,25 @@ namespace Acceleratio.XCellKit
                 }
                 else
                 {
-                    stringLiteral.AppendChild<StringPoint>(new StringPoint() { Index = new UInt32Value(i) })
-                        .Append(new NumericValue(chartModel.Argument));
+                    stringLiteral.Append(new StringPoint() { Index = new UInt32Value(i), NumericValue = new NumericValue() { Text = chartModel.Argument } });
                 }
 
                 numberLiteralY.AppendChild<NumericPoint>(new NumericPoint() { Index = new UInt32Value(i) })
-                    .Append(new NumericValue(ChartProperties.AxisYFormatCategory == "Time" ? ((double)chartModel.Value / 86400).ToString() : chartModel.Value.ToString()));
+                    .Append(new NumericValue(ChartProperties.AxisYFormatCategory == "Time" ? ((double)chartModel.Value / 86400).ToString(System.Globalization.CultureInfo.InvariantCulture) : chartModel.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)));
 
                 i++;
             }
 
-            var category = lineChartSeries.AppendChild<CategoryAxisData>(new CategoryAxisData());
-
             if (isArgumentDate)
             {
-                category.Append(numberLiteralX);
+                chartSeries.Append(new CategoryAxisData() { NumberLiteral = numberLiteralX });
             }
             else
             {
-                category.Append(stringLiteral);
+                chartSeries.Append(new CategoryAxisData() { StringLiteral = stringLiteral });
             }
 
-            lineChart.Append(new AxisId() { Val = new UInt32Value(48650112u) });
-            lineChart.Append(new AxisId() { Val = new UInt32Value(48672768u) });
+            chartSeries.Append(new Values() { NumberLiteral = numberLiteralY });
         }
 
         /// <summary>
@@ -147,24 +139,20 @@ namespace Acceleratio.XCellKit
                 new Delete() { Val = !ChartProperties.AxisY },
                 new AxisPosition() { Val = new EnumValue<AxisPositionValues>(AxisPositionValues.Left) },
                 majorGridlines,
+                SetTitle(ChartProperties.AxisYTitle),
+                new NumberingFormat() {
+                    FormatCode = ChartProperties.AxisYFormatCode,
+                    SourceLinked = new BooleanValue(true)
+                },
                 new MajorTickMark() { Val = TickMarkValues.None },
                 new MinorTickMark() { Val = TickMarkValues.None },
-                new DocumentFormat.OpenXml.Drawing.Charts.NumberingFormat()
-                {
-                    FormatCode = new StringValue(ChartProperties.AxisYFormatCode),
-                    SourceLinked = new BooleanValue(true)
-                }, new TickLabelPosition()
+                new TickLabelPosition()
                 {
                     Val = new EnumValue<TickLabelPositionValues>
                         (TickLabelPositionValues.NextTo)
                 }, new CrossingAxis() { Val = new UInt32Value(48650112U) },
                 new Crosses() { Val = new EnumValue<CrossesValues>(CrossesValues.AutoZero) },
                 new CrossBetween() { Val = new EnumValue<CrossBetweenValues>(CrossBetweenValues.Between) }));
-
-            if (ChartProperties.AxisYTitle.Length > 0)
-            {
-                valueAxis.Append(SetTitle(ChartProperties.AxisYTitle));
-            }
 
             if (ChartProperties.AxisYFormatCategory == "Time")
             {
@@ -191,6 +179,7 @@ namespace Acceleratio.XCellKit
                 }),
                 new Delete() {Val = !ChartProperties.AxisX},
                 new AxisPosition() {Val = new EnumValue<AxisPositionValues>(AxisPositionValues.Bottom)},
+                new NumberingFormat() { FormatCode = "General", SourceLinked = true },
                 new MajorTickMark() {Val = TickMarkValues.None},
                 new MinorTickMark() {Val = TickMarkValues.Outside},
                 new TickLabelPosition() {Val = new EnumValue<TickLabelPositionValues>(TickLabelPositionValues.NextTo)},
@@ -245,10 +234,10 @@ namespace Acceleratio.XCellKit
                     new Text { Text = titleText }));
 
             return new Title(
-                new Overlay { Val = false },
                 new ChartText(new RichText(new BodyProperties(),
                     new ListStyle(),
-                    paragraph)));
+                    paragraph)),
+                new Overlay {Val = false});
         }
 
         public void SetChartLocation(DrawingsPart drawingsPart, ChartPart chartPart, SpredsheetLocation location)
@@ -258,11 +247,11 @@ namespace Acceleratio.XCellKit
 
             // Pozicija charta.
             twoCellAnchor.Append(new DocumentFormat.OpenXml.Drawing.Spreadsheet.FromMarker(new ColumnId(location.ColumnIndex.ToString()),
-                new ColumnOffset("581025"),
+                new ColumnOffset("0"),
                 new RowId(location.RowIndex.ToString()),
                 new RowOffset("114300")));
             twoCellAnchor.Append(new DocumentFormat.OpenXml.Drawing.Spreadsheet.ToMarker(new ColumnId((location.ColumnIndex + 19).ToString()),
-                new ColumnOffset("276225"),
+                new ColumnOffset("0"),
                 new RowId((location.RowIndex + 15).ToString()),
                 new RowOffset("0")));
 
@@ -293,17 +282,12 @@ namespace Acceleratio.XCellKit
         private string CalculateExcelDate(string dateString)
         {
             DateTime date = DateTime.Parse(dateString);
-            return (date - new DateTime(1899,12,30)).TotalDays.ToString();
+            return (date - new DateTime(1899,12,30)).TotalDays.ToString(System.Globalization.CultureInfo.InvariantCulture);
         }
 
         private double getMajorUnitFromSeconds(int maxSeconds)
         {
-            var hPoTick = (double)maxSeconds / 10 / 3600;
-
-            if (hPoTick < 1)
-            {
-                return ((hPoTick <= 0.1 ? 0.16667 : hPoTick < 0.5 ? 0.5 : 1) * 3600) / 86400;
-            }
+            var hPoTick = (double)maxSeconds / 5 / 3600;
 
             var value = hPoTick;
             var tick = 0;
@@ -313,7 +297,7 @@ namespace Acceleratio.XCellKit
                 value = value / 10;
             }
 
-            var end = value <= 2 ? 2 : value > 2 && value < 5 ? 5 : 10;
+            var end = value <= 1 ? 1 : value <= 2 ? 2 : value <= 5 ? 5 : 10;
             return (double)(end * Math.Pow(10, tick)) / 24;
         }
     }

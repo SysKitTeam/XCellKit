@@ -51,14 +51,14 @@ namespace Acceleratio.XCellKit
             chartPart.ChartSpace = new ChartSpace();
             chartPart.ChartSpace.Append(new EditingLanguage() { Val = new StringValue("en-US") });
 
+
             Chart chartContainer = chartPart.ChartSpace.AppendChild<Chart>(new Chart());
+            // Set chart title
+            chartContainer.AppendChild(ChartPropertySetter.SetTitle(ChartPropertySetter.ChartProperties.Title));
             chartContainer.AppendChild<AutoTitleDeleted>(new AutoTitleDeleted() { Val = false });
 
             // Create a new clustered column chart.
             PlotArea plotArea = chartContainer.AppendChild<PlotArea>(new PlotArea());
-
-            // Set chart title
-            chartContainer.AppendChild(ChartPropertySetter.SetTitle(ChartPropertySetter.ChartProperties.Title));
 
             uint chartSeriesCounter = 0;
             OpenXmlCompositeElement chart = ChartPropertySetter.CreateChart(plotArea);
@@ -69,10 +69,13 @@ namespace Acceleratio.XCellKit
 
                 // Every method from chartPropertySetter can be overriden to customize chart export.
                 ChartPropertySetter.SetChartShapeProperties(chartSeries);
-                ChartPropertySetter.SetChartAxis(chart, chartSeries, chartDataSeriesGrouped.ToList());
+                ChartPropertySetter.SetChartAxis(chartSeries, chartDataSeriesGrouped.ToList());
 
                 chartSeriesCounter++;
             }
+
+            chart.Append(new AxisId() { Val = new UInt32Value(48650112u) });
+            chart.Append(new AxisId() { Val = new UInt32Value(48672768u) });
 
             // Add the Category Axis (X axis).
             ChartPropertySetter.SetLineCategoryAxis(plotArea);

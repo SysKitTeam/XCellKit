@@ -8,9 +8,9 @@ namespace Acceleratio.XCellKit
         public override OpenXmlCompositeElement CreateChart(PlotArea plotArea)
         {
             var chart = plotArea.AppendChild<BarChart>(new BarChart());
-            chart.Append(new VaryColors() { Val = false });
             chart.Append(new BarDirection() { Val = BarDirectionValues.Column });
             chart.Append(new BarGrouping() { Val = BarGroupingValues.Clustered });
+            chart.Append(new VaryColors() { Val = false });
 
             return chart;
         }

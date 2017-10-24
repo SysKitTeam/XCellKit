@@ -221,7 +221,7 @@ namespace Acceleratio.XCellKit
                 var width = 20d;
                 if (_maxNumberOfCharsPerColumn.ContainsKey(i))
                 {
-                    width = _maxNumberOfCharsPerColumn[i];
+                    width = _maxNumberOfCharsPerColumn[i] > 255 ? 255 : _maxNumberOfCharsPerColumn[i];
                 }
                 var minAtt = new OpenXmlAttribute("min", null, i.ToString());
                 var maxAtt = new OpenXmlAttribute("max", null, i.ToString());

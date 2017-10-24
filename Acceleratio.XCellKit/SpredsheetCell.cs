@@ -45,6 +45,12 @@ namespace Acceleratio.XCellKit
             }
 
             var sValue = Value.ToString();
+            
+            // Total number of characters that a cell can contain is 32,767.
+            if (sValue.Length > 32767)
+            {
+                sValue = sValue.Substring(0, 32767);
+            }
             if (SpredsheetDataType == SpredsheetDataTypeEnum.Number)
             {
                 double numberValue = 0;
@@ -59,20 +65,19 @@ namespace Acceleratio.XCellKit
             }
             else if (SpredsheetDataType == SpredsheetDataTypeEnum.String)
             {
-                var stringvalue = Value as string;
                 var typeAtt = new OpenXmlAttribute("t", null, "inlineStr");
                 openXmlAtts.Add(typeAtt);
                 writer.WriteStartElement(new Cell(), openXmlAtts);
-                stringvalue = XmlConvert.EncodeName(stringvalue);
+                sValue = XmlConvert.EncodeName(sValue);
                 writer.WriteStartElement(new InlineString());
-                writer.WriteElement(new Text(stringvalue) { Space = SpaceProcessingModeValues.Preserve  });
+                writer.WriteElement(new Text(sValue) { Space = SpaceProcessingModeValues.Preserve  });
                 writer.WriteEndElement();
                 writer.WriteEndElement();
             }
             else if (SpredsheetDataType == SpredsheetDataTypeEnum.DateTime)
             {
                 var dateTime = DateTime.MinValue;
-                if (DateTime.TryParse(Value.ToString(), out dateTime))
+                if (DateTime.TryParse(sValue, out dateTime))
                 {
                     writer.WriteStartElement(new Cell(), openXmlAtts);
                     writer.WriteElement(new CellValue(dateTime.ToOADate().ToString(CultureInfo.InvariantCulture)));
@@ -84,7 +89,7 @@ namespace Acceleratio.XCellKit
                 var typeAttribute = new OpenXmlAttribute("t", null, "str");
                 openXmlAtts.Add(typeAttribute);
                 writer.WriteStartElement(new Cell(), openXmlAtts);
-                writer.WriteElement(new CellValue(Value.ToString()));
+                writer.WriteElement(new CellValue(sValue));
                 writer.WriteEndElement();
             }
            

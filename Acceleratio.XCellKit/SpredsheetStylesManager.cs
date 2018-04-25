@@ -21,7 +21,7 @@ namespace Acceleratio.XCellKit
     public class SpredsheetStylesManager
     {
         private Dictionary<string, int> _styles;
-        private Dictionary<System.Drawing.Font, int> _fonts;
+        private Dictionary<FontKey, int> _fonts;
         private Dictionary<System.Drawing.Color, int> _fills;
         private WorkbookPart _workbookPart;
         private Stylesheet _stylesheet;
@@ -29,7 +29,7 @@ namespace Acceleratio.XCellKit
         {
             _workbookPart = workbookPart;
             _styles = new Dictionary<string, int>();
-            _fonts = new Dictionary<System.Drawing.Font, int>();
+            _fonts = new Dictionary<FontKey, int>();
             _fills = new Dictionary<System.Drawing.Color, int>();
 
             var stylesPart = _workbookPart.AddNewPart<WorkbookStylesPart>();
@@ -161,9 +161,10 @@ namespace Acceleratio.XCellKit
             var fontIndex = 0;
             if (style.Font != null)
             {
-                if (_fonts.ContainsKey(style.Font))
+                var key = new FontKey(style.Font, style.ForegroundColor);
+                if (_fonts.ContainsKey(key))
                 {
-                    fontIndex = _fonts[style.Font];
+                    fontIndex = _fonts[key];
                 }
                 else
                 {
@@ -172,7 +173,7 @@ namespace Acceleratio.XCellKit
                     newFont.FontSize = new FontSize() {Val = style.Font.Size};
                     newFont.Color = new Color() {Rgb = String.Format("{0:X2}{1:X2}{2:X2}{3:X2}",style.ForegroundColor.Value.A, style.ForegroundColor.Value.R, style.ForegroundColor.Value.G, style.ForegroundColor.Value.B) };
                     _stylesheet.Fonts.AppendChild(newFont);
-                    fontIndex = _fonts[style.Font] = (int)((UInt32)_stylesheet.Fonts.Count);
+                    fontIndex = _fonts[key] = (int)((UInt32)_stylesheet.Fonts.Count);
                     _stylesheet.Fonts.Count++;
                 }
             }
@@ -247,6 +248,51 @@ namespace Acceleratio.XCellKit
             public override int GetHashCode()
             {
                 return FontIndex.GetHashCode() ^ FillIndex.GetHashCode();
+            }
+        }
+
+        public class FontKey : IEquatable<FontKey>
+        {
+            public FontKey(System.Drawing.Font font, System.Drawing.Color? color)
+            {
+                Font = font;
+                Color = color;
+            }
+
+            public System.Drawing.Font Font { get; }
+            public System.Drawing.Color? Color { get; }
+
+            public bool Equals(FontKey other)
+            {
+                if (ReferenceEquals(null, other)) return false;
+                if (ReferenceEquals(this, other)) return true;
+                return Equals(Font, other.Font) && Color.Equals(other.Color);
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (ReferenceEquals(null, obj)) return false;
+                if (ReferenceEquals(this, obj)) return true;
+                if (obj.GetType() != this.GetType()) return false;
+                return Equals((FontKey)obj);
+            }
+
+            public override int GetHashCode()
+            {
+                unchecked
+                {
+                    return ((Font != null ? Font.GetHashCode() : 0) * 397) ^ Color.GetHashCode();
+                }
+            }
+
+            public static bool operator ==(FontKey left, FontKey right)
+            {
+                return Equals(left, right);
+            }
+
+            public static bool operator !=(FontKey left, FontKey right)
+            {
+                return !Equals(left, right);
             }
         }
     }

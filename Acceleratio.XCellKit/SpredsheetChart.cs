@@ -24,7 +24,7 @@ namespace Acceleratio.XCellKit
                 {
                     typeof(BaseChartProperties)
                         .GetProperty(pi.Name)
-                        .SetValue(ChartPropertySetter.ChartProperties, pi.GetValue(UserSettings, null), null);
+                        .SetValue(ChartPropertySetter.ChartProperties, pi.GetValue(UserSettings, null));
                 }
             }
         }

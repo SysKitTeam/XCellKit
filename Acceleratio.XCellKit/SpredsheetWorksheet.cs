@@ -74,11 +74,14 @@ namespace Acceleratio.XCellKit
 
         private void trackMaxChars(int columnIndex, SpredsheetCell cell, int extraSpace = 1)
         {
-            var previousMax = _maxNumberOfCharsPerColumn[columnIndex];
-            var charsCount = cell.Value.ToString().Count() + cell.Indent + extraSpace; 
-            if (previousMax < charsCount)
+            if (_maxNumberOfCharsPerColumn.ContainsKey(columnIndex))
             {
-                _maxNumberOfCharsPerColumn[columnIndex] = charsCount;
+                var previousMax = _maxNumberOfCharsPerColumn[columnIndex];
+                var charsCount = cell.Value.ToString().Count() + cell.Indent + extraSpace;
+                if (previousMax < charsCount)
+                {
+                    _maxNumberOfCharsPerColumn[columnIndex] = charsCount;
+                }
             }
         }
 

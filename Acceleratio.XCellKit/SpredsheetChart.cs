@@ -10,7 +10,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace Acceleratio.XCellKit
 {
-    public abstract class SpredsheetChart
+    public abstract class SpreadsheetChart
     {
         public List<ChartModel> ChartData { get; protected set; }
         public ChartSettings UserSettings { get; set; }
@@ -29,18 +29,18 @@ namespace Acceleratio.XCellKit
             }
         }
 
-        protected SpredsheetChart(List<ChartModel> chartData, ChartSettings settings)
+        protected SpreadsheetChart(List<ChartModel> chartData, ChartSettings settings)
         {
             this.ChartData = chartData.Distinct().ToList();
             this.UserSettings = settings;
         }
 
-        protected SpredsheetChart(ChartSettings settings)
+        protected SpreadsheetChart(ChartSettings settings)
         {
             this.UserSettings = settings;
         }
 
-        internal virtual void CreateChart(OpenXmlWriter writer, WorksheetPart part, SpredsheetLocation location)
+        internal virtual void CreateChart(OpenXmlWriter writer, WorksheetPart part, SpreadsheetLocation location)
         {
             DrawingsPart drawingsPart = part.AddNewPart<DrawingsPart>();
 

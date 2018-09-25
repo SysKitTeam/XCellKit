@@ -9,10 +9,10 @@ namespace Acceleratio.XCellKit.Tests
         [TestMethod]
         public void Test1()
         {
-            var newExcel = new SpredsheetWorkbook();
+            var newExcel = new SpreadsheetWorkbook();
 
-            var worksheet = new SpredsheetWorksheet("Test22");
-            worksheet.AddRow(new SpredsheetRow() { RowCells = new System.Collections.Generic.List<SpredsheetCell>() { new SpredsheetCell() { Value = "test" } } });
+            var worksheet = new SpreadsheetWorksheet("Test22");
+            worksheet.AddRow(new SpreadsheetRow() { RowCells = new System.Collections.Generic.List<SpreadsheetCell>() { new SpreadsheetCell() { Value = "test" } } });
 
             newExcel.AddWorksheet(worksheet);
             newExcel.Save("c:\\temp\\test.xlsx");

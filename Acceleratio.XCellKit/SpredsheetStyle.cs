@@ -4,7 +4,7 @@ using Font = System.Drawing.Font;
 
 namespace Acceleratio.XCellKit
 {
-    public class SpredsheetStyle
+    public class SpreadsheetStyle
     {
         public Color? BackgroundColor { get; set; }
         public Color? ForegroundColor { get; set; }
@@ -46,7 +46,7 @@ namespace Acceleratio.XCellKit
 
         public override bool Equals(object obj)
         {
-            var style = obj as SpredsheetStyle;
+            var style = obj as SpreadsheetStyle;
             if (style == null)
             {
                 return false;

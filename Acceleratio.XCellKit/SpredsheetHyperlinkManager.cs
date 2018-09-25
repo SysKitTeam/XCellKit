@@ -2,20 +2,20 @@
 
 namespace Acceleratio.XCellKit
 {
-    public class SpredsheetHyperlinkManager
+    public class SpreadsheetHyperlinkManager
     {
-        private Dictionary<SpredsheetLocation, SpredsheetHyperLink> _hyperLinks;
-        public SpredsheetHyperlinkManager()
+        private Dictionary<SpreadsheetLocation, SpreadsheetHyperLink> _hyperLinks;
+        public SpreadsheetHyperlinkManager()
         {
-            _hyperLinks = new Dictionary<SpredsheetLocation, SpredsheetHyperLink>();
+            _hyperLinks = new Dictionary<SpreadsheetLocation, SpreadsheetHyperLink>();
         }
 
-        public void AddHyperlink(SpredsheetLocation location,  SpredsheetHyperLink hyperLink)
+        public void AddHyperlink(SpreadsheetLocation location,  SpreadsheetHyperLink hyperLink)
         {
             _hyperLinks[location] = hyperLink;
         }
 
-        public Dictionary<SpredsheetLocation, SpredsheetHyperLink> GetHyperlinks()
+        public Dictionary<SpreadsheetLocation, SpreadsheetHyperLink> GetHyperlinks()
         {
             return _hyperLinks;
         }  

@@ -240,7 +240,7 @@ namespace Acceleratio.XCellKit
                 new Overlay {Val = false});
         }
 
-        public void SetChartLocation(DrawingsPart drawingsPart, ChartPart chartPart, SpredsheetLocation location)
+        public void SetChartLocation(DrawingsPart drawingsPart, ChartPart chartPart, SpreadsheetLocation location)
         {
             drawingsPart.WorksheetDrawing = new WorksheetDrawing();
             TwoCellAnchor twoCellAnchor = drawingsPart.WorksheetDrawing.AppendChild<TwoCellAnchor>(new TwoCellAnchor());

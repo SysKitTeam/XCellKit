@@ -5,7 +5,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace Acceleratio.XCellKit
 {
-    public static class SpredsheetHelper
+    public static class SpreadsheetHelper
     {
         public static string ExcelColumnFromNumber(int column)
         {
@@ -21,22 +21,22 @@ namespace Acceleratio.XCellKit
             return columnString;
         }
 
-        public static SpredsheetTable GetSpredsheetTableFromDataTable(DataTable dataTable, string tableName)
+        public static SpreadsheetTable GetSpreadsheetTableFromDataTable(DataTable dataTable, string tableName)
         {
-            var table = new SpredsheetTable(tableName);
-            table.Columns = new List<SpredsheetTableColumn>();
-            table.Rows = new List<SpredsheetRow>();
+            var table = new SpreadsheetTable(tableName);
+            table.Columns = new List<SpreadsheetTableColumn>();
+            table.Rows = new List<SpreadsheetRow>();
             foreach (DataColumn dataColumn in dataTable.Columns)
             {
-                table.Columns.Add(new SpredsheetTableColumn() {Name = dataColumn.ColumnName});
+                table.Columns.Add(new SpreadsheetTableColumn() {Name = dataColumn.ColumnName});
             }
 
             foreach (DataRow dataRow in dataTable.Rows)
             {
-                var row = new SpredsheetRow();
+                var row = new SpreadsheetRow();
                 foreach (var o in dataRow.ItemArray)
                 {
-                    row.AddCell(new SpredsheetCell() { Value = o });
+                    row.AddCell(new SpreadsheetCell() { Value = o });
                 }
 
                 table.Rows.Add(row);
@@ -70,22 +70,22 @@ namespace Acceleratio.XCellKit
             }
         }
 
-        public static SpredsheetTable GetMonstrosity( string tableName)
+        public static SpreadsheetTable GetMonstrosity( string tableName)
         {
-            var table = new SpredsheetTable(tableName);
-            table.Columns = new List<SpredsheetTableColumn>();
-            table.Rows = new List<SpredsheetRow>();
+            var table = new SpreadsheetTable(tableName);
+            table.Columns = new List<SpreadsheetTableColumn>();
+            table.Rows = new List<SpreadsheetRow>();
             for(int i = 0; i< 10; i++)
             {
-                table.Columns.Add(new SpredsheetTableColumn() { Name = "Column" + i });
+                table.Columns.Add(new SpreadsheetTableColumn() { Name = "Column" + i });
             }
 
             for(int i=0; i< 500000; i++)
             {
-                var row = new SpredsheetRow();
+                var row = new SpreadsheetRow();
                 for(int j = 0; j< 10; j++)
                 {
-                    row.AddCell(new SpredsheetCell() { Value = string.Format("{0}-{1}", i, j) });
+                    row.AddCell(new SpreadsheetCell() { Value = string.Format("{0}-{1}", i, j) });
                 }
 
                 table.Rows.Add(row);

@@ -18,14 +18,14 @@ namespace Acceleratio.XCellKit
         CenterContinuous,
         Distributed,
     }
-    public class SpredsheetStylesManager
+    public class SpreadsheetStylesManager
     {
         private Dictionary<string, int> _styles;
         private Dictionary<FontKey, int> _fonts;
         private Dictionary<System.Drawing.Color, int> _fills;
         private WorkbookPart _workbookPart;
         private Stylesheet _stylesheet;
-        public SpredsheetStylesManager(WorkbookPart workbookPart)
+        public SpreadsheetStylesManager(WorkbookPart workbookPart)
         {
             _workbookPart = workbookPart;
             _styles = new Dictionary<string, int>();
@@ -77,7 +77,7 @@ namespace Acceleratio.XCellKit
             CellFormat hyperLinkFormt = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)1U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)0U, ApplyNumberFormat = false, ApplyFill = false, ApplyBorder = false, ApplyAlignment = false, ApplyProtection = false };
             stylesPart.Stylesheet.CellFormats.AppendChild(hyperLinkFormt);
             stylesPart.Stylesheet.CellFormats.Count = 2;
-            _hyperlinkStyles[new SpredsheetStyle().GetIdentifier()] = 1;
+            _hyperlinkStyles[new SpreadsheetStyle().GetIdentifier()] = 1;
  
 
             Borders borders = new Borders() { Count = (UInt32Value)1U };
@@ -120,7 +120,7 @@ namespace Acceleratio.XCellKit
         }
 
         private Dictionary<string, int> _hyperlinkStyles = new Dictionary<string, int>(); 
-        public int GetHyperlinkStyleIndex(SpredsheetStyle style)
+        public int GetHyperlinkStyleIndex(SpreadsheetStyle style)
         {
             if (_hyperlinkStyles.ContainsKey(style.GetIdentifier()))
             {
@@ -151,7 +151,7 @@ namespace Acceleratio.XCellKit
 
         }
 
-        public int GetStyleIndex(SpredsheetStyle style)
+        public int GetStyleIndex(SpreadsheetStyle style)
         {
             if (_styles.ContainsKey(style.GetIdentifier()))
             {

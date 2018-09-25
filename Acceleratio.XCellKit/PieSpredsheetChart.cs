@@ -7,9 +7,9 @@ using DocumentFormat.OpenXml.Drawing.Charts;
 
 namespace Acceleratio.XCellKit
 {
-    public class PieSpredsheetChart : SpredsheetChart
+    public class PieSpreadsheetChart : SpreadsheetChart
     {
-        public PieSpredsheetChart(List<ChartModel> chartData, ChartSettings settings)
+        public PieSpreadsheetChart(List<ChartModel> chartData, ChartSettings settings)
             : base(chartData, settings)
         {
             this.ChartPropertySetter = new PieTypeChart();

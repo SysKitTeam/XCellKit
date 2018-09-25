@@ -5,9 +5,9 @@ using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace Acceleratio.XCellKit
 {
-    public class SpredsheetTableColumn
+    public class SpreadsheetTableColumn
     {
-        public SpredsheetTableColumn()
+        public SpreadsheetTableColumn()
         {
             FilterValues = new HashSet<string>();
         }

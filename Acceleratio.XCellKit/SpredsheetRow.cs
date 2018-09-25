@@ -4,19 +4,19 @@ using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace Acceleratio.XCellKit
 {
-    public class SpredsheetRow
+    public class SpreadsheetRow
     {
-        public SpredsheetRow()
+        public SpreadsheetRow()
         {
-            RowCells = new List<SpredsheetCell>();
+            RowCells = new List<SpreadsheetCell>();
         }
 
-        public void AddCell(SpredsheetCell cell)
+        public void AddCell(SpreadsheetCell cell)
         {
             RowCells.Add(cell);
         }
 
-        public void AddCellRange(List<SpredsheetCell> cells)
+        public void AddCellRange(List<SpreadsheetCell> cells)
         {
             RowCells.AddRange(cells);
         }
@@ -28,9 +28,9 @@ namespace Acceleratio.XCellKit
             _isVisible = isVisible;
         }
 
-        public List<SpredsheetCell> RowCells { get; set; }
+        public List<SpreadsheetCell> RowCells { get; set; }
 
-        public void WriteRow(OpenXmlWriter writer, int columnIndex, int rowIndex, SpredsheetStylesManager stylesManager, SpredsheetHyperlinkManager hyperlinkManager)
+        public void WriteRow(OpenXmlWriter writer, int columnIndex, int rowIndex, SpreadsheetStylesManager stylesManager, SpreadsheetHyperlinkManager hyperlinkManager)
         {
             var span = string.Format("{0}:{1}", columnIndex, RowCells.Count + columnIndex);
             var attributeList = new List<OpenXmlAttribute>();

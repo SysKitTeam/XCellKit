@@ -8,18 +8,18 @@ using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace Acceleratio.XCellKit
 {
-    public class SpredsheetWorkbook
+    public class SpreadsheetWorkbook
     {
-        public SpredsheetWorkbook() 
+        public SpreadsheetWorkbook() 
         {
-            _worksheets = new List<SpredsheetWorksheet>();
+            _worksheets = new List<SpreadsheetWorksheet>();
             _tableCount = 1;
         }
         
-        private readonly List<SpredsheetWorksheet> _worksheets; 
-        public void AddWorksheet(SpredsheetWorksheet spredsheetWorksheet)
+        private readonly List<SpreadsheetWorksheet> _worksheets; 
+        public void AddWorksheet(SpreadsheetWorksheet spreadsheetWorksheet)
         {
-            _worksheets.Add(spredsheetWorksheet);
+            _worksheets.Add(spreadsheetWorksheet);
         }
 
         private int _tableCount = 0;
@@ -45,11 +45,11 @@ namespace Acceleratio.XCellKit
                 var workbookPart = document.AddWorkbookPart();
                 var workbook = workbookPart.Workbook = new Workbook();
                 workbook.Sheets = sheets;
-                var stylesManager = new SpredsheetStylesManager(workbookPart);
+                var stylesManager = new SpreadsheetStylesManager(workbookPart);
                 writeWorkSheets(workbookPart, sheets, stylesManager);
         }
 
-        private void writeWorkSheets(WorkbookPart workbookPart, Sheets sheets, SpredsheetStylesManager stylesManager)
+        private void writeWorkSheets(WorkbookPart workbookPart, Sheets sheets, SpreadsheetStylesManager stylesManager)
         {
             var sheetCounter = 1;
             foreach (var worksheets in _worksheets)

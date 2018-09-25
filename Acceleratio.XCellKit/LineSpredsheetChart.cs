@@ -7,9 +7,9 @@ using DocumentFormat.OpenXml.Drawing.Charts;
 
 namespace Acceleratio.XCellKit
 {
-    public class LineSpredsheetChart : SpredsheetChart
+    public class LineSpreadsheetChart : SpreadsheetChart
     {
-        public LineSpredsheetChart(List<ChartModel> chartData, ChartSettings settings)
+        public LineSpreadsheetChart(List<ChartModel> chartData, ChartSettings settings)
             : base(chartData, settings)
         {
             this.ChartPropertySetter = new LineTypeChart();

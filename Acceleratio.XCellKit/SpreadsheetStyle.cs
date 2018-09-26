@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Spreadsheet;
+﻿using System.Text;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Color = System.Drawing.Color;
 using Font = System.Drawing.Font;
 
@@ -17,39 +18,43 @@ namespace Acceleratio.XCellKit
 
         public string GetIdentifier()
         {
-            var identifier = "";
+            var sb = new StringBuilder();
             if (BackgroundColor.HasValue)
             {
                 var colorRgb = BackgroundColor.Value.ToArgb();
-                identifier += colorRgb;
+                sb.Append(colorRgb);
             }
             if (ForegroundColor.HasValue)
             {
                 var colorRgb = ForegroundColor.Value.ToArgb();
-                identifier += colorRgb;
+                sb.Append(colorRgb);
             }
             if (Font != null)
             {
                 var fontid = Font.ToString();
-                identifier += fontid;
+                sb.Append(fontid);
             }
             if (Alignment.HasValue)
             {
-                var aligment = Alignment.Value.ToString();
-                identifier += aligment;
+                // 30% speedup on 800 000 rows when not using Enum.ToString
+                sb.Append("H");
+                sb.Append((int) Alignment.Value);
             }
             if (VerticalAlignment.HasValue)
             {
-                var aligment = VerticalAlignment.Value.ToString();
-                identifier += aligment;
+                // 30% speedup on 800 000 rows when not using Enum.ToString
+                sb.Append("V");
+                sb.Append((int)VerticalAlignment.Value);
             }
             if (IsDate)
             {
-                identifier += IsDate;
+                sb.Append(IsDate);
             }
 
-            identifier += WrapText;
-            return identifier + Indent;
+            sb.Append(WrapText);
+            sb.Append(Indent);
+
+            return sb.ToString();
         }
 
         public override bool Equals(object obj)

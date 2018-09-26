@@ -132,9 +132,10 @@ namespace Acceleratio.XCellKit
         private Dictionary<string, int> _hyperlinkStyles = new Dictionary<string, int>();
         public int GetHyperlinkStyleIndex(SpreadsheetStyle style)
         {
-            if (_hyperlinkStyles.ContainsKey(style.GetIdentifier()))
+            var styleIdentifier = style.GetIdentifier();
+            if (_hyperlinkStyles.ContainsKey(styleIdentifier))
             {
-                return _hyperlinkStyles[style.GetIdentifier()];
+                return _hyperlinkStyles[styleIdentifier];
             }
             var cellFormat = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)1U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)0U, ApplyNumberFormat = false, ApplyFill = false, ApplyBorder = false, ApplyAlignment = false, ApplyProtection = false };
             if (style.Alignment != null || style.Indent != 0 || style.VerticalAlignment != null)
@@ -156,7 +157,7 @@ namespace Acceleratio.XCellKit
             }
 
 
-            var styleIndex = _hyperlinkStyles[style.GetIdentifier()] = (int)(UInt32)_stylesheet.CellFormats.Count;
+            var styleIndex = _hyperlinkStyles[styleIdentifier] = (int)(UInt32)_stylesheet.CellFormats.Count;
             _stylesheet.CellFormats.AppendChild(cellFormat);
             _stylesheet.CellFormats.Count++;
 
@@ -166,9 +167,10 @@ namespace Acceleratio.XCellKit
 
         public int GetStyleIndex(SpreadsheetStyle style)
         {
-            if (_styles.ContainsKey(style.GetIdentifier()))
+            var styleIdentifier = style.GetIdentifier();
+            if (_styles.ContainsKey(styleIdentifier))
             {
-                return _styles[style.GetIdentifier()];
+                return _styles[styleIdentifier];
             }
 
             var fontIndex = 0;
@@ -244,7 +246,7 @@ namespace Acceleratio.XCellKit
                 cellFormat.AppendChild(aligment);
             }
 
-            var styleIndex = _styles[style.GetIdentifier()] = (int)(UInt32)_stylesheet.CellFormats.Count;
+            var styleIndex = _styles[styleIdentifier] = (int)(UInt32)_stylesheet.CellFormats.Count;
             _stylesheet.CellFormats.AppendChild(cellFormat);
             _stylesheet.CellFormats.Count++;
 

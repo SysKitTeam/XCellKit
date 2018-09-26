@@ -22,6 +22,8 @@ namespace Acceleratio.XCellKit
         // ako imamo 500 000 redaka to osjetno usporava, ovako ce se samo jednom to desiti
         private static EnumValue<SpaceProcessingModeValues> PreserveSpaceEnumValue = SpaceProcessingModeValues.Preserve;
 
+        private static readonly Cell openXmlCellElementForWriting = new Cell();
+
         private object _value;
 
         public object Value
@@ -79,6 +81,7 @@ namespace Acceleratio.XCellKit
             }
 
             var sValue = Value.ToString();
+          
             if (SpreadsheetDataType == SpreadsheetDataTypeEnum.Number)
             {
                 double numberValue = 0;
@@ -124,9 +127,6 @@ namespace Acceleratio.XCellKit
                 writer.WriteElement(new CellValue(sValue));
                 writer.WriteEndElement();
             }
-
-
-
         }
 
         protected virtual OpenXmlAttribute? getStyleAttribute(SpreadsheetStylesManager stylesManager)

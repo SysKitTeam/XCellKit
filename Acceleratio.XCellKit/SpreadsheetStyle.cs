@@ -10,8 +10,10 @@ namespace Acceleratio.XCellKit
         public Color? ForegroundColor { get; set; }
         public Font Font { get; set; }
         public HorizontalAlignmentValues? Alignment { get; set; }
+        public VerticalAlignmentValues? VerticalAlignment { get; set; }
         public bool IsDate { get; set; }
         public int Indent { get; set; }
+        public bool WrapText { get; set; }
 
         public string GetIdentifier()
         {
@@ -36,11 +38,17 @@ namespace Acceleratio.XCellKit
                 var aligment = Alignment.Value.ToString();
                 identifier += aligment;
             }
+            if (VerticalAlignment.HasValue)
+            {
+                var aligment = VerticalAlignment.Value.ToString();
+                identifier += aligment;
+            }
             if (IsDate)
             {
                 identifier += IsDate;
             }
 
+            identifier += WrapText;
             return identifier + Indent;
         }
 
@@ -52,7 +60,7 @@ namespace Acceleratio.XCellKit
                 return false;
             }
 
-            return style.BackgroundColor == BackgroundColor && style.ForegroundColor == ForegroundColor && style.Font == Font && style.Alignment == Alignment && Indent == style.Indent && IsDate == style.IsDate;
+            return style.BackgroundColor == BackgroundColor && style.ForegroundColor == ForegroundColor && style.Font == Font && style.Alignment == Alignment && style.VerticalAlignment == VerticalAlignment && Indent == style.Indent && IsDate == style.IsDate;
         }
 
         public override int GetHashCode()
@@ -79,7 +87,13 @@ namespace Acceleratio.XCellKit
                 hash ^= aligment.GetHashCode();
             }
 
-            return hash ^ Indent ^ IsDate.GetHashCode();
+            if (VerticalAlignment.HasValue)
+            {
+                var aligment = VerticalAlignment.Value.ToString();
+                hash ^= aligment.GetHashCode();
+            }
+
+            return hash ^ Indent ^ IsDate.GetHashCode() ^ WrapText.GetHashCode();
         }
     }
 }

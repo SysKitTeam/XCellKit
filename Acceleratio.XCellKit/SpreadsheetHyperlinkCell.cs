@@ -6,27 +6,29 @@ namespace Acceleratio.XCellKit
 {
     public class SpreadsheetHyperlinkCell : SpreadsheetCell
     {
-        private SpreadsheetHyperLink _hyperLink;
+        private readonly SpreadsheetHyperLink _hyperLink;
         public SpreadsheetHyperlinkCell(SpreadsheetHyperLink hyperLink)
         {
             _hyperLink = hyperLink;
+            Value = hyperLink.DisplayValue;
         }
 
         protected override OpenXmlAttribute? getStyleAttribute(SpreadsheetStylesManager stylesManager)
         {
-            var spreadsheetStyle = new SpreadsheetStyle();
-            if (Indent != 0 || Alignment != null)
+            var spredsheetStyle = new SpreadsheetStyle();
+            if (Indent != 0 || Alignment != null || VerticalAlignment != null)
             {
-                spreadsheetStyle = new SpreadsheetStyle()
+                spredsheetStyle = new SpreadsheetStyle()
                 {
                     Alignment = Alignment.HasValue ? SpreadsheetHelper.GetHorizontalAlignmentValue(Alignment.Value) : (HorizontalAlignmentValues?)null,
+                    VerticalAlignment = VerticalAlignment.HasValue ? SpreadsheetHelper.GetVerticalAlignmentValues(VerticalAlignment.Value) : (VerticalAlignmentValues?)null,
                     BackgroundColor = BackgroundColor,
                     Font = Font,
                     ForegroundColor = ForegroundColor,
                     Indent = Indent
                 };
             }
-            return new OpenXmlAttribute("s", null, ((UInt32)stylesManager.GetHyperlinkStyleIndex(spreadsheetStyle)).ToString());
+            return new OpenXmlAttribute("s", null, ((UInt32)stylesManager.GetHyperlinkStyleIndex(spredsheetStyle)).ToString());
         }
 
         public override void WriteCell(OpenXmlWriter writer, int columnIndex, int rowIndex, SpreadsheetStylesManager stylesManager, SpreadsheetHyperlinkManager hyperlinkManager)

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Acceleratio.XCellKit.Tables
+namespace Acceleratio.XCellKit
 {
     public class RequestTableRowEventArgs : EventArgs
     {

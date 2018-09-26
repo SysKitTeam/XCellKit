@@ -9,23 +9,23 @@ using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace Acceleratio.XCellKit
 {
-    public class SpredsheetWorksheet
+    public class SpreadsheetWorksheet
     {
         public string Name { get; set; }
         private int _maxColumnIndex;
         private int _maxRowIndex;
         private Dictionary<int, int> _maxNumberOfCharsPerColumn; 
 
-        public SpredsheetWorksheet(string name)
+        public SpreadsheetWorksheet(string name)
         {
             Name = name;
-            _tables = new Dictionary<SpredsheetLocation, SpredsheetTable>();
-            _rows = new Dictionary<SpredsheetLocation, SpredsheetRow>();
+            _tables = new Dictionary<SpreadsheetLocation, SpreadsheetTable>();
+            _rows = new Dictionary<SpreadsheetLocation, SpreadsheetRow>();
             _maxNumberOfCharsPerColumn = new Dictionary<int, int>();
-            _charts = new Dictionary<SpredsheetLocation, SpredsheetChart>();
+            _charts = new Dictionary<SpreadsheetLocation, SpreadsheetChart>();
         }
 
-        public SpredsheetWorksheet(string name, List<int> columnsIndexToTrackAutoWidht)
+        public SpreadsheetWorksheet(string name, List<int> columnsIndexToTrackAutoWidht)
             :this(name)
         {
             foreach (var i in columnsIndexToTrackAutoWidht)
@@ -40,15 +40,15 @@ namespace Acceleratio.XCellKit
             _forzenFirstColumn = true;
         }
 
-        private Dictionary<SpredsheetLocation, SpredsheetTable> _tables; 
-        public void AddTable(SpredsheetTable table, int columnIndex, int rowIndex)
+        private Dictionary<SpreadsheetLocation, SpreadsheetTable> _tables; 
+        public void AddTable(SpreadsheetTable table, int columnIndex, int rowIndex)
         {
-            _tables[new SpredsheetLocation(rowIndex, columnIndex)] = table;
-            var headerRow = new SpredsheetRow();
+            _tables[new SpreadsheetLocation(rowIndex, columnIndex)] = table;
+            var headerRow = new SpreadsheetRow();
             for (int i = 0; i<table.Columns.Count; i++)
             {
                 var column = table.Columns[i];
-                var headerCell = new SpredsheetCell();
+                var headerCell = new SpreadsheetCell();
                 headerCell.Value = column.Name;
                 headerRow.AddCell(headerCell);
                 if (_maxNumberOfCharsPerColumn.Any())
@@ -66,13 +66,13 @@ namespace Acceleratio.XCellKit
             }
         }
 
-        private Dictionary<SpredsheetLocation, SpredsheetChart> _charts;
-        public void AddChart(SpredsheetChart chart, int columnIndex, int rowIndex)
+        private Dictionary<SpreadsheetLocation, SpreadsheetChart> _charts;
+        public void AddChart(SpreadsheetChart chart, int columnIndex, int rowIndex)
         {
-            _charts[new SpredsheetLocation(rowIndex, columnIndex)] = chart;
+            _charts[new SpreadsheetLocation(rowIndex, columnIndex)] = chart;
         }
 
-        private void trackMaxChars(int columnIndex, SpredsheetCell cell, int extraSpace = 1)
+        private void trackMaxChars(int columnIndex, SpreadsheetCell cell, int extraSpace = 1)
         {
             if (_maxNumberOfCharsPerColumn.ContainsKey(columnIndex))
             {
@@ -85,7 +85,7 @@ namespace Acceleratio.XCellKit
             }
         }
 
-        private void trackMaxChars(SpredsheetRow row, SpredsheetLocation location)
+        private void trackMaxChars(SpreadsheetRow row, SpreadsheetLocation location)
         {
             for (int i = 0; i < row.RowCells.Count; i++)
             {
@@ -94,18 +94,18 @@ namespace Acceleratio.XCellKit
             }
         }
         
-        public void AddRow(SpredsheetRow row)
+        public void AddRow(SpreadsheetRow row)
         {
             AddRow(row, 1, _maxRowIndex + 1);
         }
 
-        private Dictionary<SpredsheetLocation, SpredsheetRow> _rows;  
-        public void AddRow(SpredsheetRow row, int columnIndex, int rowIndex)
+        private Dictionary<SpreadsheetLocation, SpreadsheetRow> _rows;  
+        public void AddRow(SpreadsheetRow row, int columnIndex, int rowIndex)
         {
-            _rows[new SpredsheetLocation(rowIndex, columnIndex)] = row;
+            _rows[new SpreadsheetLocation(rowIndex, columnIndex)] = row;
             if (_maxNumberOfCharsPerColumn.Any())
             {
-                trackMaxChars(row, new SpredsheetLocation(rowIndex, columnIndex));
+                trackMaxChars(row, new SpreadsheetLocation(rowIndex, columnIndex));
             }
             var newMaxColumnIndex = columnIndex + row.RowCells.Count;
             if (newMaxColumnIndex > _maxColumnIndex)
@@ -118,9 +118,9 @@ namespace Acceleratio.XCellKit
             }
         }
         
-        public void WriteWorksheet(OpenXmlWriter writer, WorksheetPart part, SpredsheetStylesManager stylesManager, ref int tableCount)
+        public void WriteWorksheet(OpenXmlWriter writer, WorksheetPart part, SpreadsheetStylesManager stylesManager, ref int tableCount)
         {
-            var hyperLinksManager = new SpredsheetHyperlinkManager();
+            var hyperLinksManager = new SpreadsheetHyperlinkManager();
             var newWorksheet = new Worksheet();
             writer.WriteStartElement(newWorksheet);
             writeFrozenFirstColumn(writer);
@@ -157,7 +157,7 @@ namespace Acceleratio.XCellKit
 
         }
         
-        private void writeHyperlinks(OpenXmlWriter writer, SpredsheetHyperlinkManager hyperlinkManager)
+        private void writeHyperlinks(OpenXmlWriter writer, SpreadsheetHyperlinkManager hyperlinkManager)
         {
             var hyperlinks = hyperlinkManager.GetHyperlinks();
             if (!hyperlinks.Any())
@@ -172,7 +172,7 @@ namespace Acceleratio.XCellKit
             writer.WriteEndElement();
         }
 
-        private void writeSheetData(OpenXmlWriter writer, SpredsheetStylesManager stylesManager, SpredsheetHyperlinkManager hyperlinkManager)
+        private void writeSheetData(OpenXmlWriter writer, SpreadsheetStylesManager stylesManager, SpreadsheetHyperlinkManager hyperlinkManager)
         {
             writer.WriteStartElement(new SheetData());
 

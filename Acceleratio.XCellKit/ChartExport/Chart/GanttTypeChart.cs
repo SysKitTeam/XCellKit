@@ -183,7 +183,7 @@ namespace Acceleratio.XCellKit.Helpers
         /// Create and insert data to Axis
         /// </summary>
         //public void SetChartAxis(OpenXmlCompositeElement barChartSeries1, OpenXmlCompositeElement barChartSeries2, List<GanttData> data)
-        public void SetChartAxis(List<GanttSpredsheetChart.GanttDataPairedSeries> data, List<IGrouping<string,GanttData>> groupedData)
+        public void SetChartAxis(List<GanttSpreadsheetChart.GanttDataPairedSeries> data, List<IGrouping<string,GanttData>> groupedData)
         {
             Dictionary<uint, TimeSpan> lastPointEnd = new Dictionary<uint, TimeSpan>();
             foreach (var ganttDataPairedSeries in data)
@@ -237,7 +237,7 @@ namespace Acceleratio.XCellKit.Helpers
             }
         }
 
-        public void SetChartLocation(DrawingsPart drawingsPart, ChartPart chartPart, SpredsheetLocation location)
+        public void SetChartLocation(DrawingsPart drawingsPart, ChartPart chartPart, SpreadsheetLocation location)
         {
             drawingsPart.WorksheetDrawing = new WorksheetDrawing();
             TwoCellAnchor twoCellAnchor = drawingsPart.WorksheetDrawing.AppendChild<TwoCellAnchor>(new TwoCellAnchor());

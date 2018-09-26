@@ -5,18 +5,18 @@ using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace Acceleratio.XCellKit
 {
-    public class SpredsheetHyperLink
+    public class SpreadsheetHyperLink
     {
         public string Target { get; set; }
         public string DisplayValue { get; set; }
 
-        public SpredsheetHyperLink(string target, string displayValue)
+        public SpreadsheetHyperLink(string target, string displayValue)
         {
             Target = target;
             DisplayValue = displayValue;
         }
 
-        public SpredsheetHyperLink(SpredsheetWorksheet worksheet, SpredsheetLocation locationToFocus)
+        public SpreadsheetHyperLink(SpreadsheetWorksheet worksheet, SpreadsheetLocation locationToFocus)
         {
             var worksheetName = new string(worksheet.Name.Take(30).ToArray());
             var locationRef = string.Format("{0}{1}", locationToFocus.ColumnName, locationToFocus.RowIndex);
@@ -26,7 +26,7 @@ namespace Acceleratio.XCellKit
         
         public void WriteHyperLink(OpenXmlWriter writer, int columnIndex, int rowIndex)
         {
-            var refAtt = new OpenXmlAttribute("ref", null, string.Format("{0}{1}", SpredsheetHelper.ExcelColumnFromNumber(columnIndex), rowIndex));
+            var refAtt = new OpenXmlAttribute("ref", null, string.Format("{0}{1}", SpreadsheetHelper.ExcelColumnFromNumber(columnIndex), rowIndex));
             var locationAtt = new OpenXmlAttribute("location", null, Target);
             var displayAtt = new OpenXmlAttribute("display", null, DisplayValue);
             

@@ -6,25 +6,25 @@ using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace Acceleratio.XCellKit
 {
-    public class SpredsheetTable
+    public class SpreadsheetTable
     {
-        public SpredsheetTable(string name)
+        public SpreadsheetTable(string name)
         {
             Name = name;
-            Columns = new List<SpredsheetTableColumn>();
-            Rows = new List<SpredsheetRow>();
+            Columns = new List<SpreadsheetTableColumn>();
+            Rows = new List<SpreadsheetRow>();
             FillLastCellInRow = true;
         }
         public string Name { get; private set; }
-        public List<SpredsheetTableColumn> Columns { get; set; }
-        public List<SpredsheetRow> Rows { get; set; }
+        public List<SpreadsheetTableColumn> Columns { get; set; }
+        public List<SpreadsheetRow> Rows { get; set; }
         public bool FillLastCellInRow { get; set; }
         
 
         public Table GetTableDefinition(int id, int columnIndex, int rowIndex)
         {
-            var startColumn = SpredsheetHelper.ExcelColumnFromNumber(columnIndex);
-            var endColumn = SpredsheetHelper.ExcelColumnFromNumber(columnIndex + Columns.Count - 1);
+            var startColumn = SpreadsheetHelper.ExcelColumnFromNumber(columnIndex);
+            var endColumn = SpreadsheetHelper.ExcelColumnFromNumber(columnIndex + Columns.Count - 1);
 
             var reference = string.Format("{0}{1}:{2}{3}", startColumn, rowIndex, endColumn, rowIndex + Rows.Count);
             AutoFilter autoFilter = new AutoFilter() { Reference = reference };

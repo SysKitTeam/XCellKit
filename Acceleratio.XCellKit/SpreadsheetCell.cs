@@ -7,14 +7,14 @@ using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace Acceleratio.XCellKit
 {
-    public enum SpredsheetDataTypeEnum
+    public enum SpreadsheetDataTypeEnum
     {
         String,
         Number,
         DateTime,
         Other
     }
-    public class SpredsheetCell
+    public class SpreadsheetCell
     {
         public object Value { get; set; }
         public System.Drawing.Font Font { get; set; }
@@ -22,18 +22,18 @@ namespace Acceleratio.XCellKit
         public System.Drawing.Color? ForegroundColor { get; set; }
         public HorizontalAligment? Alignment { get; set; }
         public int Indent { get; set; }
-        public SpredsheetDataTypeEnum SpredsheetDataType { get; set; }
+        public SpreadsheetDataTypeEnum SpreadsheetDataType { get; set; }
 
-        public SpredsheetCell()
+        public SpreadsheetCell()
         {
             Indent = 0;
-            SpredsheetDataType = SpredsheetDataTypeEnum.String;
+            SpreadsheetDataType = SpreadsheetDataTypeEnum.String;
         }
 
-        public virtual void WriteCell(OpenXmlWriter writer, int columnIndex, int rowIndex, SpredsheetStylesManager stylesManager, SpredsheetHyperlinkManager hyperlinkManager)
+        public virtual void WriteCell(OpenXmlWriter writer, int columnIndex, int rowIndex, SpreadsheetStylesManager stylesManager, SpreadsheetHyperlinkManager hyperlinkManager)
         {
             var openXmlAtts = new List<OpenXmlAttribute>();
-            var columnLetter = SpredsheetHelper.ExcelColumnFromNumber(columnIndex);
+            var columnLetter = SpreadsheetHelper.ExcelColumnFromNumber(columnIndex);
             var position = string.Format("{0}{1}", columnLetter, rowIndex);
             var positionAtt = new OpenXmlAttribute("r", null, position);
             openXmlAtts.Add(positionAtt);
@@ -51,7 +51,7 @@ namespace Acceleratio.XCellKit
             {
                 sValue = sValue.Substring(0, 32767);
             }
-            if (SpredsheetDataType == SpredsheetDataTypeEnum.Number)
+            if (SpreadsheetDataType == SpreadsheetDataTypeEnum.Number)
             {
                 double numberValue = 0;
                 if (double.TryParse(sValue, out numberValue))
@@ -63,7 +63,7 @@ namespace Acceleratio.XCellKit
                     writer.WriteEndElement();
                 }
             }
-            else if (SpredsheetDataType == SpredsheetDataTypeEnum.String)
+            else if (SpreadsheetDataType == SpreadsheetDataTypeEnum.String)
             {
                 var typeAtt = new OpenXmlAttribute("t", null, "inlineStr");
                 openXmlAtts.Add(typeAtt);
@@ -74,7 +74,7 @@ namespace Acceleratio.XCellKit
                 writer.WriteEndElement();
                 writer.WriteEndElement();
             }
-            else if (SpredsheetDataType == SpredsheetDataTypeEnum.DateTime)
+            else if (SpreadsheetDataType == SpreadsheetDataTypeEnum.DateTime)
             {
                 var dateTime = DateTime.MinValue;
                 if (DateTime.TryParse(sValue, out dateTime))
@@ -84,7 +84,7 @@ namespace Acceleratio.XCellKit
                     writer.WriteEndElement();
                 }
             }
-            else if (SpredsheetDataType == SpredsheetDataTypeEnum.Other)
+            else if (SpreadsheetDataType == SpreadsheetDataTypeEnum.Other)
             {
                 var typeAttribute = new OpenXmlAttribute("t", null, "str");
                 openXmlAtts.Add(typeAttribute);
@@ -97,21 +97,21 @@ namespace Acceleratio.XCellKit
             
         }
 
-        protected virtual OpenXmlAttribute? getStyleAttribute(SpredsheetStylesManager stylesManager)
+        protected virtual OpenXmlAttribute? getStyleAttribute(SpreadsheetStylesManager stylesManager)
         {
             OpenXmlAttribute? styleAtt = null;
-            if (Font != null || BackgroundColor != null || ForegroundColor != null || Alignment != null || Indent != 0 || SpredsheetDataType == SpredsheetDataTypeEnum.DateTime)
+            if (Font != null || BackgroundColor != null || ForegroundColor != null || Alignment != null || Indent != 0 || SpreadsheetDataType == SpreadsheetDataTypeEnum.DateTime)
             {
-                var spredsheetStyle = new SpredsheetStyle()
+                var spreadsheetStyle = new SpreadsheetStyle()
                 {
                     Font = Font,
                     BackgroundColor = BackgroundColor,
                     ForegroundColor = ForegroundColor,
-                    Alignment = Alignment.HasValue ? SpredsheetHelper.GetHorizontalAlignmentValue(Alignment.Value) : (HorizontalAlignmentValues?) null,
+                    Alignment = Alignment.HasValue ? SpreadsheetHelper.GetHorizontalAlignmentValue(Alignment.Value) : (HorizontalAlignmentValues?) null,
                     Indent = Indent,
-                    IsDate =  SpredsheetDataType == SpredsheetDataTypeEnum.DateTime
+                    IsDate =  SpreadsheetDataType == SpreadsheetDataTypeEnum.DateTime
                 };
-                styleAtt = new OpenXmlAttribute("s", null, ((UInt32)stylesManager.GetStyleIndex(spredsheetStyle)).ToString());
+                styleAtt = new OpenXmlAttribute("s", null, ((UInt32)stylesManager.GetStyleIndex(spreadsheetStyle)).ToString());
             }
             return styleAtt;
         }

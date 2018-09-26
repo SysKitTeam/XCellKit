@@ -33,6 +33,10 @@ namespace Acceleratio.XCellKit
 
         public void SetImageForCell(ImageDetails details)
         {
+            if (_images.Count == 0)
+            {
+                return;
+            }
             _imageDetails.Add(details);
         }
 

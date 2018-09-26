@@ -72,8 +72,9 @@
     <Compile Include="SpreadsheetRow.cs" />
     <Compile Include="SpreadsheetStyle.cs" />
     <Compile Include="SpreadsheetStylesManager.cs" />
-    <Compile Include="SpreadsheetTable.cs" />
-    <Compile Include="SpreadsheetTableColumn.cs" />
+    <Compile Include="Tables\RequestTableRowEventArgs.cs" />
+    <Compile Include="Tables\SpreadsheetTable.cs" />
+    <Compile Include="Tables\SpreadsheetTableColumn.cs" />
     <Compile Include="SpreadsheetWorkbook.cs" />
     <Compile Include="SpreadsheetWorksheet.cs" />
   </ItemGroup>

@@ -59,6 +59,7 @@ namespace Acceleratio.XCellKit
             ParticipatesInAutoWidthColumnCalculation = true;
             VerticalAlignment = XCellKit.VerticalAlignment.Center;
             Indent = 0;
+            ImageIndex = -1;
             SpreadsheetDataType = SpreadsheetDataTypeEnum.String;
         }
 

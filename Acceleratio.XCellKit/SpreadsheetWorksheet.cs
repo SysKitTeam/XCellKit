@@ -137,7 +137,7 @@ namespace Acceleratio.XCellKit
 
         private int _rowWidthsTrackedSoFar = 0;
         const int MaxRowWidthsToTrack = 100000;
-        private const int MaxRowWidthsToTrackPerTable = 5;
+        private const int MaxRowWidthsToTrackPerTable = 5000;
 
         public void AddRow(SpreadsheetRow row, int columnIndex, int rowIndex)
         {

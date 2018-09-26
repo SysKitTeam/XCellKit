@@ -35,7 +35,7 @@ namespace Acceleratio.XCellKit.Tests
         [TestMethod]
         public void Streaming_LargeTable_MemoryConsumptionOk()
         {
-            var rowsToStream = 10;
+            var rowsToStream = 800000;
             var columnsCount = 10;
             var newExcel = new SpreadsheetWorkbook();
 
@@ -68,8 +68,6 @@ namespace Acceleratio.XCellKit.Tests
             };
 
             worksheet.AddTable(table);
-
-           // worksheet.AddRow(new SpreadsheetRow() { RowCells = new System.Collections.Generic.List<SpreadsheetCell>() { new SpreadsheetCell() { Value = "test" } } });
 
             newExcel.AddWorksheet(worksheet);
            

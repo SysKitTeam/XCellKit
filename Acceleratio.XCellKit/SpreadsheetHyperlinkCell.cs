@@ -15,10 +15,10 @@ namespace Acceleratio.XCellKit
 
         protected override OpenXmlAttribute? getStyleAttribute(SpreadsheetStylesManager stylesManager)
         {
-            var spredsheetStyle = new SpreadsheetStyle();
+            var spreadsheetStyle = new SpreadsheetStyle();
             if (Indent != 0 || Alignment != null || VerticalAlignment != null)
             {
-                spredsheetStyle = new SpreadsheetStyle()
+                spreadsheetStyle = new SpreadsheetStyle()
                 {
                     Alignment = Alignment.HasValue ? SpreadsheetHelper.GetHorizontalAlignmentValue(Alignment.Value) : (HorizontalAlignmentValues?)null,
                     VerticalAlignment = VerticalAlignment.HasValue ? SpreadsheetHelper.GetVerticalAlignmentValues(VerticalAlignment.Value) : (VerticalAlignmentValues?)null,
@@ -28,7 +28,7 @@ namespace Acceleratio.XCellKit
                     Indent = Indent
                 };
             }
-            return new OpenXmlAttribute("s", null, ((UInt32)stylesManager.GetHyperlinkStyleIndex(spredsheetStyle)).ToString());
+            return new OpenXmlAttribute("s", null, ((UInt32)stylesManager.GetHyperlinkStyleIndex(spreadsheetStyle)).ToString());
         }
 
         public override void WriteCell(OpenXmlWriter writer, int columnIndex, int rowIndex, SpreadsheetStylesManager stylesManager, SpreadsheetHyperlinkManager hyperlinkManager)

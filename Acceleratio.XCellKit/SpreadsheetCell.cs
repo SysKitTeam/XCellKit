@@ -134,7 +134,7 @@ namespace Acceleratio.XCellKit
             OpenXmlAttribute? styleAtt = null;
             if (Font != null || BackgroundColor != null || ForegroundColor != null || Alignment != null || VerticalAlignment != null || Indent != 0 || SpreadsheetDataType == SpreadsheetDataTypeEnum.DateTime || WrapText)
             {
-                var spredsheetStyle = new SpreadsheetStyle()
+                var spreadsheetStyle = new SpreadsheetStyle()
                 {
                     Font = Font,
                     BackgroundColor = BackgroundColor,
@@ -145,7 +145,7 @@ namespace Acceleratio.XCellKit
                     IsDate = SpreadsheetDataType == SpreadsheetDataTypeEnum.DateTime,
                     WrapText = WrapText
                 };
-                styleAtt = new OpenXmlAttribute("s", null, ((UInt32)stylesManager.GetStyleIndex(spredsheetStyle)).ToString());
+                styleAtt = new OpenXmlAttribute("s", null, ((UInt32)stylesManager.GetStyleIndex(spreadsheetStyle)).ToString());
             }
             return styleAtt;
         }

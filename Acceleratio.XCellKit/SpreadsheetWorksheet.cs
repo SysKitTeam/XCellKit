@@ -368,9 +368,9 @@ namespace Acceleratio.XCellKit
         private void writeConditionalFormattings(OpenXmlWriter writer)
         {
             writer.WriteStartElement(new X14.ConditionalFormattings());
-            foreach (var spredsheetConditionalFormattingRule in _conditionalFormattingRules)
+            foreach (var spreadsheetConditionalFormattingRule in _conditionalFormattingRules)
             {
-                spredsheetConditionalFormattingRule.WriteOpenXml(writer);
+                spreadsheetConditionalFormattingRule.WriteOpenXml(writer);
             }
             writer.WriteEndElement();
         }

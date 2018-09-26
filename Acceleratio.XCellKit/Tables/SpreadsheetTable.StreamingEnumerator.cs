@@ -23,10 +23,11 @@ namespace Acceleratio.XCellKit
             {
             }
 
-            private bool _exhaustedAllRows;
+            public bool ExhaustedAllRows { get; private set; }
+
             public bool MoveNext()
             {
-                if (_exhaustedAllRows)
+                if (ExhaustedAllRows)
                 {
                     Current = null;
                     return false;
@@ -35,7 +36,7 @@ namespace Acceleratio.XCellKit
                 _table.RaiseRequestTableRow(args);
                 if (args.Finished)
                 {
-                    _exhaustedAllRows = true;
+                    ExhaustedAllRows = true;
                 }
 
                 Current = args.Row;
@@ -46,7 +47,7 @@ namespace Acceleratio.XCellKit
                 }
                 else
                 { 
-                  _exhaustedAllRows = true;
+                  ExhaustedAllRows = true;
                     return false;
                 }
                 return true;

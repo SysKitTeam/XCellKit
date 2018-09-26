@@ -22,6 +22,7 @@ namespace Acceleratio.XCellKit
         public string Name { get; set; }
         private int _maxColumnIndex;
         private int _maxRowIndex;
+        private bool _addAdditionalItemsDisabled;
 
         private readonly Dictionary<int, int> _maxNumberOfCharsPerColumn = new Dictionary<int, int>();
         private readonly Dictionary<SpreadsheetLocation, SpreadsheetRow> _rows = new Dictionary<SpreadsheetLocation, SpreadsheetRow>();
@@ -52,6 +53,10 @@ namespace Acceleratio.XCellKit
 
         public void AddTable(SpreadsheetTable table, int columnIndex, int rowIndex)
         {
+            if (_addAdditionalItemsDisabled)
+            {
+                throw new InvalidOperationException("Additional elements addition is disabled");
+            }
             _tables[new SpreadsheetLocation(rowIndex, columnIndex)] = table;
             var headerRow = new SpreadsheetRow();
             for (var i = 0; i < table.Columns.Count; i++)
@@ -81,17 +86,23 @@ namespace Acceleratio.XCellKit
             {
                 var enumerator = table.GetStreamingEnumerator();
 
-                // nesto redaka cemo odmah dodati tako da se ispravno postave sirine stupaca
-                // ostale retke cemo streamati kako se zapisuje u xlsx preko writera
-                // MaxRowWidthsToTrackPerTable redaka nije puno za drzati u memoriji, ostatak ce ici 1 po 1 kak se pise sheet data
+                // we have to add some rows to calculate column widths(we dont use the excel feature because it's slow when dealing with large amounts of data)
+                // the rest of the rows will be stream directyl to the openxmlwriter
+                // MaxRowWidthsToTrackPerTable rows is not so much that it would cause an memory issue, the rest will be written one by one
                 var rowsToGet = MaxRowWidthsToTrackPerTable;
-                var endOfTableIndex = rowIndex + table.RowCount;
+                var endOfTableIndex = rowIndex;
                 while (rowsToGet > 0 && enumerator.MoveNext())
                 {
                     AddRow(enumerator.Current, columnIndex, rowIndex);
                     rowsToGet--;
                     rowIndex++;
+                    endOfTableIndex++;
                 }
+
+                
+                // if we have more items to stream, disable manually adding rows after the table
+                _addAdditionalItemsDisabled = enumerator.Current != null;
+                
                 if (endOfTableIndex > _maxRowIndex)
                 {
                     _maxRowIndex = endOfTableIndex;
@@ -146,6 +157,10 @@ namespace Acceleratio.XCellKit
 
         private void addRow(SpreadsheetRow row, int columnIndex, int rowIndex, bool isTableHeaderRow)
         {
+            if (_addAdditionalItemsDisabled)
+            {
+                throw new InvalidOperationException("Additional elements addition is disabled");
+            }
             _rows[new SpreadsheetLocation(rowIndex, columnIndex)] = row;
             if (_rowWidthsTrackedSoFar < MaxRowWidthsToTrack)
             {

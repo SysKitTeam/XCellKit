@@ -41,7 +41,12 @@ namespace Acceleratio.XCellKit
             {
                 if (_streamingMode)
                 {
-                    return _streamingModeRowCount;
+
+                    if (_streamingEnumerator.ExhaustedAllRows)
+                    {
+                        return _streamingEnumerator.ItemsRead;
+                    }
+                    throw new InvalidOperationException("Row count is not available in streaming mode when not all rows have been read");
                 }
                 return Rows.Count;
             }

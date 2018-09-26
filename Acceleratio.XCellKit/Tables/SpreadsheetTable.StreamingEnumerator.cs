@@ -28,6 +28,7 @@ namespace Acceleratio.XCellKit
             {
                 if (_exhaustedAllRows)
                 {
+                    Current = null;
                     return false;
                 }
                 var args = new RequestTableRowEventArgs();
@@ -35,12 +36,19 @@ namespace Acceleratio.XCellKit
                 if (args.Finished)
                 {
                     _exhaustedAllRows = true;
-                    Current = null;
-                    return false;
                 }
 
                 Current = args.Row;
-                ItemsRead++;
+
+                if (args.Row != null)
+                {                  
+                    ItemsRead++;
+                }
+                else
+                { 
+                  _exhaustedAllRows = true;
+                    return false;
+                }
                 return true;
             }
 

@@ -100,8 +100,7 @@ namespace Acceleratio.XCellKit
                 }
                 var typeAtt = new OpenXmlAttribute("t", null, "inlineStr");
                 openXmlAtts.Add(typeAtt);
-                writer.WriteStartElement(new Cell(), openXmlAtts);
-                sValue = XmlConvert.EncodeName(sValue);
+                writer.WriteStartElement(new Cell(), openXmlAtts);                
                 writer.WriteStartElement(new InlineString());
                 writer.WriteElement(new Text(sValue) { Space = PreserveSpaceEnumValue });
                 writer.WriteEndElement();

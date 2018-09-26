@@ -86,7 +86,7 @@ namespace Acceleratio.XCellKit
                 // MaxRowWidthsToTrackPerTable redaka nije puno za drzati u memoriji, ostatak ce ici 1 po 1 kak se pise sheet data
                 var rowsToGet = MaxRowWidthsToTrackPerTable;
                 var endOfTableIndex = rowIndex + table.RowCount;
-                while (enumerator.MoveNext() && rowsToGet > 0)
+                while (rowsToGet > 0 && enumerator.MoveNext())
                 {
                     AddRow(enumerator.Current, columnIndex, rowIndex);
                     rowsToGet--;
@@ -137,7 +137,7 @@ namespace Acceleratio.XCellKit
 
         private int _rowWidthsTrackedSoFar = 0;
         const int MaxRowWidthsToTrack = 100000;
-        private const int MaxRowWidthsToTrackPerTable = 5000;
+        private const int MaxRowWidthsToTrackPerTable = 5;
 
         public void AddRow(SpreadsheetRow row, int columnIndex, int rowIndex)
         {

@@ -18,6 +18,16 @@ namespace Acceleratio.XCellKit
         CenterContinuous,
         Distributed,
     }
+
+    public enum VerticalAlignment
+    {
+        Top,
+        Center,
+        Bottom,
+        Justify,
+        Distributed,
+    }
+
     public class SpreadsheetStylesManager
     {
         private Dictionary<string, int> _styles;
@@ -78,7 +88,7 @@ namespace Acceleratio.XCellKit
             stylesPart.Stylesheet.CellFormats.AppendChild(hyperLinkFormt);
             stylesPart.Stylesheet.CellFormats.Count = 2;
             _hyperlinkStyles[new SpreadsheetStyle().GetIdentifier()] = 1;
- 
+
 
             Borders borders = new Borders() { Count = (UInt32Value)1U };
             Border border = new Border();
@@ -104,7 +114,7 @@ namespace Acceleratio.XCellKit
             _stylesheet.CellStyles = cellStyles;
 
             var dateTimeFormatInfo = DateTimeFormatInfo.CurrentInfo;
-            var dateTimeFormat = "d.mm.yyyy hh:mm:ss"; 
+            var dateTimeFormat = "d.mm.yyyy hh:mm:ss";
             if (dateTimeFormatInfo != null)
             {
                 dateTimeFormat = dateTimeFormatInfo.ShortDatePattern + " " + dateTimeFormatInfo.LongTimePattern;
@@ -119,21 +129,25 @@ namespace Acceleratio.XCellKit
             _stylesheet.NumberingFormats = numberingFormats;
         }
 
-        private Dictionary<string, int> _hyperlinkStyles = new Dictionary<string, int>(); 
+        private Dictionary<string, int> _hyperlinkStyles = new Dictionary<string, int>();
         public int GetHyperlinkStyleIndex(SpreadsheetStyle style)
         {
-            if (_hyperlinkStyles.ContainsKey(style.GetIdentifier()))
+            var styleIdentifier = style.GetIdentifier();
+            if (_hyperlinkStyles.ContainsKey(styleIdentifier))
             {
-                return _hyperlinkStyles[style.GetIdentifier()];
+                return _hyperlinkStyles[styleIdentifier];
             }
             var cellFormat = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)1U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)0U, ApplyNumberFormat = false, ApplyFill = false, ApplyBorder = false, ApplyAlignment = false, ApplyProtection = false };
-            if (style.Alignment != null || style.Indent != 0)
+            if (style.Alignment != null || style.Indent != 0 || style.VerticalAlignment != null)
             {
                 var aligment = new Alignment();
                 if (style.Alignment != null)
                 {
                     aligment.Horizontal = style.Alignment.Value;
-
+                }
+                if (style.VerticalAlignment != null)
+                {
+                    aligment.Vertical = style.VerticalAlignment.Value;
                 }
                 if (style.Indent != 0)
                 {
@@ -143,7 +157,7 @@ namespace Acceleratio.XCellKit
             }
 
 
-            var styleIndex = _hyperlinkStyles[style.GetIdentifier()] = (int)(UInt32)_stylesheet.CellFormats.Count;
+            var styleIndex = _hyperlinkStyles[styleIdentifier] = (int)(UInt32)_stylesheet.CellFormats.Count;
             _stylesheet.CellFormats.AppendChild(cellFormat);
             _stylesheet.CellFormats.Count++;
 
@@ -153,9 +167,10 @@ namespace Acceleratio.XCellKit
 
         public int GetStyleIndex(SpreadsheetStyle style)
         {
-            if (_styles.ContainsKey(style.GetIdentifier()))
+            var styleIdentifier = style.GetIdentifier();
+            if (_styles.ContainsKey(styleIdentifier))
             {
-                return _styles[style.GetIdentifier()];
+                return _styles[styleIdentifier];
             }
 
             var fontIndex = 0;
@@ -169,9 +184,16 @@ namespace Acceleratio.XCellKit
                 else
                 {
                     var newFont = new Font();
-                    newFont.FontName = new FontName() {Val = style.Font.Name};
-                    newFont.FontSize = new FontSize() {Val = style.Font.Size};
-                    newFont.Color = new Color() {Rgb = String.Format("{0:X2}{1:X2}{2:X2}{3:X2}",style.ForegroundColor.Value.A, style.ForegroundColor.Value.R, style.ForegroundColor.Value.G, style.ForegroundColor.Value.B) };
+                    newFont.FontName = new FontName() { Val = style.Font.Name };
+                    newFont.FontSize = new FontSize() { Val = style.Font.Size };
+                    if (style.Font.Bold)
+                    {
+                        newFont.Bold = new Bold();
+                    }
+                    if (style.ForegroundColor != null)
+                    {
+                        newFont.Color = new Color() { Rgb = String.Format("{0:X2}{1:X2}{2:X2}{3:X2}", style.ForegroundColor.Value.A, style.ForegroundColor.Value.R, style.ForegroundColor.Value.G, style.ForegroundColor.Value.B) };
+                    }
                     _stylesheet.Fonts.AppendChild(newFont);
                     fontIndex = _fonts[key] = (int)((UInt32)_stylesheet.Fonts.Count);
                     _stylesheet.Fonts.Count++;
@@ -186,12 +208,12 @@ namespace Acceleratio.XCellKit
                 }
                 else
                 {
-                    var newFill = new PatternFill() {PatternType = PatternValues.Solid};
-                    newFill.ForegroundColor = new ForegroundColor() { Rgb = String.Format("{0:X2}{1:X2}{2:X2}{3:X2}",style.BackgroundColor.Value.A, style.BackgroundColor.Value.R, style.BackgroundColor.Value.G, style.BackgroundColor.Value.B) };
-                    newFill.BackgroundColor = new BackgroundColor() {Indexed = 64U};
-                    fillIndex = (int) (UInt32)_stylesheet.Fills.Count;
+                    var newFill = new PatternFill() { PatternType = PatternValues.Solid };
+                    newFill.ForegroundColor = new ForegroundColor() { Rgb = String.Format("{0:X2}{1:X2}{2:X2}{3:X2}", style.BackgroundColor.Value.A, style.BackgroundColor.Value.R, style.BackgroundColor.Value.G, style.BackgroundColor.Value.B) };
+                    newFill.BackgroundColor = new BackgroundColor() { Indexed = 64U };
+                    fillIndex = (int)(UInt32)_stylesheet.Fills.Count;
                     _fills[style.BackgroundColor.Value] = fillIndex;
-                    _stylesheet.Fills.AppendChild(new Fill() {PatternFill = newFill});
+                    _stylesheet.Fills.AppendChild(new Fill() { PatternFill = newFill });
                     _stylesheet.Fills.Count++;
                 }
             }
@@ -201,24 +223,30 @@ namespace Acceleratio.XCellKit
                 numberingId = 164;
             }
 
-            var cellFormat = new CellFormat() {FormatId = 0, FontId = (UInt32)fontIndex, FillId = (UInt32)fillIndex, BorderId = 0, NumberFormatId = (UInt32)numberingId, ApplyFill = true};
-            if (style.Alignment != null || style.Indent != 0)
+            var cellFormat = new CellFormat() { FormatId = 0, FontId = (UInt32)fontIndex, FillId = (UInt32)fillIndex, BorderId = 0, NumberFormatId = (UInt32)numberingId, ApplyFill = true };
+            if (style.Alignment != null || style.VerticalAlignment != null || style.Indent != 0 || style.WrapText)
             {
                 var aligment = new Alignment();
                 if (style.Alignment != null)
                 {
                     aligment.Horizontal = style.Alignment.Value;
-
+                }
+                if (style.VerticalAlignment != null)
+                {
+                    aligment.Vertical = style.VerticalAlignment.Value;
                 }
                 if (style.Indent != 0)
                 {
-                    aligment.Indent = (UInt32) style.Indent;
+                    aligment.Indent = (UInt32)style.Indent;
+                }
+                if (style.WrapText)
+                {
+                    aligment.WrapText = true;
                 }
                 cellFormat.AppendChild(aligment);
             }
-           
 
-            var styleIndex = _styles[style.GetIdentifier()] = (int)(UInt32)_stylesheet.CellFormats.Count;
+            var styleIndex = _styles[styleIdentifier] = (int)(UInt32)_stylesheet.CellFormats.Count;
             _stylesheet.CellFormats.AppendChild(cellFormat);
             _stylesheet.CellFormats.Count++;
 
@@ -297,5 +325,5 @@ namespace Acceleratio.XCellKit
         }
     }
 
-    
+
 }

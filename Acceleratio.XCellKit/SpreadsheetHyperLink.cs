@@ -23,15 +23,5 @@ namespace Acceleratio.XCellKit
             Target = string.Format("'{0}'!{1}", worksheetName, locationRef);
             DisplayValue = string.Format("Go to {0}.", worksheet.Name);
         }
-        
-        public void WriteHyperLink(OpenXmlWriter writer, int columnIndex, int rowIndex)
-        {
-            var refAtt = new OpenXmlAttribute("ref", null, string.Format("{0}{1}", SpreadsheetHelper.ExcelColumnFromNumber(columnIndex), rowIndex));
-            var locationAtt = new OpenXmlAttribute("location", null, Target);
-            var displayAtt = new OpenXmlAttribute("display", null, DisplayValue);
-            
-            writer.WriteStartElement(new Hyperlink(), new List<OpenXmlAttribute>() {refAtt, locationAtt, displayAtt});
-            writer.WriteEndElement();
-        }
     }
 }

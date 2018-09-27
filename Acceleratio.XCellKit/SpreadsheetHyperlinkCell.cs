@@ -6,20 +6,22 @@ namespace Acceleratio.XCellKit
 {
     public class SpreadsheetHyperlinkCell : SpreadsheetCell
     {
-        private SpreadsheetHyperLink _hyperLink;
+        private readonly SpreadsheetHyperLink _hyperLink;
         public SpreadsheetHyperlinkCell(SpreadsheetHyperLink hyperLink)
         {
             _hyperLink = hyperLink;
+            Value = hyperLink.DisplayValue;
         }
 
         protected override OpenXmlAttribute? getStyleAttribute(SpreadsheetStylesManager stylesManager)
         {
             var spreadsheetStyle = new SpreadsheetStyle();
-            if (Indent != 0 || Alignment != null)
+            if (Indent != 0 || Alignment != null || VerticalAlignment != null)
             {
                 spreadsheetStyle = new SpreadsheetStyle()
                 {
                     Alignment = Alignment.HasValue ? SpreadsheetHelper.GetHorizontalAlignmentValue(Alignment.Value) : (HorizontalAlignmentValues?)null,
+                    VerticalAlignment = VerticalAlignment.HasValue ? SpreadsheetHelper.GetVerticalAlignmentValues(VerticalAlignment.Value) : (VerticalAlignmentValues?)null,
                     BackgroundColor = BackgroundColor,
                     Font = Font,
                     ForegroundColor = ForegroundColor,

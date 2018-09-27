@@ -73,9 +73,22 @@ namespace Acceleratio.XCellKit.Tests
         [TestMethod]
         public void Streaming_LargeTable_MemoryConsumptionOk()
         {
+            streaming_LargeTable_MemoryConsumptionOk(false);
+        }
+
+        [TestMethod]
+        public void Streaming_LargeTableHyperLinks_MemoryConsumptionOk()
+        {
+            streaming_LargeTable_MemoryConsumptionOk(true);
+        }
+
+        private static void streaming_LargeTable_MemoryConsumptionOk(bool useHyperlinks)
+        {
+            var maxMemoryAllowed = useHyperlinks ? 150 : 40;
+
             var counter = 0;
             var maxMemDuringStreaming = 0.0;
-            var newExcel = setupLargeWorkbook( row =>
+            var newExcel = setupLargeWorkbook(row =>
             {
                 counter++;
                 if (counter % 1000 == 0)
@@ -86,19 +99,20 @@ namespace Acceleratio.XCellKit.Tests
                         maxMemDuringStreaming = mem;
                     }
                 }
-            });
+            }, useHyperLinks: useHyperlinks);
 
             var startingMemory = Utilities.GetMemoryConsumption();
             newExcel.Save(STR_TestOutputPath);
             var endingMemory = Utilities.GetMemoryConsumption();
-            Console.WriteLine("Memory Consumption: " );
+            Console.WriteLine("Memory Consumption: ");
             Console.WriteLine("      Start: {0:N2}", startingMemory);
             Console.WriteLine("      End: {0:N2}", endingMemory);
             Console.WriteLine("      Max during streaming: {0:N2}", maxMemDuringStreaming);
             Assert.IsTrue(File.Exists(STR_TestOutputPath));
 
-            Assert.IsTrue(endingMemory - startingMemory < 300, "Ending memory to high");
-            Assert.IsTrue(maxMemDuringStreaming - startingMemory < 300, "Max memory to high");            
+            
+            Assert.IsTrue(endingMemory - startingMemory < maxMemoryAllowed, "Ending memory to high");
+            Assert.IsTrue(maxMemDuringStreaming - startingMemory < maxMemoryAllowed, "Max memory to high");
         }
 
         [TestMethod]
@@ -115,9 +129,8 @@ namespace Acceleratio.XCellKit.Tests
         }
 
         static Font _font = new Font(new FontFamily("Calibri"), 11);
-        private static SpreadsheetWorkbook setupLargeWorkbook( Action<SpreadsheetRow> afterRowCreated)
-        {
-            var rowsToStream = 800000;
+        private static SpreadsheetWorkbook setupLargeWorkbook( Action<SpreadsheetRow> afterRowCreated, int rowsToStream = 800000, bool useHyperLinks = false)
+        {             
             var columnsCount = 10;
             var newExcel = new SpreadsheetWorkbook();
 
@@ -135,15 +148,22 @@ namespace Acceleratio.XCellKit.Tests
                 var cells = new List<SpreadsheetCell>();
                 for (var i = 0; i < columnsCount; i++)
                 {
-                    
-                    cells.Add(new SpreadsheetCell()
+                    if (useHyperLinks && i == columnsCount - 1)
                     {
-                        BackgroundColor = Color.Red,
-                        ForegroundColor = Color.Blue,
-                        Font = _font,
-                        Alignment =  HorizontalAligment.Center,
-                        Value = $"Ovo je test {rowCounter} - {i}"
-                    });
+                        cells.Add(new SpreadsheetHyperlinkCell(new SpreadsheetHyperLink($"http://www.google{rowCounter}.com", "google me!")));
+
+                    }
+                    else
+                    {
+                        cells.Add(new SpreadsheetCell()
+                        {
+                            BackgroundColor = Color.Red,
+                            ForegroundColor = Color.Blue,
+                            Font = _font,
+                            Alignment = HorizontalAligment.Center,
+                            Value = $"Ovo je test {rowCounter} - {i}"
+                        });
+                    }
                 }
 
                 args.Row = new SpreadsheetRow()

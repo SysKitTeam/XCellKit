@@ -36,6 +36,41 @@ namespace Acceleratio.XCellKit.Tests
         }
 
         [TestMethod]
+        public void NonStreaming_LargeTable_FileCreated()
+        {
+            var newExcel = new SpreadsheetWorkbook();
+            var columnsCount = 10;
+            var worksheet = new SpreadsheetWorksheet("Test22");
+            for (int i = 0; i < 100000; i++)
+            {
+                var cells = new List<SpreadsheetCell>();
+                for (var j = 0; j < columnsCount; j++)
+                {
+
+                    cells.Add(new SpreadsheetCell()
+                    {
+                        BackgroundColor = Color.Red,
+                        ForegroundColor = Color.Blue,
+                        Font = _font,
+                        Alignment = HorizontalAligment.Center,
+                        Value = $"Ovo je test {i} - {j}"
+                    });
+                }
+
+                var row = new SpreadsheetRow()
+                {
+                    RowCells = cells
+                };
+                worksheet.AddRow(row);
+            }
+
+            newExcel.AddWorksheet(worksheet);
+            newExcel.Save(STR_TestOutputPath);
+
+            Assert.IsTrue(File.Exists(STR_TestOutputPath));
+        }
+
+        [TestMethod]
         public void Streaming_LargeTable_MemoryConsumptionOk()
         {
             var counter = 0;
@@ -93,7 +128,7 @@ namespace Acceleratio.XCellKit.Tests
                 table.Columns.Add(new SpreadsheetTableColumn() {Name = $"Column{i}"});
             }
 
-            table.ActivateStreamingMode(rowsToStream);
+            table.ActivateStreamingMode();
             var rowCounter = 0;
             table.RequestTableRow += (s, args) =>
             {

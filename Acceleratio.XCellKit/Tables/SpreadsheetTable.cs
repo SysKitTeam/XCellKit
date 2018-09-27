@@ -19,7 +19,6 @@ namespace Acceleratio.XCellKit
             RequestTableRow(this, args);
         }
         private List<SpreadsheetRow> _rows;
-        private int _streamingModeRowCount;
         private bool _streamingMode;
         private SpreadSheetTableStreamingEnumerator _streamingEnumerator;
         public SpreadsheetTable(string name)
@@ -27,7 +26,6 @@ namespace Acceleratio.XCellKit
             Name = name;
             Columns = new List<SpreadsheetTableColumn>();
             _rows = new List<SpreadsheetRow>();
-            _streamingModeRowCount = -1;
             _streamingMode = false;
             FillLastCellInRow = true;
             ShowHeaderRow = true;
@@ -72,14 +70,13 @@ namespace Acceleratio.XCellKit
             }
         }
 
-        public void ActivateStreamingMode(int totalRowCount)
+        public void ActivateStreamingMode()
         {
-            if (this.Rows.Count > 0)
+            if (IsInStreamingMode && this.StreamedRowsSoFar > 0)
             {
                 throw new InvalidOperationException("Streaming mode cannot be activated once rows have been added");
             }
             _streamingMode = true;
-            _streamingModeRowCount = totalRowCount;
 
             _streamingEnumerator = new SpreadSheetTableStreamingEnumerator(this);
         }

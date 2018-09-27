@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 
@@ -82,7 +83,13 @@ namespace Acceleratio.XCellKit.Tests
             streaming_LargeTable_MemoryConsumptionOk(true);
         }
 
-        private static void streaming_LargeTable_MemoryConsumptionOk(bool useHyperlinks)
+        [TestMethod]
+        public void StreamingEnumerator_LargeTable_MemoryConsumptionOk()
+        {
+            streaming_LargeTable_MemoryConsumptionOk(false, true);
+        }
+
+        private static void streaming_LargeTable_MemoryConsumptionOk(bool useHyperlinks, bool useEnumerator = false)
         {
             var maxMemoryAllowed = useHyperlinks ? 150 : 40;
 
@@ -99,7 +106,7 @@ namespace Acceleratio.XCellKit.Tests
                         maxMemDuringStreaming = mem;
                     }
                 }
-            }, useHyperLinks: useHyperlinks);
+            }, useHyperLinks: useHyperlinks, useEnumerator: useEnumerator);
 
             var startingMemory = Utilities.GetMemoryConsumption();
             newExcel.Save(STR_TestOutputPath);
@@ -129,7 +136,7 @@ namespace Acceleratio.XCellKit.Tests
         }
 
         static Font _font = new Font(new FontFamily("Calibri"), 11);
-        private static SpreadsheetWorkbook setupLargeWorkbook( Action<SpreadsheetRow> afterRowCreated, int rowsToStream = 800000, bool useHyperLinks = false)
+        private static SpreadsheetWorkbook setupLargeWorkbook( Action<SpreadsheetRow> afterRowCreated, int rowsToStream = 800000, bool useHyperLinks = false, bool useEnumerator = false)
         {             
             var columnsCount = 10;
             var newExcel = new SpreadsheetWorkbook();
@@ -141,44 +148,66 @@ namespace Acceleratio.XCellKit.Tests
                 table.Columns.Add(new SpreadsheetTableColumn() {Name = $"Column{i}"});
             }
 
-            table.ActivateStreamingMode();
-            var rowCounter = 0;
-            table.RequestTableRow += (s, args) =>
+            if (!useEnumerator)
             {
-                var cells = new List<SpreadsheetCell>();
-                for (var i = 0; i < columnsCount; i++)
+                table.ActivateStreamingMode();
+                var rowCounter = 0;
+                table.TableRowRequested += (s, args) =>
                 {
-                    if (useHyperLinks && i == columnsCount - 1)
-                    {
-                        cells.Add(new SpreadsheetHyperlinkCell(new SpreadsheetHyperLink($"http://www.google{rowCounter}.com", "google me!")));
-
-                    }
-                    else
-                    {
-                        cells.Add(new SpreadsheetCell()
-                        {
-                            BackgroundColor = Color.Red,
-                            ForegroundColor = Color.Blue,
-                            Font = _font,
-                            Alignment = HorizontalAligment.Center,
-                            Value = $"Ovo je test {rowCounter} - {i}"
-                        });
-                    }
-                }
-
-                args.Row = new SpreadsheetRow()
-                {
-                    RowCells = cells
+                    var spreadsheetRow = createTestRow(useHyperLinks, columnsCount, rowCounter);
+                    args.Row = spreadsheetRow;
+                    rowCounter++;
+                    afterRowCreated?.Invoke(args.Row);
+                    args.Finished = rowCounter == rowsToStream;
                 };
-                rowCounter++;
-                afterRowCreated?.Invoke(args.Row);
-                args.Finished = rowCounter == rowsToStream;
-            };
+            }
+            else
+            {
+                var enumerator = Enumerable.Range(0, rowsToStream).Select(x =>
+                    {
+                        var row = createTestRow(useHyperLinks, columnsCount, x);
+                        afterRowCreated?.Invoke(row);                        
+                        return row;
+                    })
+                    .GetEnumerator();
+
+                table.ActivateStreamingMode(enumerator);
+            }
 
             worksheet.AddTable(table);
 
             newExcel.AddWorksheet(worksheet);
             return newExcel;
+        }
+
+        private static SpreadsheetRow createTestRow(bool useHyperLinks, int columnsCount, int rowCounter)
+        {
+            var cells = new List<SpreadsheetCell>();
+            for (var i = 0; i < columnsCount; i++)
+            {
+                if (useHyperLinks && i == columnsCount - 1)
+                {
+                    cells.Add(new SpreadsheetHyperlinkCell(new SpreadsheetHyperLink($"http://www.google{rowCounter}.com",
+                        "google me!")));
+                }
+                else
+                {
+                    cells.Add(new SpreadsheetCell()
+                    {
+                        BackgroundColor = Color.Red,
+                        ForegroundColor = Color.Blue,
+                        Font = _font,
+                        Alignment = HorizontalAligment.Center,
+                        Value = $"Ovo je test {rowCounter} - {i}"
+                    });
+                }
+            }
+
+            var spreadsheetRow = new SpreadsheetRow()
+            {
+                RowCells = cells
+            };
+            return spreadsheetRow;
         }
     }
 }

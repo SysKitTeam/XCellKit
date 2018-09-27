@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DocumentFormat.OpenXml;
@@ -8,7 +9,11 @@ namespace Acceleratio.XCellKit
 {
     public partial class SpreadsheetTable
     {
-        public event EventHandler<RequestTableRowEventArgs> RequestTableRow = delegate { };
+        /// <summary>
+        /// Used for dynamic row building when in streaming mode
+        /// If an enumerator was not provided while calling <see cref="ActivateStreamingMode"/>
+        /// </summary>
+        public event EventHandler<RequestTableRowEventArgs> TableRowRequested = delegate { };
 
         private void RaiseRequestTableRow(RequestTableRowEventArgs args)
         {
@@ -16,7 +21,7 @@ namespace Acceleratio.XCellKit
             {
                 throw new InvalidOperationException("Cannot request rows in non streaming mode");
             }
-            RequestTableRow(this, args);
+            TableRowRequested(this, args);
         }
         private List<SpreadsheetRow> _rows;
         private bool _streamingMode;
@@ -70,7 +75,25 @@ namespace Acceleratio.XCellKit
             }
         }
 
+        /// <summary>
+        /// Calling this function will activate the streaming mode when exporting the table.
+        /// Rows can be provided by using the <see cref="TableRowRequested"/> event.
+        /// </summary>
         public void ActivateStreamingMode()
+        {
+            ActivateStreamingMode(null);
+        }
+
+        /// <summary>
+        /// Calling this function will activate the streaming mode when exporting the table.
+        /// Rows will be read by using the <paramref name="rowsEnumerator"/> parameter.
+        /// <para>
+        /// To get the most out of the streaming functionality please plan ahead about the way you provide the data to the table.
+        /// </para>
+        /// Any data manipulations should occur without additional .ToList calls or additional lists.
+        /// Ie. use .Select and transform your data to rows without calling .ToList, pass the enumerator of the resulting IEnumerable.
+        /// </summary>     
+        public void ActivateStreamingMode(IEnumerator<SpreadsheetRow> rowsEnumerator)
         {
             if (IsInStreamingMode && this.StreamedRowsSoFar > 0)
             {
@@ -78,10 +101,10 @@ namespace Acceleratio.XCellKit
             }
             _streamingMode = true;
 
-            _streamingEnumerator = new SpreadSheetTableStreamingEnumerator(this);
+            _streamingEnumerator = new SpreadSheetTableStreamingEnumerator(this, rowsEnumerator);
         }
 
-
+      
         public int StreamedRowsSoFar
         {
             get

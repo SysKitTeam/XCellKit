@@ -13,14 +13,16 @@ namespace Acceleratio.XCellKit
         public class SpreadSheetTableStreamingEnumerator : IEnumerator<SpreadsheetRow>
         {
             private readonly SpreadsheetTable _table;
-
-            public SpreadSheetTableStreamingEnumerator(SpreadsheetTable table)
+            private readonly IEnumerator<SpreadsheetRow> _internalEnumerator;
+            public SpreadSheetTableStreamingEnumerator(SpreadsheetTable table, IEnumerator<SpreadsheetRow> internalEnumerator)
             {
                 _table = table;
+                _internalEnumerator = internalEnumerator;
             }
 
             public void Dispose()
             {
+                _internalEnumerator?.Dispose();
             }
 
             public bool ExhaustedAllRows { get; private set; }
@@ -32,22 +34,38 @@ namespace Acceleratio.XCellKit
                     Current = null;
                     return false;
                 }
-                var args = new RequestTableRowEventArgs();
-                _table.RaiseRequestTableRow(args);
-                if (args.Finished)
+
+                if (_internalEnumerator == null)
                 {
-                    ExhaustedAllRows = true;
+                    var args = new RequestTableRowEventArgs();
+                    _table.RaiseRequestTableRow(args);
+                    if (args.Finished)
+                    {
+                        Current = null;
+                    }
+                    else
+                    {
+                        Current = args.Row;
+                    }
+                    
+                }
+                else
+                {
+                    var hasData = _internalEnumerator.MoveNext();
+                    Current = (SpreadsheetRow)_internalEnumerator.Current;
+                    if (!hasData)
+                    {
+                        Current = null;
+                    }
                 }
 
-                Current = args.Row;
-
-                if (args.Row != null)
-                {                  
+                if (Current != null)
+                {
                     ItemsRead++;
                 }
                 else
-                { 
-                  ExhaustedAllRows = true;
+                {
+                    ExhaustedAllRows = true;
                     return false;
                 }
                 return true;

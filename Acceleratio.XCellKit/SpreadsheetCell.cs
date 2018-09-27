@@ -25,6 +25,8 @@ namespace Acceleratio.XCellKit
         private static readonly Cell openXmlCellElementForWriting = new Cell();
 
         private object _value;
+        private bool? _wrapTextExplicit;
+        private bool _wrapTextInternal = false;
 
         public object Value
         {
@@ -32,7 +34,7 @@ namespace Acceleratio.XCellKit
             set
             {
                 _value = value;
-                WrapText = _value != null && (_value.ToString().Contains("\n") || _value.ToString().Length > 200);
+                _wrapTextInternal = _value != null && (_value.ToString().Contains("\n") || _value.ToString().Length > 200);
             }
         }
 
@@ -52,7 +54,12 @@ namespace Acceleratio.XCellKit
         public double ImageScaleFactor { get; set; }
         public System.Drawing.Size? MergedCellsRange { get; set; }
         public bool ParticipatesInAutoWidthColumnCalculation { get; set; }
-        public bool WrapText { get; private set; }
+
+        public bool WrapText
+        {
+            get => _wrapTextExplicit.GetValueOrDefault(_wrapTextInternal);
+            set => _wrapTextExplicit = value;
+        }
 
         public SpreadsheetCell()
         {

@@ -313,13 +313,17 @@ namespace Acceleratio.XCellKit
                 {
                     continue;
                 }
-                var enumerator = table.Value.GetStreamingEnumerator();
-                var tableRowPosition = table.Value.StreamedRowsSoFar;
-                while (enumerator.MoveNext())
+
+                using (var enumerator = table.Value.GetStreamingEnumerator())
                 {
-                    var row = enumerator.Current;
-                    row.WriteRow(writer, table.Key.ColumnIndex, table.Key.RowIndex + tableRowPosition + 1, stylesManager, hyperlinkManager, drawingsManager);
-                    tableRowPosition++;
+                    var tableRowPosition = table.Value.StreamedRowsSoFar;
+                    while (enumerator.MoveNext())
+                    {
+                        var row = enumerator.Current;
+                        row.WriteRow(writer, table.Key.ColumnIndex, table.Key.RowIndex + tableRowPosition + 1,
+                            stylesManager, hyperlinkManager, drawingsManager);
+                        tableRowPosition++;
+                    }
                 }
             }
 

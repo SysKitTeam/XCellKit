@@ -7,12 +7,12 @@ using DocumentFormat.OpenXml.Drawing.Charts;
 
 namespace Acceleratio.XCellKit
 {
-    public class PieSpredsheetChart : SpredsheetChart
+    public class BarSpreadsheetChart : SpreadsheetChart
     {
-        public PieSpredsheetChart(List<ChartModel> chartData, ChartSettings settings)
+        public BarSpreadsheetChart(List<ChartModel> chartData, ChartSettings settings)
             : base(chartData, settings)
         {
-            this.ChartPropertySetter = new PieTypeChart();
+            this.ChartPropertySetter = new BarTypeChart();
 
             this.ChartPropertyValuesFromSettings();
         }

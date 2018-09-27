@@ -11,17 +11,17 @@ using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace Acceleratio.XCellKit
 {
-    public class GanttSpredsheetChart : SpredsheetChart
+    public class GanttSpreadsheetChart : SpreadsheetChart
     {
         public List<GanttData> GanttData { get; protected set; }
 
-        public GanttSpredsheetChart(List<GanttData> ganttData, ChartSettings settings)
+        public GanttSpreadsheetChart(List<GanttData> ganttData, ChartSettings settings)
             : base(settings)
         {
             this.GanttData = ganttData.Distinct().ToList();
         }
 
-        internal override void CreateChart(OpenXmlWriter writer, WorksheetPart part, SpredsheetLocation location)
+        internal override void CreateChart(OpenXmlWriter writer, WorksheetPart part, SpreadsheetLocation location)
         {
             DrawingsPart drawingsPart = part.AddNewPart<DrawingsPart>();
 

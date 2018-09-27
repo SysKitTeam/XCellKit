@@ -1,10 +1,10 @@
 ﻿namespace Acceleratio.XCellKit
 {
-    public class SpredsheetLocation
+    public class SpreadsheetLocation
     {
         private int _rowIndex;
         private int _columnIndex;
-        public SpredsheetLocation(int rowIndex, int columnIndex)
+        public SpreadsheetLocation(int rowIndex, int columnIndex)
         {
             _rowIndex = rowIndex;
             _columnIndex = columnIndex;
@@ -12,7 +12,7 @@
 
         public string ColumnName
         {
-            get { return SpredsheetHelper.ExcelColumnFromNumber(_columnIndex); }
+            get { return SpreadsheetHelper.ExcelColumnFromNumber(_columnIndex); }
         }
 
         public int RowIndex
@@ -27,7 +27,7 @@
 
         public override bool Equals(object obj)
         {
-            var location = obj as SpredsheetLocation;
+            var location = obj as SpreadsheetLocation;
             if (location == null)
             {
                 return false;

@@ -16,10 +16,10 @@ namespace SysKit.XCellKit
     }
     public class SpreadsheetCell
     {
-        // ovo je izvuceno u static jer dobivamo masivna ubrzanja
-        // kad se svaki put nova instanca dodjeljuje u  Space = SpaceProcessingModeValues.Preserve
-        // stvara se novi objekt ovog dolje tipa, a da bi se dobio innertext mora se iz enum descriptiona preko atributa procitati text vrijednost
-        // ako imamo 500 000 redaka to osjetno usporava, ovako ce se samo jednom to desiti
+        // Massive performance gains have been achieved by reusing this static member
+        // everytime that Space = SpaceProcessingModeValues.Preserve was performed, a new isntance of a type called EnumValue vas created
+        // getting the text value of this object slowed down the export process
+        // so by caching this value we have mad gains
         private static EnumValue<SpaceProcessingModeValues> PreserveSpaceEnumValue = SpaceProcessingModeValues.Preserve;
 
         private static readonly Cell openXmlCellElementForWriting = new Cell();

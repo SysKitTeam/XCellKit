@@ -13,7 +13,8 @@ namespace SysKit.XCellKit
         {
             if (columnNames == null)
             {
-                // bolje je unaprijed izgenerirati sva imena stupaca, nekih 8% je uzimalo na 500 000 ako se svaki put generiralo ispocetka
+                // from a performance perspective it is more efficient to pregenerate all the column names
+                // the constant string format calls killed performance
                 pregenerateColumnNames();
             }
             if (column > columnNames.Length)

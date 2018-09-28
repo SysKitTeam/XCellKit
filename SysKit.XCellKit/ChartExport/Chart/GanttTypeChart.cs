@@ -181,14 +181,13 @@ namespace SysKit.XCellKit.Helpers
 
         /// <summary>
         /// Create and insert data to Axis
-        /// </summary>
-        //public void SetChartAxis(OpenXmlCompositeElement barChartSeries1, OpenXmlCompositeElement barChartSeries2, List<GanttData> data)
+        /// </summary>        
         public void SetChartAxis(List<GanttSpreadsheetChart.GanttDataPairedSeries> data, List<IGrouping<string,GanttData>> groupedData)
         {
             Dictionary<uint, TimeSpan> lastPointEnd = new Dictionary<uint, TimeSpan>();
             foreach (var ganttDataPairedSeries in data)
             {
-                // Y axis - prvi bar je za početnu poziciju (ne prikazuje se)
+                // Y axis - first bar is for the starting position (is not visible)
                 StringLiteral stringLiteral1 = ganttDataPairedSeries.BarChartSeriesHidden.AppendChild<CategoryAxisData>(new CategoryAxisData())
                     .AppendChild<StringLiteral>(new StringLiteral());
                 stringLiteral1.Append(new PointCount() {Val = new UInt32Value((uint)ganttDataPairedSeries.Values.Count)});
@@ -197,7 +196,7 @@ namespace SysKit.XCellKit.Helpers
                     .AppendChild<StringLiteral>(new StringLiteral());
                 stringLiteral2.Append(new PointCount() {Val = new UInt32Value((uint)ganttDataPairedSeries.Values.Count)});
 
-                // X axis - prvi bar je za početnu poziciju (ne prikazuje se)
+                // X axis - first bar is for the starting position (is not visible)
                 NumberLiteral numberLiteral1 = ganttDataPairedSeries.BarChartSeriesHidden.AppendChild<Values>(new Values())
                     .AppendChild<NumberLiteral>(new NumberLiteral());
                 numberLiteral1.Append(new FormatCode("General"));
@@ -242,7 +241,7 @@ namespace SysKit.XCellKit.Helpers
             drawingsPart.WorksheetDrawing = new WorksheetDrawing();
             TwoCellAnchor twoCellAnchor = drawingsPart.WorksheetDrawing.AppendChild<TwoCellAnchor>(new TwoCellAnchor());
 
-            // Pozicija charta.
+            // Chart position
             twoCellAnchor.Append(new DocumentFormat.OpenXml.Drawing.Spreadsheet.FromMarker(new ColumnId(location.ColumnIndex.ToString()),
                 new ColumnOffset("0"),
                 new RowId(location.RowIndex.ToString()),
@@ -258,7 +257,7 @@ namespace SysKit.XCellKit.Helpers
                     Spreadsheet.GraphicFrame());
             graphicFrame.Macro = "";
 
-            // Ime charta.
+            // Chart name
             graphicFrame.Append(new DocumentFormat.OpenXml.Drawing.Spreadsheet.NonVisualGraphicFrameProperties(
                 new DocumentFormat.OpenXml.Drawing.Spreadsheet.NonVisualDrawingProperties() { Id = new UInt32Value(2u), Name = "Chart 1" },
                 new DocumentFormat.OpenXml.Drawing.Spreadsheet.NonVisualGraphicFrameDrawingProperties()));

@@ -15,8 +15,8 @@ namespace SysKit.XCellKit
 {
     public class DrawingsManager
     {
-        // open xml koristi mjernu jedinicu naziva EMU
-        // prema definiciji za EMU( English Metric Units) postoji 914400 po inchu
+        // Open xml uses an unit named EMU (English Metric Unit)
+        // by definition there is 914400 EMUs per inch        
         public const int INT_EMUsPerInch = 914400;
         private List<Image> _images = new List<Image>();
         private readonly List<ImageDetails> _imageDetails = new List<ImageDetails>();
@@ -88,14 +88,14 @@ namespace SysKit.XCellKit
 
 
         /// <summary>
-        /// kovertiranje u English Metric Units (EMU)        
+        /// Convert to English Metric Units (EMU)        
         /// </summary>
         /// <param name="value"></param>
         /// <param name="dpi"></param>
         /// <returns></returns>
         private long convertPixelsToEMUs(int value, float dpi)
         {
-            // da bi pixele pretvorili u inche moramo iskoristiti ovu formulu koja je vezana za dpi slike
+            // to convert pixels into inches we use this formula
             return (long)(INT_EMUsPerInch / dpi) * value;
         }
 
@@ -113,9 +113,11 @@ namespace SysKit.XCellKit
                 imgWidth = (long)(imgWidth * details.ImageScaleFactor);
                 imgHeight = (long)(imgHeight * details.ImageScaleFactor);
             }
-            //ovdje zapravo jos ima posla jer su slike mutne i nema indenta
-            //no pokazalo se da za 80k redaka slike jednostavno nisu dobro rjesenje u excelu. Excel se brzo izgenerira, ali sto ti to znaci kad ga jedva u excelu gledas
-            //tako da ovaj kod jos treba srediti ako cemo koristiti
+
+            // there is still work to be done here since the images can get fuzzy and there is no indent
+            // but, since you cannot have thousands of cell images(which we need) without performance penalty in the Excel application itselft
+            // we can easily and quickly generate such excel files, but Excel has trouble reading and rendering them
+            // so for now this stay as is
             Xdr.OneCellAnchor oneCellAnchor = new Xdr.OneCellAnchor();
 
             Xdr.FromMarker fromMarker1 = new Xdr.FromMarker();

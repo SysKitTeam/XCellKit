@@ -245,7 +245,7 @@ namespace SysKit.XCellKit
             drawingsPart.WorksheetDrawing = new WorksheetDrawing();
             TwoCellAnchor twoCellAnchor = drawingsPart.WorksheetDrawing.AppendChild<TwoCellAnchor>(new TwoCellAnchor());
 
-            // Pozicija charta.
+            // Chart position
             twoCellAnchor.Append(new DocumentFormat.OpenXml.Drawing.Spreadsheet.FromMarker(new ColumnId(location.ColumnIndex.ToString()),
                 new ColumnOffset("0"),
                 new RowId(location.RowIndex.ToString()),
@@ -261,7 +261,7 @@ namespace SysKit.XCellKit
                     Spreadsheet.GraphicFrame());
             graphicFrame.Macro = "";
 
-            // Ime charta.
+            // Chart title
             graphicFrame.Append(new DocumentFormat.OpenXml.Drawing.Spreadsheet.NonVisualGraphicFrameProperties(
                 new DocumentFormat.OpenXml.Drawing.Spreadsheet.NonVisualDrawingProperties() { Id = new UInt32Value(2u), Name = "Chart 1" },
                 new DocumentFormat.OpenXml.Drawing.Spreadsheet.NonVisualGraphicFrameDrawingProperties()));

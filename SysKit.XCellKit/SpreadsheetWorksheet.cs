@@ -242,10 +242,13 @@ namespace SysKit.XCellKit
             var hyperlinkTargetRelationshipIds = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             var clickableHyperLinks = new HashSet<KeyValuePair<SpreadsheetLocation, SpreadsheetHyperLink>>();
 
-            // external ULRove moramo baciti kao relationshipove i onda ih u hyperlinkovima referencirat
-            // zbog problema s trajanjem exporta u slucaju da ima puno hyperlinkova dodano je ogranicenje na INT_MaxUniqueHyperlinks, inace export traje 10x duze i to razlika moze samo rasti
-            // jer je provjera za unique(za svaki link dodani) u pozadinskom openXML kodu sekvencijalan prolazak i usporedba kroz kolekciju. Odnosno O(n^2)
-            // plus ovaj dio nije streamable nazalost, barem ne na ocit nacin
+            // we must add external URLs as relationships and reference them in the hyperlinks
+            // the more unique URLs there are the more performance problems there are
+            // because of this, a limit of INT_MaxUniqueHyperlinks was put in place
+            // without it the export can take 10x longer and it only gets worse the more unique links there are
+            // why is that?
+            // when adding a new relationship there is a uniqueness check. The check is performed sequentialy so the actual impact i O(n^2)
+            // also this part does not seem streamable so all of the openxml element would need to be stored in the memory
             foreach (var hyperlink in hyperlinks.Where(x => !string.IsNullOrEmpty(x.Value.Target)))
             {
                 var target = hyperlink.Value.Target;

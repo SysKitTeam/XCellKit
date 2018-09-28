@@ -57,9 +57,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Acceleratio.XCellKit\Acceleratio.XCellKit.csproj">
+    <ProjectReference Include="..\Acceleratio.XCellKit\SysKit.XCellKit.csproj">
       <Project>{c739604c-2757-4de5-a225-edd1d2c71e21}</Project>
-      <Name>Acceleratio.Celport</Name>
+      <Name>SysKit.XCellKit</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2035
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SysKit.XCellKit", "Acceleratio.XCellKit\SysKit.XCellKit.csproj", "{C739604C-2757-4DE5-A225-EDD1D2C71E21}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SysKit.XCellKit", "SysKit.XCellKit\SysKit.XCellKit.csproj", "{C739604C-2757-4DE5-A225-EDD1D2C71E21}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SysKit.XCellKit.Tests", "Acceleratio.XCellKit.Tests\SysKit.XCellKit.Tests.csproj", "{5166E812-259C-4D56-8856-7B2B3FB63A54}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SysKit.XCellKit.Tests", "SysKit.XCellKit.Tests\SysKit.XCellKit.Tests.csproj", "{5166E812-259C-4D56-8856-7B2B3FB63A54}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

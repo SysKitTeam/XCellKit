@@ -13,7 +13,7 @@ using ExtensionList = DocumentFormat.OpenXml.Spreadsheet.ExtensionList;
 using Hyperlink = DocumentFormat.OpenXml.Spreadsheet.Hyperlink;
 using X14 = DocumentFormat.OpenXml.Office2010.Excel;
 
-namespace Acceleratio.XCellKit
+namespace SysKit.XCellKit
 {
     public class SpreadsheetWorksheet
     {

@@ -8,7 +8,7 @@ using DocumentFormat.OpenXml.Drawing.Charts;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 
-namespace Acceleratio.XCellKit
+namespace SysKit.XCellKit
 {
     public abstract class SpreadsheetChart
     {

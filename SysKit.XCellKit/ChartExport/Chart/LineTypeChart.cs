@@ -2,7 +2,7 @@
 using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.Drawing.Charts;
 
-namespace Acceleratio.XCellKit
+namespace SysKit.XCellKit
 {
     internal class LineTypeChart : ChartPropertiesSetup
     {

@@ -7,8 +7,8 @@
     <ProjectGuid>{C739604C-2757-4DE5-A225-EDD1D2C71E21}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Acceleratio.XCellKit</RootNamespace>
-    <AssemblyName>Acceleratio.XCellKit</AssemblyName>
+    <RootNamespace>SysKit.XCellKit</RootNamespace>
+    <AssemblyName>SysKit.XCellKit</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />

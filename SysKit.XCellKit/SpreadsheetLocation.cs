@@ -1,4 +1,4 @@
-﻿namespace Acceleratio.XCellKit
+﻿namespace SysKit.XCellKit
 {
     public class SpreadsheetLocation
     {

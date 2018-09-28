@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Acceleratio.XCellKit
+namespace SysKit.XCellKit
 {
 
     public partial class SpreadsheetTable

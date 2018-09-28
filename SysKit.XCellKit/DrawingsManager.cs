@@ -11,7 +11,7 @@ using A = DocumentFormat.OpenXml.Drawing;
 using A14 = DocumentFormat.OpenXml.Office2010.Drawing;
 using Drawing = DocumentFormat.OpenXml.Spreadsheet.Drawing;
 
-namespace Acceleratio.XCellKit
+namespace SysKit.XCellKit
 {
     public class DrawingsManager
     {

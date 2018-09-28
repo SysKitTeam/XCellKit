@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Acceleratio.XCellKit
+namespace SysKit.XCellKit
 {
     internal class BaseChartProperties
     {

@@ -6,7 +6,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using Formula = DocumentFormat.OpenXml.Office.Excel.Formula;
 using X14 = DocumentFormat.OpenXml.Office2010.Excel;
 
-namespace Acceleratio.XCellKit
+namespace SysKit.XCellKit
 {
     public abstract class SpreadsheetConditionalFormattingRule
     {

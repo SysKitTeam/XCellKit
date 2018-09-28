@@ -3,7 +3,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using Color = System.Drawing.Color;
 using Font = System.Drawing.Font;
 
-namespace Acceleratio.XCellKit
+namespace SysKit.XCellKit
 {
     public class SpreadsheetStyle
     {

@@ -4,7 +4,7 @@ using System.Data;
 using System.Text;
 using DocumentFormat.OpenXml.Spreadsheet;
 
-namespace Acceleratio.XCellKit
+namespace SysKit.XCellKit
 {
     public static class SpreadsheetHelper
     {

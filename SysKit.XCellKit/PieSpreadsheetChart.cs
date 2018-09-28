@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using DocumentFormat.OpenXml.Drawing.Charts;
 
-namespace Acceleratio.XCellKit
+namespace SysKit.XCellKit
 {
     public class PieSpreadsheetChart : SpreadsheetChart
     {

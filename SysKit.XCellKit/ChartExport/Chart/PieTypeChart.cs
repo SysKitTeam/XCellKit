@@ -1,8 +1,8 @@
-﻿using Acceleratio.XCellKit.ChartExport.Chart;
-using DocumentFormat.OpenXml;
+﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Drawing.Charts;
+using SysKit.XCellKit.ChartExport.Chart;
 
-namespace Acceleratio.XCellKit
+namespace SysKit.XCellKit
 {
     internal class PieTypeChart : ChartPropertiesSetup
     {

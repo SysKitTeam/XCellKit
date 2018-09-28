@@ -1,7 +1,7 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Drawing.Charts;
 
-namespace Acceleratio.XCellKit
+namespace SysKit.XCellKit
 {
     internal class BarTypeChart : ChartPropertiesSetup
     {

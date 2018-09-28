@@ -1,4 +1,4 @@
-﻿namespace Acceleratio.XCellKit.ChartExport.Chart
+﻿namespace SysKit.XCellKit.ChartExport.Chart
 {
     internal class PieChartProperties : BaseChartProperties
     {

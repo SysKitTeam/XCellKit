@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Spreadsheet;
 
-namespace Acceleratio.XCellKit
+namespace SysKit.XCellKit
 {
     public class SpreadsheetTableColumn
     {

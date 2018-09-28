@@ -9,7 +9,7 @@ using DocumentFormat.OpenXml.Packaging;
 using Outline = DocumentFormat.OpenXml.Drawing.Outline;
 using Values = DocumentFormat.OpenXml.Drawing.Charts.Values;
 
-namespace Acceleratio.XCellKit.Helpers
+namespace SysKit.XCellKit.Helpers
 {
     internal class GanttTypeChart
     {

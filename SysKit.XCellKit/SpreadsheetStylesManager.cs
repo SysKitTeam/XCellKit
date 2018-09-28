@@ -5,7 +5,7 @@ using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 
-namespace Acceleratio.XCellKit
+namespace SysKit.XCellKit
 {
     public enum HorizontalAligment
     {

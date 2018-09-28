@@ -3,7 +3,7 @@ using System.Linq;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Spreadsheet;
 
-namespace Acceleratio.XCellKit
+namespace SysKit.XCellKit
 {
     public class SpreadsheetHyperLink
     {

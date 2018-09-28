@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Acceleratio.XCellKit
+namespace SysKit.XCellKit
 {
     public class GanttData : IEquatable<GanttData>
     {

@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Acceleratio.XCellKit.Helpers;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Drawing.Charts;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using SysKit.XCellKit.Helpers;
 
-namespace Acceleratio.XCellKit
+namespace SysKit.XCellKit
 {
     public class GanttSpreadsheetChart : SpreadsheetChart
     {

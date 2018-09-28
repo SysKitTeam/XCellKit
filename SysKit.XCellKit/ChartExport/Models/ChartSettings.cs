@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Acceleratio.XCellKit
+namespace SysKit.XCellKit
 {
     public class ChartSettings
     {

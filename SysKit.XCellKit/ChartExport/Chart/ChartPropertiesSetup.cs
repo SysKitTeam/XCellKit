@@ -9,7 +9,7 @@ using DocumentFormat.OpenXml.Packaging;
 using Boolean = DocumentFormat.OpenXml.Office2013.Drawing.ChartStyle.Boolean;
 using Chart = DocumentFormat.OpenXml.Drawing.Charts.Chart;
 
-namespace Acceleratio.XCellKit
+namespace SysKit.XCellKit
 {
     internal abstract class ChartPropertiesSetup
     {

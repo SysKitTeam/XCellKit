@@ -7,7 +7,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 
-namespace Acceleratio.XCellKit.Tests
+namespace SysKit.XCellKit.Tests
 {
     [TestClass]
     public class WorkBookTests

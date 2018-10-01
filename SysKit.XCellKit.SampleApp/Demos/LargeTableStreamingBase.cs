@@ -22,7 +22,7 @@ namespace SysKit.XCellKit.SampleApp.Demos
             {
                 if (useHyperLinks && i == columnsCount - 1)
                 {
-                    cells.Add(new SpreadsheetHyperlinkCell(new SpreadsheetHyperLink($"http://www.google{rowCounter}.com",
+                    cells.Add(new SpreadsheetHyperlinkCell(new SpreadsheetHyperLink($"http://www.google.com",
                         "google me!")));
                 }
                 else

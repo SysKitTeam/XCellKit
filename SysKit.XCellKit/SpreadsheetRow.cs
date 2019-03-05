@@ -9,6 +9,8 @@ namespace SysKit.XCellKit
     {
         public double? RowHeight { get; set; }
         public bool IsVisible { get; set; } = true;
+        public bool IsExpanded { get; set; } = true;
+        public bool IsMaster { get; set; } = true;
         public SpreadsheetRow()
         {
             RowCells = new List<SpreadsheetCell>();
@@ -45,6 +47,16 @@ namespace SysKit.XCellKit
             if (!IsVisible)
             {
                 var hiddenAttribute = new OpenXmlAttribute("hidden", null, 1.ToString());
+                attributeList.Add(hiddenAttribute);
+            }
+            if (!IsExpanded)
+            {
+                var hiddenAttribute = new OpenXmlAttribute("collapsed", null, 1.ToString());
+                attributeList.Add(hiddenAttribute);
+            }
+            if (!IsMaster)
+            {
+                var hiddenAttribute = new OpenXmlAttribute("outlineLevel", null, 1.ToString());
                 attributeList.Add(hiddenAttribute);
             }
 

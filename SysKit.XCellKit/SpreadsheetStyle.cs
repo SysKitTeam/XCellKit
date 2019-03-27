@@ -33,6 +33,7 @@ namespace SysKit.XCellKit
             {
                 var fontid = Font.ToString();
                 sb.Append(fontid);
+                sb.Append(Font.Style);
             }
             if (Alignment.HasValue)
             {

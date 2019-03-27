@@ -34,7 +34,7 @@ namespace SysKit.XCellKit
             _streamingMode = false;
             FillLastCellInRow = true;
             ShowHeaderRow = true;
-            StyleName = "TableStyleLight11";
+            StyleName = "TableStyleLight9";
         }
         public string Name { get; private set; }
         public List<SpreadsheetTableColumn> Columns { get; set; }

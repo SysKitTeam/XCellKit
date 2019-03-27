@@ -170,7 +170,7 @@ namespace SysKit.XCellKit
                 }
                 i++;
             }
-            TableStyleInfo tableStyle = new TableStyleInfo() { Name = StyleName, ShowFirstColumn = false, ShowLastColumn = false, ShowRowStripes = false, ShowColumnStripes = false, };
+            TableStyleInfo tableStyle = new TableStyleInfo() { Name = StyleName, ShowFirstColumn = false, ShowLastColumn = false, ShowRowStripes = true, ShowColumnStripes = false, };
             if (autoFilter != null)
             {
                 table.Append(autoFilter);

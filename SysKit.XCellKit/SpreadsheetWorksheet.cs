@@ -51,7 +51,7 @@ namespace SysKit.XCellKit
             AddTable(table, 1, _maxRowIndex + 1);
         }
 
-        public void AddTable(SpreadsheetTable table, int columnIndex, int rowIndex)
+        public void AddTable(SpreadsheetTable table, int columnIndex, int rowIndex, HeaderCellStyle headerCellStyle = null)
         {
             if (_addAdditionalItemsDisabled)
             {
@@ -64,6 +64,12 @@ namespace SysKit.XCellKit
                 var column = table.Columns[i];
                 var headerCell = new SpreadsheetCell();
                 headerCell.Value = column.Name;
+                if (headerCellStyle != null)
+                {
+                    headerCell.BackgroundColor = headerCellStyle.BackgroundColor;
+                    headerCell.ForegroundColor = headerCellStyle.ForegroundColor;
+                    headerCell.Font = headerCellStyle.Font;
+                }
                 headerRow.AddCell(headerCell);
                 trackMaxChars(columnIndex + i, headerCell);
             }
@@ -190,6 +196,8 @@ namespace SysKit.XCellKit
             {
                new KeyValuePair<string, string>( "r", "http://schemas.openxmlformats.org/officeDocument/2006/relationships")
             });
+
+            writeSheetProperties(writer);
             writeFrozenFirstColumn(writer);
             writeColumns(writer);
             writeSheetData(writer, stylesManager, hyperLinksManager, DrawingsManager);
@@ -204,6 +212,14 @@ namespace SysKit.XCellKit
         private void writeDrawings(WorksheetPart part, OpenXmlWriter writer)
         {
             DrawingsManager.WriteDrawings(part, writer);
+        }
+
+        private void writeSheetProperties(OpenXmlWriter writer)
+        {
+            writer.WriteStartElement(new SheetProperties());
+            writer.WriteStartElement(new OutlineProperties(), new List<OpenXmlAttribute>() { new OpenXmlAttribute("summaryBelow", null, 0.ToString()) });
+            writer.WriteEndElement();
+            writer.WriteEndElement();
         }
 
         private void writeFrozenFirstColumn(OpenXmlWriter writer)

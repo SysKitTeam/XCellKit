@@ -190,6 +190,10 @@ namespace SysKit.XCellKit
                     {
                         newFont.Bold = new Bold();
                     }
+                    if (style.Font.Italic)
+                    {
+                        newFont.Italic = new Italic();
+                    }
                     if (style.ForegroundColor != null)
                     {
                         newFont.Color = new Color() { Rgb = String.Format("{0:X2}{1:X2}{2:X2}{3:X2}", style.ForegroundColor.Value.A, style.ForegroundColor.Value.R, style.ForegroundColor.Value.G, style.ForegroundColor.Value.B) };

@@ -34,9 +34,11 @@ namespace SysKit.XCellKit
             _streamingMode = false;
             FillLastCellInRow = true;
             ShowHeaderRow = true;
+            StyleName = "TableStyleLight11";
         }
         public string Name { get; private set; }
         public List<SpreadsheetTableColumn> Columns { get; set; }
+        public string StyleName { get; set; }
 
         public int RowCount
         {
@@ -168,7 +170,7 @@ namespace SysKit.XCellKit
                 }
                 i++;
             }
-            TableStyleInfo tableStyle = new TableStyleInfo() { Name = "TableStyleLight9", ShowFirstColumn = false, ShowLastColumn = false, ShowRowStripes = true, ShowColumnStripes = false, };
+            TableStyleInfo tableStyle = new TableStyleInfo() { Name = StyleName, ShowFirstColumn = false, ShowLastColumn = false, ShowRowStripes = false, ShowColumnStripes = false, };
             if (autoFilter != null)
             {
                 table.Append(autoFilter);

@@ -156,14 +156,21 @@ namespace SysKit.XCellKit
         const int MaxRowWidthsToTrack = 100000;
         private const int MaxRowWidthsToTrackPerTable = 5000;
 
-        public void AddRow(SpreadsheetRow row, int columnIndex, int rowIndex)
+        /// <summary>
+        /// Adds new row to Spreadsheet
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="columnIndex"></param>
+        /// <param name="rowIndex"></param>
+        /// <param name="forceAddRow">If set to true, row will be added even if we are in streaming mode. Just be careful that this might cause an overlap of streamed data, so don't add additional rows until streaming has ended</param>
+        public void AddRow(SpreadsheetRow row, int columnIndex, int rowIndex, bool forceAddRow = false)
         {
             addRow(row, columnIndex, rowIndex, false);
         }
 
-        private void addRow(SpreadsheetRow row, int columnIndex, int rowIndex, bool isTableHeaderRow)
+        private void addRow(SpreadsheetRow row, int columnIndex, int rowIndex, bool isTableHeaderRow, bool forceAddRow = false)
         {
-            if (_addAdditionalItemsDisabled)
+            if (_addAdditionalItemsDisabled && !forceAddRow)
             {
                 throw new InvalidOperationException("Additional elements addition is disabled");
             }

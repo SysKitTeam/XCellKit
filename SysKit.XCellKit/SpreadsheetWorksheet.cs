@@ -165,7 +165,7 @@ namespace SysKit.XCellKit
         /// <param name="forceAddRow">If set to true, row will be added even if we are in streaming mode. Just be careful that this might cause an overlap of streamed data, so don't add additional rows until streaming has ended</param>
         public void AddRow(SpreadsheetRow row, int columnIndex, int rowIndex, bool forceAddRow = false)
         {
-            addRow(row, columnIndex, rowIndex, false);
+            addRow(row, columnIndex, rowIndex, false, forceAddRow);
         }
 
         private void addRow(SpreadsheetRow row, int columnIndex, int rowIndex, bool isTableHeaderRow, bool forceAddRow = false)

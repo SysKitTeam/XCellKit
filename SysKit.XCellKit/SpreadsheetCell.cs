@@ -12,6 +12,7 @@ namespace SysKit.XCellKit
         String,
         Number,
         DateTime,
+        SharedString,
         Other
     }
     public class SpreadsheetCell
@@ -126,6 +127,12 @@ namespace SysKit.XCellKit
                     writer.WriteElement(new CellValue(dateTime.ToOADate().ToString(CultureInfo.InvariantCulture)));
                     writer.WriteEndElement();
                 }
+            }
+            else if (SpreadsheetDataType == SpreadsheetDataTypeEnum.SharedString)
+            {
+                writer.WriteStartElement(new Cell { DataType = CellValues.SharedString });
+                writer.WriteElement(new CellValue(sValue));
+                writer.WriteEndElement();
             }
             else if (SpreadsheetDataType == SpreadsheetDataTypeEnum.Other)
             {

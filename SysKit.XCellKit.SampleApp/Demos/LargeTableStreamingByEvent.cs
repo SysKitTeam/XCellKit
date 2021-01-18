@@ -24,6 +24,8 @@ namespace SysKit.XCellKit.SampleApp.Demos
                 table.Columns.Add(new SpreadsheetTableColumn() { Name = $"Column{i}" });
             }
 
+            var sharedItemIndex = worksheet.AddSharedStringItem("poduzetnikRow");
+            worksheet.AddRow(createTestSharedTextCell(sharedItemIndex), 1, 1, true);
             table.ActivateStreamingMode();
             var rowCounter = 0;
             table.TableRowRequested += (s, args) =>
@@ -32,9 +34,14 @@ namespace SysKit.XCellKit.SampleApp.Demos
                 args.Row = spreadsheetRow;
                 rowCounter++;
                 args.Finished = rowCounter == RowsToStream;
+
+                if (args.Finished)
+                {
+                    //worksheet.ChangeSharedStringItem(sharedItemIndex, "");
+                }
             };
 
-            worksheet.AddTable(table);
+            worksheet.AddTable(table, 1, 5);
             workBook.AddWorksheet(worksheet);
             workBook.Save(OutputFile);
         }

@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Drawing;
-using DocumentFormat.OpenXml.Drawing.Charts;
-using DocumentFormat.OpenXml.Drawing.Spreadsheet;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using Column = DocumentFormat.OpenXml.Spreadsheet.Column;
+using Columns = DocumentFormat.OpenXml.Spreadsheet.Columns;
 using Extension = DocumentFormat.OpenXml.Spreadsheet.Extension;
 using ExtensionList = DocumentFormat.OpenXml.Spreadsheet.ExtensionList;
 using Hyperlink = DocumentFormat.OpenXml.Spreadsheet.Hyperlink;
+using Text = DocumentFormat.OpenXml.Drawing.Text;
 using X14 = DocumentFormat.OpenXml.Office2010.Excel;
 
 namespace SysKit.XCellKit
@@ -28,7 +28,9 @@ namespace SysKit.XCellKit
         private readonly Dictionary<SpreadsheetLocation, SpreadsheetRow> _rows = new Dictionary<SpreadsheetLocation, SpreadsheetRow>();
         private readonly Dictionary<SpreadsheetLocation, SpreadsheetTable> _tables = new Dictionary<SpreadsheetLocation, SpreadsheetTable>();
         private readonly List<SpreadsheetConditionalFormattingRule> _conditionalFormattingRules = new List<SpreadsheetConditionalFormattingRule>();
+        private readonly Dictionary<int, string> _sharedStringItems = new Dictionary<int, string>();
         public DrawingsManager DrawingsManager { get; set; }
+
         public SpreadsheetWorksheet(string name)
         {
             Name = name;
@@ -105,10 +107,10 @@ namespace SysKit.XCellKit
                     endOfTableIndex++;
                 }
 
-                
+
                 // if we have more items to stream, disable manually adding rows after the table
                 _addAdditionalItemsDisabled = enumerator.Current != null;
-                
+
                 if (endOfTableIndex > _maxRowIndex)
                 {
                     _maxRowIndex = endOfTableIndex;
@@ -196,7 +198,25 @@ namespace SysKit.XCellKit
             _conditionalFormattingRules.Add(conditionalFormattingRule);
         }
 
-        public void WriteWorksheet(OpenXmlWriter writer, WorksheetPart part, SpreadsheetStylesManager stylesManager, ref int tableCount)
+        private int sharedStringKey = 0;
+        public int AddSharedStringItem(string text)
+        {
+            //if (_sharedStringItems.ContainsKey(text))
+            //{
+            //    return _sharedStringItems[text];
+            //}
+
+            var key = sharedStringKey++;
+            _sharedStringItems.Add(key, text);
+            return key;
+        }
+
+        public void ChangeSharedStringItem(int itemIndex, string newValue)
+        {
+            _sharedStringItems[itemIndex] = newValue;
+        }
+
+        public void WriteWorksheet(OpenXmlWriter writer, WorksheetPart part, WorkbookPart workbookPart, SpreadsheetStylesManager stylesManager, ref int tableCount)
         {
             var hyperLinksManager = new SpreadsheetHyperlinkManager();
             writer.WriteStartElement(new Worksheet(), new List<OpenXmlAttribute>(), new List<KeyValuePair<string, string>>()
@@ -213,6 +233,7 @@ namespace SysKit.XCellKit
             writeDrawings(part, writer);
             writeTables(writer, part, ref tableCount);
             writeExtensionsList(writer);
+            writeSharedStringTableParts(workbookPart, stylesManager);
             writer.WriteEndElement();
         }
 
@@ -468,6 +489,56 @@ namespace SysKit.XCellKit
             }
 
             writer.WriteEndElement();
+        }
+
+        private void writeSharedStringTableParts(WorkbookPart workbookPart, SpreadsheetStylesManager stylesManager)
+        {
+            if (!_sharedStringItems.Any())
+            {
+                return;
+            }
+
+            // Get the SharedStringTablePart. If it does not exist, create a new one.
+            SharedStringTablePart shareStringPart = workbookPart.GetPartsOfType<SharedStringTablePart>().Any()
+                ? workbookPart.GetPartsOfType<SharedStringTablePart>().First()
+                : workbookPart.AddNewPart<SharedStringTablePart>();
+
+            // TODO: lepse ovo
+            foreach (var keyValue in _sharedStringItems.OrderBy(si => si.Key))
+            {
+                insertSharedStringItem(keyValue.Value, shareStringPart, stylesManager);
+            }
+        }
+
+        // Given text and a SharedStringTablePart, creates a SharedStringItem with the specified text 
+        // and inserts it into the SharedStringTablePart. If the item already exists, returns its index.
+        private void insertSharedStringItem(string text, SharedStringTablePart shareStringPart, SpreadsheetStylesManager stylesManager)
+        {
+            // If the part does not contain a SharedStringTable, create one.
+            if (shareStringPart.SharedStringTable == null)
+            {
+                shareStringPart.SharedStringTable = new SharedStringTable();
+            }
+
+            int i = 0;
+
+            // Iterate through all the items in the SharedStringTable. If the text already exists, return its index.
+            foreach (SharedStringItem item in shareStringPart.SharedStringTable.Elements<SharedStringItem>())
+            {
+                if (item.InnerText == text)
+                {
+                    return;
+                }
+
+                i++;
+            }
+
+            Run run = new Run();
+            run.Append(new DocumentFormat.OpenXml.Spreadsheet.Text(text));
+            run.RunProperties = new RunProperties();
+            run.RunProperties.Append(new Color { Rgb = "FFFF00" });
+            shareStringPart.SharedStringTable.AppendChild(new SharedStringItem(run));
+            shareStringPart.SharedStringTable.Save();
         }
 
         public int LastRowIndex

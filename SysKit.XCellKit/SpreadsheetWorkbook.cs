@@ -69,7 +69,7 @@ namespace SysKit.XCellKit
                 var worksheetPart = workbookPart.AddNewPart<WorksheetPart>(sheetId);
                 using (var writer = OpenXmlWriter.Create(worksheetPart))
                 {
-                    worksheets.WriteWorksheet(writer, worksheetPart, stylesManager, ref _tableCount);
+                    worksheets.WriteWorksheet(writer, worksheetPart, workbookPart, stylesManager, ref _tableCount);
                 }
             }
         }

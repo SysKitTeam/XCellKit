@@ -80,6 +80,7 @@
     <Compile Include="SpreadsheetWorkbook.cs" />
     <Compile Include="SpreadsheetWorksheet.cs" />
     <Compile Include="Tables\SpreadsheetTable.StreamingEnumerator.cs" />
+    <Compile Include="Tables\SpreadsheetStreamingFinishedArgs.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="DrawingsManager.cs" />
   </ItemGroup>

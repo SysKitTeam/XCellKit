@@ -10,7 +10,6 @@ using Columns = DocumentFormat.OpenXml.Spreadsheet.Columns;
 using Extension = DocumentFormat.OpenXml.Spreadsheet.Extension;
 using ExtensionList = DocumentFormat.OpenXml.Spreadsheet.ExtensionList;
 using Hyperlink = DocumentFormat.OpenXml.Spreadsheet.Hyperlink;
-using Text = DocumentFormat.OpenXml.Drawing.Text;
 using X14 = DocumentFormat.OpenXml.Office2010.Excel;
 
 namespace SysKit.XCellKit
@@ -28,7 +27,7 @@ namespace SysKit.XCellKit
         private readonly Dictionary<SpreadsheetLocation, SpreadsheetRow> _rows = new Dictionary<SpreadsheetLocation, SpreadsheetRow>();
         private readonly Dictionary<SpreadsheetLocation, SpreadsheetTable> _tables = new Dictionary<SpreadsheetLocation, SpreadsheetTable>();
         private readonly List<SpreadsheetConditionalFormattingRule> _conditionalFormattingRules = new List<SpreadsheetConditionalFormattingRule>();
-        private readonly Dictionary<int, string> _sharedStringItems = new Dictionary<int, string>();
+        private readonly List<SpreadsheetSharedStringItem> _sharedStringItems = new List<SpreadsheetSharedStringItem>();
         public DrawingsManager DrawingsManager { get; set; }
 
         public SpreadsheetWorksheet(string name)
@@ -198,20 +197,19 @@ namespace SysKit.XCellKit
             _conditionalFormattingRules.Add(conditionalFormattingRule);
         }
 
-        private int sharedStringKey = 0;
-        public int AddSharedStringItem(string text)
+        public int AddSharedStringItem(SpreadsheetSharedStringItem item)
         {
-            //if (_sharedStringItems.ContainsKey(text))
-            //{
-            //    return _sharedStringItems[text];
-            //}
+            var existingItem = _sharedStringItems.FindIndex(i => i.Text == item.Text);
+            if (existingItem != -1)
+            {
+                return existingItem;
+            }
 
-            var key = sharedStringKey++;
-            _sharedStringItems.Add(key, text);
-            return key;
+            _sharedStringItems.Add(item);
+            return _sharedStringItems.Count - 1;
         }
 
-        public void ChangeSharedStringItem(int itemIndex, string newValue)
+        public void ChangeSharedStringItem(int itemIndex, SpreadsheetSharedStringItem newValue)
         {
             _sharedStringItems[itemIndex] = newValue;
         }
@@ -233,7 +231,7 @@ namespace SysKit.XCellKit
             writeDrawings(part, writer);
             writeTables(writer, part, ref tableCount);
             writeExtensionsList(writer);
-            writeSharedStringTableParts(workbookPart, stylesManager);
+            writeSharedStringTableParts(workbookPart);
             writer.WriteEndElement();
         }
 
@@ -491,7 +489,7 @@ namespace SysKit.XCellKit
             writer.WriteEndElement();
         }
 
-        private void writeSharedStringTableParts(WorkbookPart workbookPart, SpreadsheetStylesManager stylesManager)
+        private void writeSharedStringTableParts(WorkbookPart workbookPart)
         {
             if (!_sharedStringItems.Any())
             {
@@ -503,16 +501,14 @@ namespace SysKit.XCellKit
                 ? workbookPart.GetPartsOfType<SharedStringTablePart>().First()
                 : workbookPart.AddNewPart<SharedStringTablePart>();
 
-            // TODO: lepse ovo
-            foreach (var keyValue in _sharedStringItems.OrderBy(si => si.Key))
+            foreach (var sharedItem in _sharedStringItems)
             {
-                insertSharedStringItem(keyValue.Value, shareStringPart, stylesManager);
+                insertSharedStringItem(sharedItem.GetElement(), shareStringPart);
             }
         }
 
         // Given text and a SharedStringTablePart, creates a SharedStringItem with the specified text 
-        // and inserts it into the SharedStringTablePart. If the item already exists, returns its index.
-        private void insertSharedStringItem(string text, SharedStringTablePart shareStringPart, SpreadsheetStylesManager stylesManager)
+        private void insertSharedStringItem(SharedStringItem item, SharedStringTablePart shareStringPart)
         {
             // If the part does not contain a SharedStringTable, create one.
             if (shareStringPart.SharedStringTable == null)
@@ -520,24 +516,7 @@ namespace SysKit.XCellKit
                 shareStringPart.SharedStringTable = new SharedStringTable();
             }
 
-            int i = 0;
-
-            // Iterate through all the items in the SharedStringTable. If the text already exists, return its index.
-            foreach (SharedStringItem item in shareStringPart.SharedStringTable.Elements<SharedStringItem>())
-            {
-                if (item.InnerText == text)
-                {
-                    return;
-                }
-
-                i++;
-            }
-
-            Run run = new Run();
-            run.Append(new DocumentFormat.OpenXml.Spreadsheet.Text(text));
-            run.RunProperties = new RunProperties();
-            run.RunProperties.Append(new Color { Rgb = "FFFF00" });
-            shareStringPart.SharedStringTable.AppendChild(new SharedStringItem(run));
+            shareStringPart.SharedStringTable.AppendChild(item);
             shareStringPart.SharedStringTable.Save();
         }
 

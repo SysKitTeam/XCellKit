@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SysKit.XCellKit.SampleApp.Demos
+﻿namespace SysKit.XCellKit.SampleApp.Demos
 {
     class LargeTableStreamingByEvent : LargeTableStreamingBase
     {
@@ -24,8 +18,6 @@ namespace SysKit.XCellKit.SampleApp.Demos
                 table.Columns.Add(new SpreadsheetTableColumn() { Name = $"Column{i}" });
             }
 
-            var sharedItemIndex = worksheet.AddSharedStringItem("poduzetnikRow");
-            worksheet.AddRow(createTestSharedTextCell(sharedItemIndex), 1, 1, true);
             table.ActivateStreamingMode();
             var rowCounter = 0;
             table.TableRowRequested += (s, args) =>
@@ -34,11 +26,6 @@ namespace SysKit.XCellKit.SampleApp.Demos
                 args.Row = spreadsheetRow;
                 rowCounter++;
                 args.Finished = rowCounter == RowsToStream;
-
-                if (args.Finished)
-                {
-                    //worksheet.ChangeSharedStringItem(sharedItemIndex, "");
-                }
             };
 
             worksheet.AddTable(table, 1, 5);

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SysKit.XCellKit.SampleApp.Demos
 {
@@ -37,26 +33,6 @@ namespace SysKit.XCellKit.SampleApp.Demos
                     });
                 }
             }
-
-            var spreadsheetRow = new SpreadsheetRow()
-            {
-                RowCells = cells
-            };
-            return spreadsheetRow;
-        }
-
-        protected SpreadsheetRow createTestSharedTextCell(int sharedTypeIndex)
-        {
-            var cells = new List<SpreadsheetCell>();
-            cells.Add(new SpreadsheetCell()
-            {
-                BackgroundColor = Color.Red,
-                ForegroundColor = Color.Blue,
-                Font = _font,
-                Alignment = HorizontalAligment.Center,
-                Value = $"{sharedTypeIndex}",
-                SpreadsheetDataType = SpreadsheetDataTypeEnum.SharedString
-            });
 
             var spreadsheetRow = new SpreadsheetRow()
             {

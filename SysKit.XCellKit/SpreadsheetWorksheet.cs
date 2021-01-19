@@ -157,21 +157,14 @@ namespace SysKit.XCellKit
         const int MaxRowWidthsToTrack = 100000;
         private const int MaxRowWidthsToTrackPerTable = 5000;
 
-        /// <summary>
-        /// Adds new row to Spreadsheet
-        /// </summary>
-        /// <param name="row"></param>
-        /// <param name="columnIndex"></param>
-        /// <param name="rowIndex"></param>
-        /// <param name="forceAddRow">If set to true, row will be added even if we are in streaming mode. Just be careful that this might cause an overlap of streamed data, so don't add additional rows until streaming has ended</param>
-        public void AddRow(SpreadsheetRow row, int columnIndex, int rowIndex, bool forceAddRow = false)
+        public void AddRow(SpreadsheetRow row, int columnIndex, int rowIndex)
         {
-            addRow(row, columnIndex, rowIndex, false, forceAddRow);
+            addRow(row, columnIndex, rowIndex, false);
         }
 
-        private void addRow(SpreadsheetRow row, int columnIndex, int rowIndex, bool isTableHeaderRow, bool forceAddRow = false)
+        private void addRow(SpreadsheetRow row, int columnIndex, int rowIndex, bool isTableHeaderRow)
         {
-            if (_addAdditionalItemsDisabled && !forceAddRow)
+            if (_addAdditionalItemsDisabled)
             {
                 throw new InvalidOperationException("Additional elements addition is disabled");
             }
@@ -197,6 +190,11 @@ namespace SysKit.XCellKit
             _conditionalFormattingRules.Add(conditionalFormattingRule);
         }
 
+        /// <summary>
+        /// Adds a new SharedStringItem and returns its index that is used as cell value
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
         public int AddSharedStringItem(SpreadsheetSharedStringItem item)
         {
             var existingItem = _sharedStringItems.FindIndex(i => i.Text == item.Text);

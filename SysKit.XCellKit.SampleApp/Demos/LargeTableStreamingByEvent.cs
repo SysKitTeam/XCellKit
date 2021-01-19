@@ -28,7 +28,7 @@
                 args.Finished = rowCounter == RowsToStream;
             };
 
-            worksheet.AddTable(table, 1, 5);
+            worksheet.AddTable(table);
             workBook.AddWorksheet(worksheet);
             workBook.Save(OutputFile);
         }

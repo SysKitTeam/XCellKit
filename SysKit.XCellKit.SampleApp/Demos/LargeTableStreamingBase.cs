@@ -5,7 +5,7 @@ namespace SysKit.XCellKit.SampleApp.Demos
 {
     abstract class LargeTableStreamingBase : DemoBase
     {
-        protected const int RowsToStream = 6000;
+        protected const int RowsToStream = 800000;
         static Font _font = new Font(new FontFamily("Calibri"), 11);
         public LargeTableStreamingBase(string title, string description) : base(title, description)
         {

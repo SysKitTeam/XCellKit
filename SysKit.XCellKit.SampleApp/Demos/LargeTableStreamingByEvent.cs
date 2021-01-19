@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SysKit.XCellKit.SampleApp.Demos
+﻿namespace SysKit.XCellKit.SampleApp.Demos
 {
     class LargeTableStreamingByEvent : LargeTableStreamingBase
     {

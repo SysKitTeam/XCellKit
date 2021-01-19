@@ -72,6 +72,7 @@
     <Compile Include="SpreadsheetHyperlinkManager.cs" />
     <Compile Include="SpreadsheetLocation.cs" />
     <Compile Include="SpreadsheetRow.cs" />
+    <Compile Include="SpreadsheetSharedStringItem.cs" />
     <Compile Include="SpreadsheetStyle.cs" />
     <Compile Include="SpreadsheetStylesManager.cs" />
     <Compile Include="Tables\RequestTableRowEventArgs.cs" />

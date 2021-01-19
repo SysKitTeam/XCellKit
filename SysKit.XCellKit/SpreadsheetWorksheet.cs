@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Drawing;
-using DocumentFormat.OpenXml.Drawing.Charts;
-using DocumentFormat.OpenXml.Drawing.Spreadsheet;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using Column = DocumentFormat.OpenXml.Spreadsheet.Column;
+using Columns = DocumentFormat.OpenXml.Spreadsheet.Columns;
 using Extension = DocumentFormat.OpenXml.Spreadsheet.Extension;
 using ExtensionList = DocumentFormat.OpenXml.Spreadsheet.ExtensionList;
 using Hyperlink = DocumentFormat.OpenXml.Spreadsheet.Hyperlink;
@@ -28,7 +27,9 @@ namespace SysKit.XCellKit
         private readonly Dictionary<SpreadsheetLocation, SpreadsheetRow> _rows = new Dictionary<SpreadsheetLocation, SpreadsheetRow>();
         private readonly Dictionary<SpreadsheetLocation, SpreadsheetTable> _tables = new Dictionary<SpreadsheetLocation, SpreadsheetTable>();
         private readonly List<SpreadsheetConditionalFormattingRule> _conditionalFormattingRules = new List<SpreadsheetConditionalFormattingRule>();
+        private readonly List<SpreadsheetSharedStringItem> _sharedStringItems = new List<SpreadsheetSharedStringItem>();
         public DrawingsManager DrawingsManager { get; set; }
+
         public SpreadsheetWorksheet(string name)
         {
             Name = name;
@@ -105,10 +106,10 @@ namespace SysKit.XCellKit
                     endOfTableIndex++;
                 }
 
-                
+
                 // if we have more items to stream, disable manually adding rows after the table
                 _addAdditionalItemsDisabled = enumerator.Current != null;
-                
+
                 if (endOfTableIndex > _maxRowIndex)
                 {
                     _maxRowIndex = endOfTableIndex;
@@ -156,21 +157,14 @@ namespace SysKit.XCellKit
         const int MaxRowWidthsToTrack = 100000;
         private const int MaxRowWidthsToTrackPerTable = 5000;
 
-        /// <summary>
-        /// Adds new row to Spreadsheet
-        /// </summary>
-        /// <param name="row"></param>
-        /// <param name="columnIndex"></param>
-        /// <param name="rowIndex"></param>
-        /// <param name="forceAddRow">If set to true, row will be added even if we are in streaming mode. Just be careful that this might cause an overlap of streamed data, so don't add additional rows until streaming has ended</param>
-        public void AddRow(SpreadsheetRow row, int columnIndex, int rowIndex, bool forceAddRow = false)
+        public void AddRow(SpreadsheetRow row, int columnIndex, int rowIndex)
         {
-            addRow(row, columnIndex, rowIndex, false, forceAddRow);
+            addRow(row, columnIndex, rowIndex, false);
         }
 
-        private void addRow(SpreadsheetRow row, int columnIndex, int rowIndex, bool isTableHeaderRow, bool forceAddRow = false)
+        private void addRow(SpreadsheetRow row, int columnIndex, int rowIndex, bool isTableHeaderRow)
         {
-            if (_addAdditionalItemsDisabled && !forceAddRow)
+            if (_addAdditionalItemsDisabled)
             {
                 throw new InvalidOperationException("Additional elements addition is disabled");
             }
@@ -196,7 +190,29 @@ namespace SysKit.XCellKit
             _conditionalFormattingRules.Add(conditionalFormattingRule);
         }
 
-        public void WriteWorksheet(OpenXmlWriter writer, WorksheetPart part, SpreadsheetStylesManager stylesManager, ref int tableCount)
+        /// <summary>
+        /// Adds a new SharedStringItem and returns its index that is used as cell value
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public int AddSharedStringItem(SpreadsheetSharedStringItem item)
+        {
+            var existingItem = _sharedStringItems.FindIndex(i => i.Text == item.Text);
+            if (existingItem != -1)
+            {
+                return existingItem;
+            }
+
+            _sharedStringItems.Add(item);
+            return _sharedStringItems.Count - 1;
+        }
+
+        public void ChangeSharedStringItem(int itemIndex, SpreadsheetSharedStringItem newValue)
+        {
+            _sharedStringItems[itemIndex] = newValue;
+        }
+
+        public void WriteWorksheet(OpenXmlWriter writer, WorksheetPart part, WorkbookPart workbookPart, SpreadsheetStylesManager stylesManager, ref int tableCount)
         {
             var hyperLinksManager = new SpreadsheetHyperlinkManager();
             writer.WriteStartElement(new Worksheet(), new List<OpenXmlAttribute>(), new List<KeyValuePair<string, string>>()
@@ -213,6 +229,7 @@ namespace SysKit.XCellKit
             writeDrawings(part, writer);
             writeTables(writer, part, ref tableCount);
             writeExtensionsList(writer);
+            writeSharedStringTableParts(workbookPart);
             writer.WriteEndElement();
         }
 
@@ -468,6 +485,37 @@ namespace SysKit.XCellKit
             }
 
             writer.WriteEndElement();
+        }
+
+        private void writeSharedStringTableParts(WorkbookPart workbookPart)
+        {
+            if (!_sharedStringItems.Any())
+            {
+                return;
+            }
+
+            // Get the SharedStringTablePart. If it does not exist, create a new one.
+            SharedStringTablePart shareStringPart = workbookPart.GetPartsOfType<SharedStringTablePart>().Any()
+                ? workbookPart.GetPartsOfType<SharedStringTablePart>().First()
+                : workbookPart.AddNewPart<SharedStringTablePart>();
+
+            foreach (var sharedItem in _sharedStringItems)
+            {
+                insertSharedStringItem(sharedItem.GetElement(), shareStringPart);
+            }
+        }
+
+        // Given text and a SharedStringTablePart, creates a SharedStringItem with the specified text 
+        private void insertSharedStringItem(SharedStringItem item, SharedStringTablePart shareStringPart)
+        {
+            // If the part does not contain a SharedStringTable, create one.
+            if (shareStringPart.SharedStringTable == null)
+            {
+                shareStringPart.SharedStringTable = new SharedStringTable();
+            }
+
+            shareStringPart.SharedStringTable.AppendChild(item);
+            shareStringPart.SharedStringTable.Save();
         }
 
         public int LastRowIndex

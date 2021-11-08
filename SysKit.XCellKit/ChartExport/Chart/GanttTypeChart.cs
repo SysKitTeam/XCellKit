@@ -1,11 +1,12 @@
-﻿using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Drawing;
-using DocumentFormat.OpenXml.Drawing.Charts;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Drawing;
+using DocumentFormat.OpenXml.Drawing.Charts;
 using DocumentFormat.OpenXml.Drawing.Spreadsheet;
 using DocumentFormat.OpenXml.Packaging;
+using Index = DocumentFormat.OpenXml.Drawing.Charts.Index;
 using Outline = DocumentFormat.OpenXml.Drawing.Outline;
 using Values = DocumentFormat.OpenXml.Drawing.Charts.Values;
 
@@ -117,11 +118,11 @@ namespace SysKit.XCellKit.Helpers
         public CategoryAxis SetGanttCategoryAxis(PlotArea plotArea, bool hide = false)
         {
             return plotArea.AppendChild<CategoryAxis>(new CategoryAxis(new AxisId()
-                    { Val = new UInt32Value(48650112u) }, new Scaling(new Orientation()
-                {
-                    Val = new EnumValue<DocumentFormat.
+            { Val = new UInt32Value(48650112u) }, new Scaling(new Orientation()
+            {
+                Val = new EnumValue<DocumentFormat.
                         OpenXml.Drawing.Charts.OrientationValues>(DocumentFormat.OpenXml.Drawing.Charts.OrientationValues.MinMax)
-                }),
+            }),
                 new Delete() { Val = hide },
                 new AxisPosition() { Val = new EnumValue<AxisPositionValues>(AxisPositionValues.Bottom) },
                 new MajorTickMark() { Val = TickMarkValues.None },
@@ -182,7 +183,7 @@ namespace SysKit.XCellKit.Helpers
         /// <summary>
         /// Create and insert data to Axis
         /// </summary>        
-        public void SetChartAxis(List<GanttSpreadsheetChart.GanttDataPairedSeries> data, List<IGrouping<string,GanttData>> groupedData)
+        public void SetChartAxis(List<GanttSpreadsheetChart.GanttDataPairedSeries> data, List<IGrouping<string, GanttData>> groupedData)
         {
             Dictionary<uint, TimeSpan> lastPointEnd = new Dictionary<uint, TimeSpan>();
             foreach (var ganttDataPairedSeries in data)
@@ -190,32 +191,32 @@ namespace SysKit.XCellKit.Helpers
                 // Y axis - first bar is for the starting position (is not visible)
                 StringLiteral stringLiteral1 = ganttDataPairedSeries.BarChartSeriesHidden.AppendChild<CategoryAxisData>(new CategoryAxisData())
                     .AppendChild<StringLiteral>(new StringLiteral());
-                stringLiteral1.Append(new PointCount() {Val = new UInt32Value((uint)ganttDataPairedSeries.Values.Count)});
+                stringLiteral1.Append(new PointCount() { Val = new UInt32Value((uint)ganttDataPairedSeries.Values.Count) });
 
                 StringLiteral stringLiteral2 = ganttDataPairedSeries.BarChartSeriesValue.AppendChild<CategoryAxisData>(new CategoryAxisData())
                     .AppendChild<StringLiteral>(new StringLiteral());
-                stringLiteral2.Append(new PointCount() {Val = new UInt32Value((uint)ganttDataPairedSeries.Values.Count)});
+                stringLiteral2.Append(new PointCount() { Val = new UInt32Value((uint)ganttDataPairedSeries.Values.Count) });
 
                 // X axis - first bar is for the starting position (is not visible)
                 NumberLiteral numberLiteral1 = ganttDataPairedSeries.BarChartSeriesHidden.AppendChild<Values>(new Values())
                     .AppendChild<NumberLiteral>(new NumberLiteral());
                 numberLiteral1.Append(new FormatCode("General"));
-                numberLiteral1.Append(new PointCount() {Val = new UInt32Value((uint)ganttDataPairedSeries.Values.Count)});
+                numberLiteral1.Append(new PointCount() { Val = new UInt32Value((uint)ganttDataPairedSeries.Values.Count) });
 
                 NumberLiteral numberLiteral2 = ganttDataPairedSeries.BarChartSeriesValue.AppendChild<Values>(new Values())
                     .AppendChild<NumberLiteral>(new NumberLiteral());
                 numberLiteral2.Append(new FormatCode("General"));
-                numberLiteral2.Append(new PointCount() {Val = new UInt32Value((uint)ganttDataPairedSeries.Values.Count)});
+                numberLiteral2.Append(new PointCount() { Val = new UInt32Value((uint)ganttDataPairedSeries.Values.Count) });
 
                 // Set values to X and Y axis.
                 foreach (GanttData key in ganttDataPairedSeries.Values)
                 {
                     var i = (uint)groupedData.FindIndex(x => x.Key == key.Name);
 
-                    stringLiteral1.AppendChild<StringPoint>(new StringPoint() {Index = new UInt32Value(i) })
+                    stringLiteral1.AppendChild<StringPoint>(new StringPoint() { Index = new UInt32Value(i) })
                         .AppendChild<NumericValue>(new NumericValue(key.Name));
 
-                    stringLiteral2.AppendChild<StringPoint>(new StringPoint() {Index = new UInt32Value(i)})
+                    stringLiteral2.AppendChild<StringPoint>(new StringPoint() { Index = new UInt32Value(i) })
                         .AppendChild<NumericValue>(new NumericValue(key.Name));
 
                     numberLiteral1.AppendChild<NumericPoint>(new NumericPoint() { Index = new UInt32Value(i) })
@@ -266,7 +267,7 @@ namespace SysKit.XCellKit.Helpers
                 new Extents() { Cx = 0L, Cy = 0L }));
 
             graphicFrame.Append(new Graphic(new GraphicData(new ChartReference() { Id = drawingsPart.GetIdOfPart(chartPart) })
-                { Uri = "http://schemas.openxmlformats.org/drawingml/2006/chart" }));
+            { Uri = "http://schemas.openxmlformats.org/drawingml/2006/chart" }));
 
             twoCellAnchor.Append(new ClientData());
         }

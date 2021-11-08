@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2035
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31729.503
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SysKit.XCellKit", "SysKit.XCellKit\SysKit.XCellKit.csproj", "{C739604C-2757-4DE5-A225-EDD1D2C71E21}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SysKit.XCellKit", "SysKit.XCellKit\SysKit.XCellKit.csproj", "{C739604C-2757-4DE5-A225-EDD1D2C71E21}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SysKit.XCellKit.Tests", "SysKit.XCellKit.Tests\SysKit.XCellKit.Tests.csproj", "{5166E812-259C-4D56-8856-7B2B3FB63A54}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SysKit.XCellKit.Tests", "SysKit.XCellKit.Tests\SysKit.XCellKit.Tests.csproj", "{5166E812-259C-4D56-8856-7B2B3FB63A54}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SysKit.XCellKit.SampleApp", "SysKit.XCellKit.SampleApp\SysKit.XCellKit.SampleApp.csproj", "{1BB01722-C55A-4981-87B1-A2CEAFAFF80C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SysKit.XCellKit.SampleApp", "SysKit.XCellKit.SampleApp\SysKit.XCellKit.SampleApp.csproj", "{1BB01722-C55A-4981-87B1-A2CEAFAFF80C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

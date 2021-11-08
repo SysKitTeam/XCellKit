@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Drawing.Charts;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using SysKit.XCellKit.Helpers;
+using Index = DocumentFormat.OpenXml.Drawing.Charts.Index;
 
 namespace SysKit.XCellKit
 {
@@ -101,7 +99,7 @@ namespace SysKit.XCellKit
         {
             public BarChartSeries BarChartSeriesHidden { get; set; }
             public BarChartSeries BarChartSeriesValue { get; set; }
-            public List<GanttData> Values  { get; set; }
+            public List<GanttData> Values { get; set; }
         }
     }
 }

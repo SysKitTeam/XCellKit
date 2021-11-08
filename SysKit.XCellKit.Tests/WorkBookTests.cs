@@ -117,7 +117,7 @@ namespace SysKit.XCellKit.Tests
             Console.WriteLine("      Max during streaming: {0:N2}", maxMemDuringStreaming);
             Assert.IsTrue(File.Exists(STR_TestOutputPath));
 
-            
+
             Assert.IsTrue(endingMemory - startingMemory < maxMemoryAllowed, "Ending memory to high");
             Assert.IsTrue(maxMemDuringStreaming - startingMemory < maxMemoryAllowed, "Max memory to high");
         }
@@ -132,12 +132,12 @@ namespace SysKit.XCellKit.Tests
             sw.Stop();
             Assert.IsTrue(File.Exists(STR_TestOutputPath));
             Console.WriteLine("Export took: {0:N4} seconds", sw.Elapsed.TotalSeconds);
-            Assert.IsTrue(sw.Elapsed.TotalSeconds < 60, "Export taking to long"); 
+            Assert.IsTrue(sw.Elapsed.TotalSeconds < 60, "Export taking to long");
         }
 
         static Font _font = new Font(new FontFamily("Calibri"), 11);
-        private static SpreadsheetWorkbook setupLargeWorkbook( Action<SpreadsheetRow> afterRowCreated, int rowsToStream = 800000, bool useHyperLinks = false, bool useEnumerator = false)
-        {             
+        private static SpreadsheetWorkbook setupLargeWorkbook(Action<SpreadsheetRow> afterRowCreated, int rowsToStream = 800000, bool useHyperLinks = false, bool useEnumerator = false)
+        {
             var columnsCount = 10;
             var newExcel = new SpreadsheetWorkbook();
 
@@ -145,7 +145,7 @@ namespace SysKit.XCellKit.Tests
             var table = new SpreadsheetTable("GridTable");
             for (var i = 0; i < 10; i++)
             {
-                table.Columns.Add(new SpreadsheetTableColumn() {Name = $"Column{i}"});
+                table.Columns.Add(new SpreadsheetTableColumn() { Name = $"Column{i}" });
             }
 
             if (!useEnumerator)
@@ -166,7 +166,7 @@ namespace SysKit.XCellKit.Tests
                 var enumerator = Enumerable.Range(0, rowsToStream).Select(x =>
                     {
                         var row = createTestRow(useHyperLinks, columnsCount, x);
-                        afterRowCreated?.Invoke(row);                        
+                        afterRowCreated?.Invoke(row);
                         return row;
                     })
                     .GetEnumerator();

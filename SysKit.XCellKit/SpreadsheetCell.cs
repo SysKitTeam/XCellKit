@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Xml;
+using System.Text.RegularExpressions;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Spreadsheet;
 
@@ -90,7 +90,7 @@ namespace SysKit.XCellKit
             }
 
             var sValue = Value.ToString();
-          
+
             if (SpreadsheetDataType == SpreadsheetDataTypeEnum.Number)
             {
                 double numberValue = 0;
@@ -110,9 +110,16 @@ namespace SysKit.XCellKit
                 {
                     sValue = sValue.Substring(0, 32767);
                 }
+
+                // From xml spec valid chars: 
+                // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]     
+                // any Unicode character, excluding the surrogate blocks, FFFE, and FFFF.
+                string re = @"[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\u10000-\u10FFFF]";
+                sValue = Regex.Replace(sValue, re, "");
+
                 var typeAtt = new OpenXmlAttribute("t", null, "inlineStr");
                 openXmlAtts.Add(typeAtt);
-                writer.WriteStartElement(new Cell(), openXmlAtts);                
+                writer.WriteStartElement(new Cell(), openXmlAtts);
                 writer.WriteStartElement(new InlineString());
                 writer.WriteElement(new Text(sValue) { Space = PreserveSpaceEnumValue });
                 writer.WriteEndElement();

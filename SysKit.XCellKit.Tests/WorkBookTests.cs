@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 
 namespace SysKit.XCellKit.Tests
@@ -29,6 +29,20 @@ namespace SysKit.XCellKit.Tests
 
             var worksheet = new SpreadsheetWorksheet("Test22");
             worksheet.AddRow(new SpreadsheetRow() { RowCells = new System.Collections.Generic.List<SpreadsheetCell>() { new SpreadsheetCell() { Value = "test" } } });
+
+            newExcel.AddWorksheet(worksheet);
+            newExcel.Save(STR_TestOutputPath);
+
+            Assert.IsTrue(File.Exists(STR_TestOutputPath));
+        }
+
+        [TestMethod]
+        public void Save_SingleCellInvalidChar_FileCreated()
+        {
+            var newExcel = new SpreadsheetWorkbook();
+
+            var worksheet = new SpreadsheetWorksheet("Test22");
+            worksheet.AddRow(new SpreadsheetRow() { RowCells = new System.Collections.Generic.List<SpreadsheetCell>() { new SpreadsheetCell() { Value = "test\vtest" } } });
 
             newExcel.AddWorksheet(worksheet);
             newExcel.Save(STR_TestOutputPath);

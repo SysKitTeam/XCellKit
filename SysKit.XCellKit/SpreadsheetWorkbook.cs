@@ -25,7 +25,7 @@ namespace SysKit.XCellKit
             _worksheets.Add(spreadsheetWorksheet);
         }
 
-        public void AddTag(string tag)
+        public void SetTag(string tag)
         {
             _tag = tag;
         }

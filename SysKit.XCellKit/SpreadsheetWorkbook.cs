@@ -1,26 +1,33 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace SysKit.XCellKit
 {
     public class SpreadsheetWorkbook
     {
-        public SpreadsheetWorkbook() 
+        private string _tag = null;
+
+        public SpreadsheetWorkbook()
         {
             _worksheets = new List<SpreadsheetWorksheet>();
             _tableCount = 1;
         }
-        
-        private readonly List<SpreadsheetWorksheet> _worksheets; 
+
+        private readonly List<SpreadsheetWorksheet> _worksheets;
         public void AddWorksheet(SpreadsheetWorksheet spreadsheetWorksheet)
         {
             _worksheets.Add(spreadsheetWorksheet);
+        }
+
+        public void AddTag(string tag)
+        {
+            _tag = tag;
         }
 
         private int _tableCount = 0;
@@ -49,12 +56,16 @@ namespace SysKit.XCellKit
 
         private void save(SpreadsheetDocument document)
         {
-             var sheets = new Sheets();
-                var workbookPart = document.AddWorkbookPart();
-                var workbook = workbookPart.Workbook = new Workbook();
-                workbook.Sheets = sheets;
-                var stylesManager = new SpreadsheetStylesManager(workbookPart);
-                writeWorkSheets(workbookPart, sheets, stylesManager);
+            var sheets = new Sheets();
+            var workbookPart = document.AddWorkbookPart();
+            var workbook = workbookPart.Workbook = new Workbook();
+            workbook.Sheets = sheets;
+            if (_tag != null)
+            {
+                document.PackageProperties.Keywords = _tag;
+            }
+            var stylesManager = new SpreadsheetStylesManager(workbookPart);
+            writeWorkSheets(workbookPart, sheets, stylesManager);
         }
 
         private void writeWorkSheets(WorkbookPart workbookPart, Sheets sheets, SpreadsheetStylesManager stylesManager)

@@ -41,14 +41,15 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'    
 
-- task: NuGetCommand@2
+- task: DotNetCoreCLI@2
   inputs:
     command: 'pack'
-    packagesToPack: 'SysKit.XCellKit/SysKit.XCellKit.csproj'
+    packagesToPack: '**/SysKit.XCellKit.csproj'
+    nobuild: true
     versioningScheme: 'byEnvVar'
     versionEnvVar: 'appVersion'
     configuration: $(buildConfiguration)
-    buildProperties: 'OutputPath=$(Build.ArtifactStagingDirectory)'
+    outputDirectory: '$(Build.ArtifactStagingDirectory)'
 
 - task: PublishBuildArtifacts@1
   inputs:

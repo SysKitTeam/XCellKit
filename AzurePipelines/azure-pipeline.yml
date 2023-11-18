@@ -13,11 +13,17 @@ variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'  
-  appVersionMajor: '2023.11'  
-  buildNumber: $[counter(variables['appVersionMajor'], 1)]
-  appVersion: '$(appVersionMajor).$(buildNumber)'
+  appVersionPrefix: $[format('{0:yyyy}.{0:MM}.{0:dd}', pipeline.startTime)]
+  buildNumber: $[counter(variables['appVersionPrefix'], 1)]
+  appVersion: '$(appVersionPrefix).$(buildNumber)'
 
 steps:
+- task: DownloadSecureFile@1
+  name: snkFile
+  displayName: 'Download SNK file'
+  inputs:
+    secureFile: 'AssemblyIdentity.snk'
+
 - task: NuGetToolInstaller@1
   displayName: 'Install Nuget'
 
@@ -32,7 +38,7 @@ steps:
     solution: '$(solution)'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
-    msbuildArgs: '/p:Version=$(appVersion)'
+    msbuildArgs: '/p:Version=$(appVersion) /p:SignAssembly=true /p:AssemblyOriginatorKeyFile=$(snkFile.secureFilePath)'
 
 - task: VSTest@2
   displayName: 'Run tests'

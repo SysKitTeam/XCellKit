@@ -15,6 +15,7 @@ variables:
   buildConfiguration: 'Release'  
   appVersionMajor: '2023.11'  
   buildNumber: $[counter(variables['appVersionMajor'], 1)]
+  appVersion: '$(appVersionMajor).$(buildNumber)'
 
 steps:
 - task: NuGetToolInstaller@1
@@ -31,7 +32,7 @@ steps:
     solution: '$(solution)'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
-    msbuildArgs: '/p:Version=$(appVersionMajor).$(buildNumber)'
+    msbuildArgs: '/p:Version=$(appVersion)'
 
 - task: VSTest@2
   displayName: 'Run tests'
@@ -39,3 +40,19 @@ steps:
   inputs:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'    
+
+- task: NuGetCommand@2
+  inputs:
+    command: 'pack'
+    packagesToPack: 'SysKit.XCellKit/SysKit.XCellKit.csproj'
+    versioningScheme: 'byEnvVar'
+    versionEnvVar: 'appVersion'
+    configuration: $(buildConfiguration)
+    buildProperties: 'OutputPath=$(Build.ArtifactStagingDirectory)'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    artifactName: 'drop'
+    publishLocation: 'Container'
+

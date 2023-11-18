@@ -42,7 +42,7 @@ steps:
 
 - task: VSTest@2
   displayName: 'Run tests'
-  condition: false
+  condition: false # need to fix the memory issue before running tests again
   inputs:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'    
@@ -58,8 +58,17 @@ steps:
     outputDirectory: '$(Build.ArtifactStagingDirectory)'
 
 - task: PublishBuildArtifacts@1
+  condition: false # for testing purposes only
   inputs:
     pathtoPublish: '$(Build.ArtifactStagingDirectory)'
     artifactName: 'drop'
     publishLocation: 'Container'
+
+- task: NuGetCommand@2
+  displayName: 'Publish NuGet package to Azure DevOps Artifacts'  
+  inputs:
+    command: 'push'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg'
+    nuGetFeedType: 'internal'
+    publishVstsFeed: 'SysKitNuget'    
 

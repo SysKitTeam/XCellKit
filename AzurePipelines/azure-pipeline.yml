@@ -12,7 +12,9 @@ pool:
 variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
+  buildConfiguration: 'Release'  
+  appVersionMajor: '2023.11'  
+  buildNumber: $[counter(variables['appVersionMajor'], 1)]
 
 steps:
 - task: NuGetToolInstaller@1
@@ -29,10 +31,11 @@ steps:
     solution: '$(solution)'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+    msbuildArgs: '/p:Version=$(appVersionMajor).$(buildNumber)'
 
 - task: VSTest@2
   displayName: 'Run tests'
   condition: false
   inputs:
     platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
+    configuration: '$(buildConfiguration)'    

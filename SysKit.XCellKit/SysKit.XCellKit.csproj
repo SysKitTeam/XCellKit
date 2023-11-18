@@ -2,8 +2,11 @@
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
 		<OutputType>Library</OutputType>
-		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-	</PropertyGroup>
+    <Company>SysKit Ltd.</Company>
+    <Copyright>Copyright © SysKit Ltd. 2023</Copyright>
+    <Product>SysKit.XCellKit</Product>
+    <Version>2023.11</Version>
+  </PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="DocumentFormat.OpenXml" Version="2.14.0" />
 		<PackageReference Include="Microsoft.Windows.Compatibility" Version="5.0.2" />

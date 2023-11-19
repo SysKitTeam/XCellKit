@@ -1,10 +1,10 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Spreadsheet;
 using Column = DocumentFormat.OpenXml.Spreadsheet.Column;
 using Columns = DocumentFormat.OpenXml.Spreadsheet.Columns;
 using Extension = DocumentFormat.OpenXml.Spreadsheet.Extension;
@@ -450,14 +450,30 @@ namespace SysKit.XCellKit
             foreach (var table in _tables)
             {
                 var tableId = "table" + tableCount;
-                var tableDefinition = part.AddNewPart<TableDefinitionPart>(tableId);
-                tableDefinition.Table = table.Value.GetTableDefinition(tableCount, table.Key.ColumnIndex, table.Key.RowIndex);
+
                 var idAtt = new OpenXmlAttribute("id", "http://schemas.openxmlformats.org/officeDocument/2006/relationships", tableId);
                 writer.WriteStartElement(new TablePart(), new List<OpenXmlAttribute>() { idAtt });
                 writer.WriteEndElement();
                 tableCount++;
             }
             writer.WriteEndElement();
+        }
+
+        public void AddTableParts(WorksheetPart part, ref int tableCount)
+        {
+            if (!_tables.Any())
+            {
+                return;
+            }
+
+            foreach (var table in _tables)
+            {
+                var tableId = "table" + tableCount;
+                var tableDefinition = part.AddNewPart<TableDefinitionPart>(tableId);
+                tableDefinition.Table = table.Value.GetTableDefinition(tableCount, table.Key.ColumnIndex, table.Key.RowIndex);
+
+                tableCount++;
+            }
         }
 
         private void writeColumns(OpenXmlWriter writer)

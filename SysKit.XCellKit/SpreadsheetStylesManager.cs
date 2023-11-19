@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using DocumentFormat.OpenXml;
+﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
 
 namespace SysKit.XCellKit
 {
@@ -33,27 +33,25 @@ namespace SysKit.XCellKit
         private Dictionary<string, int> _styles;
         private Dictionary<FontKey, int> _fonts;
         private Dictionary<System.Drawing.Color, int> _fills;
-        private WorkbookPart _workbookPart;
+
         private Stylesheet _stylesheet;
-        public SpreadsheetStylesManager(WorkbookPart workbookPart)
+        public SpreadsheetStylesManager()
         {
-            _workbookPart = workbookPart;
             _styles = new Dictionary<string, int>();
             _fonts = new Dictionary<FontKey, int>();
             _fills = new Dictionary<System.Drawing.Color, int>();
 
-            var stylesPart = _workbookPart.AddNewPart<WorkbookStylesPart>();
+
             _stylesheet = new Stylesheet();
-            stylesPart.Stylesheet = _stylesheet;
 
             _stylesheet.Fills = new Fills();
             _stylesheet.Fills.AppendChild(new Fill { PatternFill = new PatternFill { PatternType = PatternValues.None } }); // required, reserved by Excel
             _stylesheet.Fills.AppendChild(new Fill { PatternFill = new PatternFill { PatternType = PatternValues.Gray125 } }); // required, reserved by Excel
             _stylesheet.Fills.Count = 2;
 
-            stylesPart.Stylesheet.Fonts = new Fonts();
-            stylesPart.Stylesheet.Fonts.Count = 2;
-            stylesPart.Stylesheet.Fonts.AppendChild(new Font());
+            _stylesheet.Fonts = new Fonts();
+            _stylesheet.Fonts.Count = 2;
+            _stylesheet.Fonts.AppendChild(new Font());
 
             Font hyperLinkFont = new Font();
             Underline underline1 = new Underline();
@@ -71,22 +69,23 @@ namespace SysKit.XCellKit
             hyperLinkFont.Append(fontFamilyNumbering2);
             hyperLinkFont.Append(fontCharSet2);
             hyperLinkFont.Append(fontScheme2);
-            stylesPart.Stylesheet.Fonts.AppendChild(hyperLinkFont);
 
-            stylesPart.Stylesheet.Borders = new Borders();
-            stylesPart.Stylesheet.Borders.Count = 1;
-            stylesPart.Stylesheet.Borders.AppendChild(new Border());
+            _stylesheet.Fonts.AppendChild(hyperLinkFont);
 
-            stylesPart.Stylesheet.CellStyleFormats = new CellStyleFormats();
-            stylesPart.Stylesheet.CellStyleFormats.Count = 2;
-            stylesPart.Stylesheet.CellStyleFormats.AppendChild(new CellFormat());
+            _stylesheet.Borders = new Borders();
+            _stylesheet.Borders.Count = 1;
+            _stylesheet.Borders.AppendChild(new Border());
 
-            stylesPart.Stylesheet.CellFormats = new CellFormats();
+            _stylesheet.CellStyleFormats = new CellStyleFormats();
+            _stylesheet.CellStyleFormats.Count = 2;
+            _stylesheet.CellStyleFormats.AppendChild(new CellFormat());
+
+            _stylesheet.CellFormats = new CellFormats();
             // empty one for index 0, seems to be required
-            stylesPart.Stylesheet.CellFormats.AppendChild(new CellFormat());
+            _stylesheet.CellFormats.AppendChild(new CellFormat());
             CellFormat hyperLinkFormt = new CellFormat() { NumberFormatId = (UInt32Value)0U, FontId = (UInt32Value)1U, FillId = (UInt32Value)0U, BorderId = (UInt32Value)0U, ApplyNumberFormat = false, ApplyFill = false, ApplyBorder = false, ApplyAlignment = false, ApplyProtection = false };
-            stylesPart.Stylesheet.CellFormats.AppendChild(hyperLinkFormt);
-            stylesPart.Stylesheet.CellFormats.Count = 2;
+            _stylesheet.CellFormats.AppendChild(hyperLinkFormt);
+            _stylesheet.CellFormats.Count = 2;
             _hyperlinkStyles[new SpreadsheetStyle().GetIdentifier()] = 1;
 
 
@@ -127,6 +126,12 @@ namespace SysKit.XCellKit
             numberingFormats.Append(numberingFormat1);
 
             _stylesheet.NumberingFormats = numberingFormats;
+        }
+
+        public void AttachToWorkBook(WorkbookPart workbookPart)
+        {
+            var stylesPart = workbookPart.AddNewPart<WorkbookStylesPart>();
+            stylesPart.Stylesheet = _stylesheet;
         }
 
         private Dictionary<string, int> _hyperlinkStyles = new Dictionary<string, int>();

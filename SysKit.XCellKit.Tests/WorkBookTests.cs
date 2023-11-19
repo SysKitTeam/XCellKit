@@ -105,7 +105,7 @@ namespace SysKit.XCellKit.Tests
 
         private static void streaming_LargeTable_MemoryConsumptionOk(bool useHyperlinks, bool useEnumerator = false)
         {
-            var maxMemoryAllowed = useHyperlinks ? 150 : 40;
+            var maxMemoryAllowed = useHyperlinks ? 200 : 50;
 
             var counter = 0;
             var maxMemDuringStreaming = 0.0;

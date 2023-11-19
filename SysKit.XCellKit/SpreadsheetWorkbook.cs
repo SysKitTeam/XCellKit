@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Packaging;
 using System.Linq;
 
 namespace SysKit.XCellKit
@@ -31,56 +32,111 @@ namespace SysKit.XCellKit
         }
 
         private int _tableCount = 0;
+        private Sheets _sheets;
+        private SpreadsheetStylesManager _stylesManager;
+
         public void Save(string path)
         {
-#if DEBUG
-            var sw = Stopwatch.StartNew();
-#endif
-            using (var document = SpreadsheetDocument.Create(path, SpreadsheetDocumentType.Workbook))
+            using (var fs = File.Create(path))
             {
-                save(document);
+                Save(fs);
             }
-#if DEBUG
-            sw.Stop();
-            Debug.WriteLine(string.Format("Export time:{0}", sw.Elapsed));
-#endif
         }
 
         public void Save(Stream stream)
         {
-            using (var document = SpreadsheetDocument.Create(stream, SpreadsheetDocumentType.Workbook))
+            if (!stream.CanSeek)
             {
-                save(document);
+                throw new NotSupportedException("Non-seekable streams are not supported");
+            }
+
+#if DEBUG
+            var sw = Stopwatch.StartNew();
+#endif
+            var startingPosition = stream.Position;
+
+            firstPassSave(stream);
+
+            stream.Position = startingPosition;
+
+            secondPassSave(stream);
+
+#if DEBUG
+            sw.Stop();
+            Debug.WriteLine($"Export time: {sw.Elapsed}");
+#endif
+        }
+
+        private void firstPassSave(Stream stream)
+        {
+            using (var package = Package.Open(stream, FileMode.Create, FileAccess.Write))
+            {
+                using (var document = SpreadsheetDocument.Create(package, SpreadsheetDocumentType.Workbook))
+                {
+                    firstPassSave(document);
+                }
             }
         }
 
-        private void save(SpreadsheetDocument document)
+
+        private void firstPassSave(SpreadsheetDocument document)
         {
-            var sheets = new Sheets();
+            _sheets = new Sheets();
             var workbookPart = document.AddWorkbookPart();
-            var workbook = workbookPart.Workbook = new Workbook();
-            workbook.Sheets = sheets;
+
+            _stylesManager = new SpreadsheetStylesManager();
+            writeWorkSheets(workbookPart, _sheets, _stylesManager);
+        }
+
+        private void secondPassSave(Stream stream)
+        {
+            using (var package = Package.Open(stream, FileMode.Open, FileAccess.ReadWrite))
+            {
+                using (var document = SpreadsheetDocument.Open(package))
+                {
+                    secondPassSave(document);
+                }
+            }
+        }
+
+        private void secondPassSave(SpreadsheetDocument document)
+        {
+            document.WorkbookPart.Workbook = new Workbook();
+            document.WorkbookPart.Workbook.Sheets = _sheets;
+
+            _stylesManager.AttachToWorkBook(document.WorkbookPart);
+
             if (_tag != null)
             {
                 document.PackageProperties.Keywords = _tag;
             }
-            var stylesManager = new SpreadsheetStylesManager(workbookPart);
-            writeWorkSheets(workbookPart, sheets, stylesManager);
+
+            var sheetCounter = 1;
+            _tableCount = 1;
+            foreach (var worksheet in _worksheets)
+            {
+                var sheetId = "Sheet" + sheetCounter;
+
+                var worksheetPart = (WorksheetPart)document.WorkbookPart.GetPartById(sheetId);
+
+                worksheet.AddTableParts(worksheetPart, ref _tableCount);
+            }
         }
 
         private void writeWorkSheets(WorkbookPart workbookPart, Sheets sheets, SpreadsheetStylesManager stylesManager)
         {
             var sheetCounter = 1;
-            foreach (var worksheets in _worksheets)
+            _tableCount = 1;
+            foreach (var worksheet in _worksheets)
             {
                 var sheetId = "Sheet" + sheetCounter;
-                var sheet = new Sheet() { Name = new string(worksheets.Name.Take(30).ToArray()), SheetId = (UInt32Value)(UInt32)sheetCounter, Id = sheetId };
+                var sheet = new Sheet() { Name = new string(worksheet.Name.Take(30).ToArray()), SheetId = (UInt32Value)(UInt32)sheetCounter, Id = sheetId };
                 sheetCounter++;
                 sheets.Append(sheet);
                 var worksheetPart = workbookPart.AddNewPart<WorksheetPart>(sheetId);
                 using (var writer = OpenXmlWriter.Create(worksheetPart))
                 {
-                    worksheets.WriteWorksheet(writer, worksheetPart, workbookPart, stylesManager, ref _tableCount);
+                    worksheet.WriteWorksheet(writer, worksheetPart, workbookPart, stylesManager, ref _tableCount);
                 }
             }
         }

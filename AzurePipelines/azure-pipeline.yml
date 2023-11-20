@@ -1,0 +1,68 @@
+trigger: none
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'  
+  appVersionPrefix: $[format('{0:yyyy}.{0:MM}.{0:dd}', pipeline.startTime)]
+  buildNumber: $[counter(variables['appVersionPrefix'], 1)]
+  appVersion: '$(appVersionPrefix).$(buildNumber)'
+
+steps:
+- task: DownloadSecureFile@1
+  name: snkFile
+  displayName: 'Download SNK file'
+  inputs:
+    secureFile: 'AssemblyIdentity.snk'
+
+- task: NuGetToolInstaller@1
+  displayName: 'Install Nuget'
+
+- task: NuGetCommand@2
+  displayName: 'Restore nuget packages'
+  inputs:
+    restoreSolution: '$(solution)'
+
+- task: VSBuild@1
+  displayName: 'Build solution'
+  inputs:
+    solution: '$(solution)'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    msbuildArgs: '/p:Version=$(appVersion) /p:SignAssembly=true /p:AssemblyOriginatorKeyFile=$(snkFile.secureFilePath)'
+
+- task: VSTest@2
+  displayName: 'Run tests'
+  condition: false # need to fix the memory issue before running tests again
+  inputs:
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'    
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'pack'
+    packagesToPack: '**/SysKit.XCellKit.csproj'
+    nobuild: true
+    versioningScheme: 'byEnvVar'
+    versionEnvVar: 'appVersion'
+    configuration: $(buildConfiguration)
+    outputDirectory: '$(Build.ArtifactStagingDirectory)'
+
+- task: PublishBuildArtifacts@1
+  condition: false # for testing purposes only
+  inputs:
+    pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    artifactName: 'drop'
+    publishLocation: 'Container'
+
+- task: NuGetCommand@2
+  displayName: 'Publish NuGet package to Azure DevOps Artifacts'  
+  inputs:
+    command: 'push'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg'
+    nuGetFeedType: 'internal'
+    publishVstsFeed: 'SysKitNuget'    
+

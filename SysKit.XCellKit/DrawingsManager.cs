@@ -1,15 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Spreadsheet;
-using Xdr = DocumentFormat.OpenXml.Drawing.Spreadsheet;
 using A = DocumentFormat.OpenXml.Drawing;
 using A14 = DocumentFormat.OpenXml.Office2010.Drawing;
 using Drawing = DocumentFormat.OpenXml.Spreadsheet.Drawing;
+using Xdr = DocumentFormat.OpenXml.Drawing.Spreadsheet;
 
 namespace SysKit.XCellKit
 {
@@ -18,6 +18,7 @@ namespace SysKit.XCellKit
         // Open xml uses an unit named EMU (English Metric Unit)
         // by definition there is 914400 EMUs per inch        
         public const int INT_EMUsPerInch = 914400;
+        private const string DrawingPartId = "drawingPart1";
         private List<Image> _images = new List<Image>();
         private readonly List<ImageDetails> _imageDetails = new List<ImageDetails>();
 
@@ -40,14 +41,29 @@ namespace SysKit.XCellKit
             _imageDetails.Add(details);
         }
 
-        public void WriteDrawings(WorksheetPart worksheetPart, OpenXmlWriter writer)
+        internal void WriteDrawings(OpenXmlWriter writer)
         {
             if (!_images.Any() || !_imageDetails.Any())
             {
                 return;
             }
-            var drawingPartId = "drawingPart1";
-            DrawingsPart drawingsPart = worksheetPart.AddNewPart<DrawingsPart>(drawingPartId);
+
+            var idAtt = new OpenXmlAttribute("id", "http://schemas.openxmlformats.org/officeDocument/2006/relationships", DrawingPartId);
+            var pageMargins1 = new PageMargins() { Left = 0.7D, Right = 0.7D, Top = 0.75D, Bottom = 0.75D, Header = 0.3D, Footer = 0.3D };
+            //  PageSetup pageSetup1 = new PageSetup() { PaperSize = (UInt32Value)9U, Orientation = OrientationValues.Portrait};
+            writer.WriteElement(pageMargins1);
+            //writer.WriteElement(pageSetup1);
+            writer.WriteStartElement(new Drawing(), new List<OpenXmlAttribute>() { idAtt });
+            writer.WriteEndElement();
+        }
+
+        internal void AttachDrawingsPart(WorksheetPart worksheetPart)
+        {
+            if (!_images.Any() || !_imageDetails.Any())
+            {
+                return;
+            }
+            DrawingsPart drawingsPart = worksheetPart.AddNewPart<DrawingsPart>(DrawingPartId);
             int imgCounter = 0;
             foreach (var image in _images)
             {
@@ -61,30 +77,25 @@ namespace SysKit.XCellKit
                     imagePart1.FeedData(ms);
                 }
             }
+
             using (var drawingsWriter = OpenXmlWriter.Create(drawingsPart))
             {
-                drawingsWriter.WriteStartElement(new Xdr.WorksheetDrawing(), new List<OpenXmlAttribute>(), new List<KeyValuePair<string, string>>()
-                {
-                    new KeyValuePair<string, string>("xdr", "http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing"),
-                    new KeyValuePair<string, string>("a", "http://schemas.openxmlformats.org/drawingml/2006/main")
-                });
+                drawingsWriter.WriteStartElement(new Xdr.WorksheetDrawing(), new List<OpenXmlAttribute>(),
+                    new List<KeyValuePair<string, string>>()
+                    {
+                        new KeyValuePair<string, string>("xdr",
+                            "http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing"),
+                        new KeyValuePair<string, string>("a", "http://schemas.openxmlformats.org/drawingml/2006/main")
+                    });
                 foreach (var imageDetails in _imageDetails)
                 {
                     var twoCellAnchor1 = createImageAnchor(imageDetails);
                     drawingsWriter.WriteElement(twoCellAnchor1);
                 }
+
                 drawingsWriter.WriteEndElement();
             }
-
-            var idAtt = new OpenXmlAttribute("id", "http://schemas.openxmlformats.org/officeDocument/2006/relationships", drawingPartId);
-            var pageMargins1 = new PageMargins() { Left = 0.7D, Right = 0.7D, Top = 0.75D, Bottom = 0.75D, Header = 0.3D, Footer = 0.3D };
-            //  PageSetup pageSetup1 = new PageSetup() { PaperSize = (UInt32Value)9U, Orientation = OrientationValues.Portrait};
-            writer.WriteElement(pageMargins1);
-            //writer.WriteElement(pageSetup1);
-            writer.WriteStartElement(new Drawing(), new List<OpenXmlAttribute>() { idAtt });
-            writer.WriteEndElement();
         }
-
 
 
         /// <summary>

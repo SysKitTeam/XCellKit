@@ -12,6 +12,8 @@ namespace SysKit.XCellKit
 {
     public class SpreadsheetWorkbook
     {
+        delegate void SheetHandler(int ordinal, SpreadsheetWorksheet worksheet, TableIdProvider tableIdProvider);
+
         private string _tag = null;
 
         public SpreadsheetWorkbook()
@@ -55,11 +57,11 @@ namespace SysKit.XCellKit
 #endif
             var startingPosition = stream.Position;
 
-            firstPassSave(stream);
+            saveContent(stream);
 
             stream.Position = startingPosition;
 
-            secondPassSave(stream);
+            saveOpenXmlParts(stream);
 
 #if DEBUG
             sw.Stop();
@@ -67,19 +69,28 @@ namespace SysKit.XCellKit
 #endif
         }
 
-        private void firstPassSave(Stream stream)
+        /// <summary>
+        /// To avoid a memory bug in openxml: https://github.com/dotnet/Open-XML-SDK/issues/807
+        /// we will save the content first without any OpenXml parts.
+        /// In this way we can stream data without loading all of the data in memory
+        /// </summary>
+        private void saveContent(Stream stream)
         {
             using (var package = Package.Open(stream, FileMode.Create, FileAccess.Write))
             {
                 using (var document = SpreadsheetDocument.Create(package, SpreadsheetDocumentType.Workbook))
                 {
-                    firstPassSave(document);
+                    saveContent(document);
                 }
             }
         }
 
-
-        private void firstPassSave(SpreadsheetDocument document)
+        /// <summary>
+        /// To avoid a memory bug in openxml: https://github.com/dotnet/Open-XML-SDK/issues/807
+        /// we will save the content first without any OpenXml parts.
+        /// In this way we can stream data without loading all of the data in memory
+        /// </summary>
+        private void saveContent(SpreadsheetDocument document)
         {
             _sheets = new Sheets();
             var workbookPart = document.AddWorkbookPart();
@@ -88,56 +99,81 @@ namespace SysKit.XCellKit
             writeWorkSheets(workbookPart, _sheets, _stylesManager);
         }
 
-        private void secondPassSave(Stream stream)
+        /// <summary>
+        /// To avoid a memory bug in openxml: https://github.com/dotnet/Open-XML-SDK/issues/807
+        /// we will save openXml parts separately in a separate save.
+        /// This will avoid loading large amounts of data in memory
+        /// </summary>
+        private void saveOpenXmlParts(Stream stream)
         {
             using (var package = Package.Open(stream, FileMode.Open, FileAccess.ReadWrite))
             {
                 using (var document = SpreadsheetDocument.Open(package))
                 {
-                    secondPassSave(document);
+                    saveOpenXmlParts(document);
                 }
             }
         }
 
-        private void secondPassSave(SpreadsheetDocument document)
+        /// <summary>
+        /// To avoid a memory bug in openxml: https://github.com/dotnet/Open-XML-SDK/issues/807
+        /// we will save openXml parts separately in a separate save.
+        /// This will avoid loading large amounts of data in memory
+        /// </summary>
+        private void saveOpenXmlParts(SpreadsheetDocument document)
         {
-            document.WorkbookPart.Workbook = new Workbook();
-            document.WorkbookPart.Workbook.Sheets = _sheets;
+            attachWorkBook(document);
+            attachTagsToDocument(document);
 
-            _stylesManager.AttachToWorkBook(document.WorkbookPart);
+            handleWorkSheetsAction((ordinal, spreadsheetWorksheet, tableIdProvider) =>
+            {
+                var sheetId = "Sheet" + ordinal;
+                var worksheetPart = (WorksheetPart)document.WorkbookPart.GetPartById(sheetId);
+                spreadsheetWorksheet.AttachAdditionalParts(document.WorkbookPart, worksheetPart, tableIdProvider);
+            });
+        }
 
+        private void attachTagsToDocument(SpreadsheetDocument document)
+        {
             if (_tag != null)
             {
                 document.PackageProperties.Keywords = _tag;
             }
+        }
 
-            var sheetCounter = 1;
-            _tableCount = 1;
-            foreach (var worksheet in _worksheets)
-            {
-                var sheetId = "Sheet" + sheetCounter;
+        private void attachWorkBook(SpreadsheetDocument document)
+        {
+            document.WorkbookPart.Workbook = new Workbook();
+            document.WorkbookPart.Workbook.Sheets = _sheets;
 
-                var worksheetPart = (WorksheetPart)document.WorkbookPart.GetPartById(sheetId);
-
-                worksheet.AddTableParts(worksheetPart, ref _tableCount);
-            }
+            _stylesManager.AttachStylesPart(document.WorkbookPart);
         }
 
         private void writeWorkSheets(WorkbookPart workbookPart, Sheets sheets, SpreadsheetStylesManager stylesManager)
         {
-            var sheetCounter = 1;
-            _tableCount = 1;
-            foreach (var worksheet in _worksheets)
+            handleWorkSheetsAction((ordinal, spreadsheetWorksheet, tableIdProvider) =>
             {
-                var sheetId = "Sheet" + sheetCounter;
-                var sheet = new Sheet() { Name = new string(worksheet.Name.Take(30).ToArray()), SheetId = (UInt32Value)(UInt32)sheetCounter, Id = sheetId };
-                sheetCounter++;
+                var sheetId = "Sheet" + ordinal;
+
+                var sheet = new Sheet() { Name = new string(spreadsheetWorksheet.Name.Take(30).ToArray()), SheetId = (UInt32Value)(UInt32)ordinal, Id = sheetId };
+
                 sheets.Append(sheet);
                 var worksheetPart = workbookPart.AddNewPart<WorksheetPart>(sheetId);
                 using (var writer = OpenXmlWriter.Create(worksheetPart))
                 {
-                    worksheet.WriteWorksheet(writer, worksheetPart, workbookPart, stylesManager, ref _tableCount);
+                    spreadsheetWorksheet.WriteWorksheet(writer, worksheetPart, workbookPart, stylesManager, tableIdProvider);
                 }
+            });
+        }
+
+        private void handleWorkSheetsAction(SheetHandler handler)
+        {
+            var sheetCounter = 1;
+            var tableIdProvider = new TableIdProvider();
+            foreach (var worksheet in _worksheets)
+            {
+                handler(sheetCounter, worksheet, tableIdProvider);
+                sheetCounter++;
             }
         }
     }

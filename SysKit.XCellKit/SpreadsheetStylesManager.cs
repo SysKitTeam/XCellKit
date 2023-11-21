@@ -128,7 +128,7 @@ namespace SysKit.XCellKit
             _stylesheet.NumberingFormats = numberingFormats;
         }
 
-        public void AttachToWorkBook(WorkbookPart workbookPart)
+        internal void AttachStylesPart(WorkbookPart workbookPart)
         {
             var stylesPart = workbookPart.AddNewPart<WorkbookStylesPart>();
             stylesPart.Stylesheet = _stylesheet;

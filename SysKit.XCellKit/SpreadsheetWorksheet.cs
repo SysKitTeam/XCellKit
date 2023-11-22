@@ -1,10 +1,10 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Spreadsheet;
 using Column = DocumentFormat.OpenXml.Spreadsheet.Column;
 using Columns = DocumentFormat.OpenXml.Spreadsheet.Columns;
 using Extension = DocumentFormat.OpenXml.Spreadsheet.Extension;
@@ -212,7 +212,7 @@ namespace SysKit.XCellKit
             _sharedStringItems[itemIndex] = newValue;
         }
 
-        public void WriteWorksheet(OpenXmlWriter writer, WorksheetPart part, WorkbookPart workbookPart, SpreadsheetStylesManager stylesManager, ref int tableCount)
+        internal void WriteWorksheet(OpenXmlWriter writer, WorksheetPart part, WorkbookPart workbookPart, SpreadsheetStylesManager stylesManager, TableIdProvider tableIdProvider)
         {
             var hyperLinksManager = new SpreadsheetHyperlinkManager();
             writer.WriteStartElement(new Worksheet(), new List<OpenXmlAttribute>(), new List<KeyValuePair<string, string>>()
@@ -226,16 +226,10 @@ namespace SysKit.XCellKit
             writeSheetData(writer, stylesManager, hyperLinksManager, DrawingsManager);
             writeMergedCells(writer);
             writeHyperlinks(writer, part, hyperLinksManager);
-            writeDrawings(part, writer);
-            writeTables(writer, part, ref tableCount);
+            DrawingsManager.WriteDrawings(writer);
+            writeTables(writer, tableIdProvider);
             writeExtensionsList(writer);
-            writeSharedStringTableParts(workbookPart);
             writer.WriteEndElement();
-        }
-
-        private void writeDrawings(WorksheetPart part, OpenXmlWriter writer)
-        {
-            DrawingsManager.WriteDrawings(part, writer);
         }
 
         private void writeSheetProperties(OpenXmlWriter writer)
@@ -438,7 +432,7 @@ namespace SysKit.XCellKit
         }
 
 
-        private void writeTables(OpenXmlWriter writer, WorksheetPart part, ref int tableCount)
+        private void writeTables(OpenXmlWriter writer, TableIdProvider tableIdProvider)
         {
             if (!_tables.Any())
             {
@@ -449,15 +443,35 @@ namespace SysKit.XCellKit
 
             foreach (var table in _tables)
             {
-                var tableId = "table" + tableCount;
-                var tableDefinition = part.AddNewPart<TableDefinitionPart>(tableId);
-                tableDefinition.Table = table.Value.GetTableDefinition(tableCount, table.Key.ColumnIndex, table.Key.RowIndex);
+                var tableIdValue = tableIdProvider.GetNextId();
+                var tableId = "table" + tableIdValue;
                 var idAtt = new OpenXmlAttribute("id", "http://schemas.openxmlformats.org/officeDocument/2006/relationships", tableId);
                 writer.WriteStartElement(new TablePart(), new List<OpenXmlAttribute>() { idAtt });
                 writer.WriteEndElement();
-                tableCount++;
             }
             writer.WriteEndElement();
+        }
+
+        internal void AttachAdditionalParts(WorkbookPart workbookPart, WorksheetPart worksheetPart, TableIdProvider tableIdProvider)
+        {
+            DrawingsManager.AttachDrawingsPart(worksheetPart);
+            attachSharedStringTableParts(workbookPart);
+            attachTableParts(worksheetPart, tableIdProvider);
+        }
+
+        private void attachTableParts(WorksheetPart worksheetPart, TableIdProvider tableIdProvider)
+        {
+            if (!_tables.Any())
+            {
+                return;
+            }
+            foreach (var table in _tables)
+            {
+                var tableIdValue = tableIdProvider.GetNextId();
+                var tableId = "table" + tableIdValue;
+                var tableDefinition = worksheetPart.AddNewPart<TableDefinitionPart>(tableId);
+                tableDefinition.Table = table.Value.GetTableDefinition(tableIdValue, table.Key.ColumnIndex, table.Key.RowIndex);
+            }
         }
 
         private void writeColumns(OpenXmlWriter writer)
@@ -487,7 +501,7 @@ namespace SysKit.XCellKit
             writer.WriteEndElement();
         }
 
-        private void writeSharedStringTableParts(WorkbookPart workbookPart)
+        private void attachSharedStringTableParts(WorkbookPart workbookPart)
         {
             if (!_sharedStringItems.Any())
             {

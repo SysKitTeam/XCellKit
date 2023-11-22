@@ -10,6 +10,11 @@ variables:
   appVersionPrefix: $[format('{0:yyyy}.{0:MM}.{0:dd}', pipeline.startTime)]
   buildNumber: $[counter(variables['appVersionPrefix'], 1)]
   appVersion: '$(appVersionPrefix).$(buildNumber)'
+  ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
+    previewSuffix: ''
+  ${{ else }}:
+    previewSuffix: '-preview'
+  nugetVersion: $(appVersionPrefix).$(buildNumber)$(previewSuffix)
 
 steps:
 - task: DownloadSecureFile@1
@@ -47,7 +52,7 @@ steps:
     packagesToPack: '**/SysKit.XCellKit.csproj'
     nobuild: true
     versioningScheme: 'byEnvVar'
-    versionEnvVar: 'appVersion'
+    versionEnvVar: 'nugetVersion'
     configuration: $(buildConfiguration)
     outputDirectory: '$(Build.ArtifactStagingDirectory)'
 

@@ -1,9 +1,12 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Spreadsheet;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
-using DocumentFormat.OpenXml;
-using DocumentFormat.OpenXml.Spreadsheet;
+using Color = SkiaSharp.SKColor;
+using Font = SkiaSharp.SKFont;
+using Size = SkiaSharp.SKSize;
 
 namespace SysKit.XCellKit
 {
@@ -39,9 +42,9 @@ namespace SysKit.XCellKit
             }
         }
 
-        public System.Drawing.Font Font { get; set; }
-        public System.Drawing.Color? BackgroundColor { get; set; }
-        public System.Drawing.Color? ForegroundColor { get; set; }
+        public Font Font { get; set; }
+        public Color? BackgroundColor { get; set; }
+        public Color? ForegroundColor { get; set; }
         public HorizontalAligment? Alignment { get; set; }
         public VerticalAlignment? VerticalAlignment { get; set; }
         public int Indent { get; set; }
@@ -53,7 +56,7 @@ namespace SysKit.XCellKit
         /// </summary>
         public int ImageIndex { get; set; }
         public double ImageScaleFactor { get; set; }
-        public System.Drawing.Size? MergedCellsRange { get; set; }
+        public Size? MergedCellsRange { get; set; }
         public bool ParticipatesInAutoWidthColumnCalculation { get; set; }
 
         public bool WrapText

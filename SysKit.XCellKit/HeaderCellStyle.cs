@@ -1,6 +1,5 @@
-﻿using System;
-using Color = System.Drawing.Color;
-using Font = System.Drawing.Font;
+﻿using Color = SkiaSharp.SKColor;
+using Font = SkiaSharp.SKFont;
 
 namespace SysKit.XCellKit
 {

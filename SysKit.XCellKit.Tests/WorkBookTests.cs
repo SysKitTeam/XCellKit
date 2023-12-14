@@ -1,11 +1,12 @@
 ﻿using Microsoft.Extensions.FileProviders;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
+using Image = SkiaSharp.SKImage;
 
 
 namespace SysKit.XCellKit.Tests
@@ -22,7 +23,7 @@ namespace SysKit.XCellKit.Tests
         {
             if (File.Exists(STR_TestOutputPath))
             {
-                File.Delete(STR_TestOutputPath);
+                //File.Delete(STR_TestOutputPath);
             }
 
             _testImage1.Dispose();
@@ -36,8 +37,8 @@ namespace SysKit.XCellKit.Tests
             using var imageStream1 = fileProvider.GetFileInfo("TestImages/ArrowRight16.png").CreateReadStream();
             using var imageStream2 = fileProvider.GetFileInfo("TestImages/WindowsServer16.png").CreateReadStream();
 
-            _testImage1 = Image.FromStream(imageStream1);
-            _testImage2 = Image.FromStream(imageStream2);
+            _testImage1 = Image.FromEncodedData(imageStream1);
+            _testImage2 = Image.FromEncodedData(imageStream2);
         }
 
         private void setupImagesForWorksheet(SpreadsheetWorksheet worksheet)
@@ -121,8 +122,8 @@ namespace SysKit.XCellKit.Tests
                     var shouldAddImage = i < 10000 && j == 0;
                     cells.Add(new SpreadsheetCell()
                     {
-                        BackgroundColor = Color.Red,
-                        ForegroundColor = Color.Blue,
+                        BackgroundColor = SKColor.Parse("#FF0000"),
+                        ForegroundColor = SKColor.Parse("#0000FF"),
                         Font = _font,
                         Alignment = HorizontalAligment.Center,
                         Value = $"Ovo je test {i} - {j}",
@@ -271,7 +272,7 @@ namespace SysKit.XCellKit.Tests
             Assert.IsTrue(sw.Elapsed.TotalSeconds < 60, "Export taking to long");
         }
 
-        static Font _font = new Font(new FontFamily("Calibri"), 11);
+        private static SKFont _font = new SKFont(SKTypeface.FromFamilyName("Calibri"), 11);
 
         private static SpreadsheetWorkbook setupLargeWorkbook(Action<SpreadsheetRow> afterRowCreated, int rowsToStream = 800000, bool useHyperLinks = false, bool useEnumerator = false)
         {
@@ -338,8 +339,8 @@ namespace SysKit.XCellKit.Tests
                 {
                     cells.Add(new SpreadsheetCell()
                     {
-                        BackgroundColor = Color.Red,
-                        ForegroundColor = Color.Blue,
+                        BackgroundColor = SKColor.Parse("#FF0000"),
+                        ForegroundColor = SKColor.Parse("#0000FF"),
                         Font = _font,
                         Alignment = HorizontalAligment.Center,
                         Value = $"Ovo je test {rowCounter} - {i}"

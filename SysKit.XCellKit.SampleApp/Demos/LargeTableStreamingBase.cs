@@ -1,14 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Drawing;
+﻿using SkiaSharp;
+using System.Collections.Generic;
 
 namespace SysKit.XCellKit.SampleApp.Demos
 {
     abstract class LargeTableStreamingBase : DemoBase
     {
         protected const int RowsToStream = 800000;
-        static Font _font = new Font(new FontFamily("Calibri"), 11);
+        private static SKFont _font = new SKFont(SKTypeface.FromFamilyName("Calibri"), 11);
         public LargeTableStreamingBase(string title, string description) : base(title, description)
         {
+
         }
 
         protected SpreadsheetRow createTestRow(bool useHyperLinks, int columnsCount, int rowCounter)
@@ -25,8 +26,8 @@ namespace SysKit.XCellKit.SampleApp.Demos
                 {
                     cells.Add(new SpreadsheetCell()
                     {
-                        BackgroundColor = Color.Red,
-                        ForegroundColor = Color.Blue,
+                        BackgroundColor = SKColor.Parse("#FF0000"),
+                        ForegroundColor = SKColor.Parse("#0000FF"),
                         Font = _font,
                         Alignment = HorizontalAligment.Center,
                         Value = $"Cell value {rowCounter} - {i}"

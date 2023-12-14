@@ -23,7 +23,7 @@ namespace SysKit.XCellKit.Tests
         {
             if (File.Exists(STR_TestOutputPath))
             {
-                //File.Delete(STR_TestOutputPath);
+                File.Delete(STR_TestOutputPath);
             }
 
             _testImage1.Dispose();

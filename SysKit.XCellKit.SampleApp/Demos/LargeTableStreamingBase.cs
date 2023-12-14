@@ -1,14 +1,17 @@
-﻿using System.Collections.Generic;
-using System.Drawing;
+﻿using IronSoftware.Drawing;
+using System.Collections.Generic;
+using Color = SixLabors.ImageSharp.Color;
+using Font = IronSoftware.Drawing.Font;
 
 namespace SysKit.XCellKit.SampleApp.Demos
 {
     abstract class LargeTableStreamingBase : DemoBase
     {
         protected const int RowsToStream = 800000;
-        static Font _font = new Font(new FontFamily("Calibri"), 11);
+        private static Font _font = new Font("Calibri", FontStyle.Regular, 11);
         public LargeTableStreamingBase(string title, string description) : base(title, description)
         {
+
         }
 
         protected SpreadsheetRow createTestRow(bool useHyperLinks, int columnsCount, int rowCounter)

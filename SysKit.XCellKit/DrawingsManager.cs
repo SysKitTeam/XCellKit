@@ -1,9 +1,9 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Png;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using A = DocumentFormat.OpenXml.Drawing;
@@ -72,7 +72,7 @@ namespace SysKit.XCellKit
                 imgCounter++;
                 using (var ms = new MemoryStream())
                 {
-                    image.Save(ms, ImageFormat.Png);
+                    image.Save(ms, new PngEncoder());
                     ms.Position = 0;
                     imagePart1.FeedData(ms);
                 }
@@ -104,7 +104,7 @@ namespace SysKit.XCellKit
         /// <param name="value"></param>
         /// <param name="dpi"></param>
         /// <returns></returns>
-        private long convertPixelsToEMUs(int value, float dpi)
+        private long convertPixelsToEMUs(int value, double dpi)
         {
             // to convert pixels into inches we use this formula
             return (long)(INT_EMUsPerInch / dpi) * value;
@@ -114,9 +114,8 @@ namespace SysKit.XCellKit
         private Xdr.OneCellAnchor createImageAnchor(ImageDetails details)
         {
             var image = _images[details.ImageIndex];
-
-            long imgWidth = convertPixelsToEMUs(image.Width, image.HorizontalResolution);
-            long imgHeight = convertPixelsToEMUs(image.Height, image.VerticalResolution);
+            var imgWidth = convertPixelsToEMUs(image.Width, image.Metadata.CalculateHorizontalDpi());
+            var imgHeight = convertPixelsToEMUs(image.Height, image.Metadata.CalculateVerticalDpi());
 
             // ReSharper disable once CompareOfFloatsByEqualityOperator
             if (details.ImageScaleFactor != 0)

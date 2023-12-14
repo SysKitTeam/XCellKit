@@ -1,6 +1,7 @@
 ﻿using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using SixLabors.ImageSharp;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -369,7 +370,7 @@ namespace SysKit.XCellKit
 
         private void writeMergedCells(OpenXmlWriter writer)
         {
-            var mergedCellRanges = new Dictionary<SpreadsheetLocation, System.Drawing.Size>();
+            var mergedCellRanges = new Dictionary<SpreadsheetLocation, Size>();
             foreach (var row in _rows)
             {
                 for (var i = 0; i < row.Value.RowCells.Count; i++)

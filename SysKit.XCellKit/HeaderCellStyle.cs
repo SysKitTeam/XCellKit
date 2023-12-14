@@ -1,6 +1,5 @@
-﻿using System;
-using Color = System.Drawing.Color;
-using Font = System.Drawing.Font;
+﻿using IronSoftware.Drawing;
+using Color = SixLabors.ImageSharp.Color;
 
 namespace SysKit.XCellKit
 {

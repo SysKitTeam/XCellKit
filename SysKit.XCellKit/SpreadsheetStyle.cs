@@ -1,7 +1,7 @@
-﻿using System.Text;
-using DocumentFormat.OpenXml.Spreadsheet;
-using Color = System.Drawing.Color;
-using Font = System.Drawing.Font;
+﻿using DocumentFormat.OpenXml.Spreadsheet;
+using System.Text;
+using Color = SixLabors.ImageSharp.Color;
+using Font = IronSoftware.Drawing.Font;
 
 namespace SysKit.XCellKit
 {
@@ -21,25 +21,23 @@ namespace SysKit.XCellKit
             var sb = new StringBuilder();
             if (BackgroundColor.HasValue)
             {
-                var colorRgb = BackgroundColor.Value.ToArgb();
-                sb.Append(colorRgb);
+                sb.Append(BackgroundColor.Value.GetRgbAsInt());
             }
             if (ForegroundColor.HasValue)
             {
-                var colorRgb = ForegroundColor.Value.ToArgb();
-                sb.Append(colorRgb);
+                sb.Append(ForegroundColor.Value.GetRgbAsInt());
             }
             if (Font != null)
             {
                 var fontid = Font.ToString();
                 sb.Append(fontid);
-                sb.Append(Font.Style);
+                // sb.Append(Font.Style);
             }
             if (Alignment.HasValue)
             {
                 // 30% speedup on 800 000 rows when not using Enum.ToString
                 sb.Append("H");
-                sb.Append((int) Alignment.Value);
+                sb.Append((int)Alignment.Value);
             }
             if (VerticalAlignment.HasValue)
             {
@@ -74,13 +72,11 @@ namespace SysKit.XCellKit
             var hash = 0;
             if (BackgroundColor.HasValue)
             {
-                var colorRgb = BackgroundColor.Value.ToArgb();
-                hash ^= colorRgb.GetHashCode();
+                hash ^= BackgroundColor.Value.GetRgbAsInt().GetHashCode();
             }
             if (ForegroundColor.HasValue)
             {
-                var colorRgb = ForegroundColor.Value.ToArgb();
-                hash ^= colorRgb.GetHashCode();
+                hash ^= ForegroundColor.Value.GetRgbAsInt().GetHashCode();
             }
             if (Font != null)
             {

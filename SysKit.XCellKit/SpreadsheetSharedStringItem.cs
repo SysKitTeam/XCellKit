@@ -1,5 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Spreadsheet;
-using Color = System.Drawing.Color;
+using Color = SixLabors.ImageSharp.Color;
 
 namespace SysKit.XCellKit
 {
@@ -22,8 +22,7 @@ namespace SysKit.XCellKit
 
             if (FontColor.HasValue)
             {
-                var hexColor = $"{FontColor.Value.R:X2}{FontColor.Value.G:X2}{FontColor.Value.B:X2}";
-                run.RunProperties.Append(new DocumentFormat.OpenXml.Spreadsheet.Color { Rgb = hexColor });
+                run.RunProperties.Append(new DocumentFormat.OpenXml.Spreadsheet.Color { Rgb = FontColor.Value.GetRgbAsHex() });
             }
 
             return new SharedStringItem(run);

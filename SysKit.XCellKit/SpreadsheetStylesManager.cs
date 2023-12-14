@@ -32,14 +32,14 @@ namespace SysKit.XCellKit
     {
         private Dictionary<string, int> _styles;
         private Dictionary<FontKey, int> _fonts;
-        private Dictionary<System.Drawing.Color, int> _fills;
+        private Dictionary<SixLabors.ImageSharp.Color, int> _fills;
 
         private Stylesheet _stylesheet;
         public SpreadsheetStylesManager()
         {
             _styles = new Dictionary<string, int>();
             _fonts = new Dictionary<FontKey, int>();
-            _fills = new Dictionary<System.Drawing.Color, int>();
+            _fills = new Dictionary<SixLabors.ImageSharp.Color, int>();
 
 
             _stylesheet = new Stylesheet();
@@ -189,7 +189,7 @@ namespace SysKit.XCellKit
                 else
                 {
                     var newFont = new Font();
-                    newFont.FontName = new FontName() { Val = style.Font.Name };
+                    newFont.FontName = new FontName() { Val = style.Font.FamilyName };
                     newFont.FontSize = new FontSize() { Val = style.Font.Size };
                     if (style.Font.Bold)
                     {
@@ -201,7 +201,7 @@ namespace SysKit.XCellKit
                     }
                     if (style.ForegroundColor != null)
                     {
-                        newFont.Color = new Color() { Rgb = String.Format("{0:X2}{1:X2}{2:X2}{3:X2}", style.ForegroundColor.Value.A, style.ForegroundColor.Value.R, style.ForegroundColor.Value.G, style.ForegroundColor.Value.B) };
+                        newFont.Color = new Color() { Rgb = style.ForegroundColor.Value.GetRgbAsHex() };
                     }
                     _stylesheet.Fonts.AppendChild(newFont);
                     fontIndex = _fonts[key] = (int)((UInt32)_stylesheet.Fonts.Count);
@@ -218,7 +218,7 @@ namespace SysKit.XCellKit
                 else
                 {
                     var newFill = new PatternFill() { PatternType = PatternValues.Solid };
-                    newFill.ForegroundColor = new ForegroundColor() { Rgb = String.Format("{0:X2}{1:X2}{2:X2}{3:X2}", style.BackgroundColor.Value.A, style.BackgroundColor.Value.R, style.BackgroundColor.Value.G, style.BackgroundColor.Value.B) };
+                    newFill.ForegroundColor = new ForegroundColor() { Rgb = style.BackgroundColor.Value.GetRgbAsHex() };
                     newFill.BackgroundColor = new BackgroundColor() { Indexed = 64U };
                     fillIndex = (int)(UInt32)_stylesheet.Fills.Count;
                     _fills[style.BackgroundColor.Value] = fillIndex;
@@ -290,14 +290,14 @@ namespace SysKit.XCellKit
 
         public class FontKey : IEquatable<FontKey>
         {
-            public FontKey(System.Drawing.Font font, System.Drawing.Color? color)
+            public FontKey(IronSoftware.Drawing.Font font, SixLabors.ImageSharp.Color? color)
             {
                 Font = font;
                 Color = color;
             }
 
-            public System.Drawing.Font Font { get; }
-            public System.Drawing.Color? Color { get; }
+            public IronSoftware.Drawing.Font Font { get; }
+            public SixLabors.ImageSharp.Color? Color { get; }
 
             public bool Equals(FontKey other)
             {

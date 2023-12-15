@@ -26,8 +26,8 @@ namespace SysKit.XCellKit.SampleApp.Demos
                 {
                     cells.Add(new SpreadsheetCell()
                     {
-                        BackgroundColor = SKColor.Parse("#FF0000"),
-                        ForegroundColor = SKColor.Parse("#0000FF"),
+                        BackgroundColor = SKColors.Red,
+                        ForegroundColor = SKColors.Blue,
                         Font = _font,
                         Alignment = HorizontalAligment.Center,
                         Value = $"Cell value {rowCounter} - {i}"

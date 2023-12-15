@@ -122,8 +122,8 @@ namespace SysKit.XCellKit.Tests
                     var shouldAddImage = i < 10000 && j == 0;
                     cells.Add(new SpreadsheetCell()
                     {
-                        BackgroundColor = SKColor.Parse("#FF0000"),
-                        ForegroundColor = SKColor.Parse("#0000FF"),
+                        BackgroundColor = SKColors.Red,
+                        ForegroundColor = SKColors.Blue,
                         Font = _font,
                         Alignment = HorizontalAligment.Center,
                         Value = $"Ovo je test {i} - {j}",
@@ -339,8 +339,8 @@ namespace SysKit.XCellKit.Tests
                 {
                     cells.Add(new SpreadsheetCell()
                     {
-                        BackgroundColor = SKColor.Parse("#FF0000"),
-                        ForegroundColor = SKColor.Parse("#0000FF"),
+                        BackgroundColor = SKColors.Red,
+                        ForegroundColor = SKColors.Blue,
                         Font = _font,
                         Alignment = HorizontalAligment.Center,
                         Value = $"Ovo je test {rowCounter} - {i}"

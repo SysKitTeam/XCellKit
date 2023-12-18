@@ -47,5 +47,10 @@ namespace SysKit.XCellKit
         {
             return (color.Alpha << 24) | (color.Red << 16) | (color.Green << 8) | color.Blue;
         }
+
+        public static string GetId(this SKFont font)
+        {
+            return $"[Font: Name={font.Typeface.FamilyName}, Size={font.Size}]";
+        }
     }
 }

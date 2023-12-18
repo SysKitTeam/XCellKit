@@ -28,9 +28,8 @@ namespace SysKit.XCellKit
             }
             if (Font != null)
             {
-                var fontid = Font.ToString();
-                sb.Append(fontid);
-                // sb.Append(Font.Style);
+                sb.Append(Font.GetId());
+                sb.Append(Font.Typeface.Style);
             }
             if (Alignment.HasValue)
             {

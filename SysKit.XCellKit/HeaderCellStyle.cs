@@ -1,5 +1,4 @@
 ﻿using Color = SkiaSharp.SKColor;
-using Font = SkiaSharp.SKFont;
 
 namespace SysKit.XCellKit
 {
@@ -7,6 +6,6 @@ namespace SysKit.XCellKit
     {
         public Color? BackgroundColor { get; set; }
         public Color? ForegroundColor { get; set; }
-        public Font Font { get; set; }
+        public XCellFont Font { get; set; }
     }
 }

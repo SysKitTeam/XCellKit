@@ -272,7 +272,7 @@ namespace SysKit.XCellKit.Tests
             Assert.IsTrue(sw.Elapsed.TotalSeconds < 60, "Export taking to long");
         }
 
-        private static SKFont _font = new SKFont(SKTypeface.FromFamilyName("Calibri"), 11);
+        private static XCellFont _font = new("Calibri", 11);
 
         private static SpreadsheetWorkbook setupLargeWorkbook(Action<SpreadsheetRow> afterRowCreated, int rowsToStream = 800000, bool useHyperLinks = false, bool useEnumerator = false)
         {

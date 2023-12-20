@@ -8,7 +8,7 @@ namespace SysKit.XCellKit
     {
         public Color? BackgroundColor { get; set; }
         public Color? ForegroundColor { get; set; }
-        public SkiaSharp.SKFont Font { get; set; }
+        public XCellFont Font { get; set; }
         public HorizontalAlignmentValues? Alignment { get; set; }
         public VerticalAlignmentValues? VerticalAlignment { get; set; }
         public bool IsDate { get; set; }
@@ -29,7 +29,7 @@ namespace SysKit.XCellKit
             if (Font != null)
             {
                 sb.Append(Font.GetId());
-                sb.Append(Font.Typeface.Style);
+                sb.Append(Font.Style);
             }
             if (Alignment.HasValue)
             {
@@ -78,7 +78,7 @@ namespace SysKit.XCellKit
             }
             if (Font != null)
             {
-                var fontid = Font.ToString();
+                var fontid = Font.GetId();
                 hash ^= fontid.GetHashCode();
             }
             if (Alignment.HasValue)

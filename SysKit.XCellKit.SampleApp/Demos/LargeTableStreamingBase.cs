@@ -6,7 +6,7 @@ namespace SysKit.XCellKit.SampleApp.Demos
     abstract class LargeTableStreamingBase : DemoBase
     {
         protected const int RowsToStream = 800000;
-        private static SKFont _font = new SKFont(SKTypeface.FromFamilyName("Calibri"), 11);
+        private static XCellFont _font = new("Calibri", 11);
         public LargeTableStreamingBase(string title, string description) : base(title, description)
         {
 

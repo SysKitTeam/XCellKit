@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using Color = SkiaSharp.SKColor;
-using Font = SkiaSharp.SKFont;
 using Size = SkiaSharp.SKSize;
 
 namespace SysKit.XCellKit
@@ -42,7 +41,7 @@ namespace SysKit.XCellKit
             }
         }
 
-        public Font Font { get; set; }
+        public XCellFont Font { get; set; }
         public Color? BackgroundColor { get; set; }
         public Color? ForegroundColor { get; set; }
         public HorizontalAligment? Alignment { get; set; }

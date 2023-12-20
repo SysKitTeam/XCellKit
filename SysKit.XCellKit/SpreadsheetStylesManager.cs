@@ -189,13 +189,13 @@ namespace SysKit.XCellKit
                 else
                 {
                     var newFont = new Font();
-                    newFont.FontName = new FontName() { Val = style.Font.Typeface.FamilyName };
+                    newFont.FontName = new FontName() { Val = style.Font.Name };
                     newFont.FontSize = new FontSize() { Val = style.Font.Size };
-                    if (style.Font.Typeface.IsBold)
+                    if (style.Font.IsBold)
                     {
                         newFont.Bold = new Bold();
                     }
-                    if (style.Font.Typeface.IsItalic)
+                    if (style.Font.IsItalic)
                     {
                         newFont.Italic = new Italic();
                     }
@@ -290,13 +290,13 @@ namespace SysKit.XCellKit
 
         public class FontKey : IEquatable<FontKey>
         {
-            public FontKey(SkiaSharp.SKFont font, SkiaSharp.SKColor? color)
+            public FontKey(XCellFont font, SkiaSharp.SKColor? color)
             {
                 Font = font;
                 Color = color;
             }
 
-            public SkiaSharp.SKFont Font { get; }
+            public XCellFont Font { get; }
             public SkiaSharp.SKColor? Color { get; }
 
             public bool Equals(FontKey other)

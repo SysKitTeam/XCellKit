@@ -2,8 +2,6 @@
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using A = DocumentFormat.OpenXml.Drawing;
@@ -19,7 +17,7 @@ namespace SysKit.XCellKit
         // by definition there is 914400 EMUs per inch        
         public const int INT_EMUsPerInch = 914400;
         private const string DrawingPartId = "drawingPart1";
-        private List<Image> _images = new List<Image>();
+        private List<SkiaSharp.SKImage> _images = new List<SkiaSharp.SKImage>();
         private readonly List<ImageDetails> _imageDetails = new List<ImageDetails>();
 
         /// <summary>
@@ -27,7 +25,7 @@ namespace SysKit.XCellKit
         /// <para />IMPORTANT: Do not use cell images if you expect a high number of rows in the document
         /// this will kill the excel performance if each row has an image when dealing with > 100 000 rows
         /// </summary>        
-        public void SetImages(List<Image> images)
+        public void SetImages(List<SkiaSharp.SKImage> images)
         {
             _images = images;
         }
@@ -72,7 +70,7 @@ namespace SysKit.XCellKit
                 imgCounter++;
                 using (var ms = new MemoryStream())
                 {
-                    image.Save(ms, ImageFormat.Png);
+                    image.EncodedData.SaveTo(ms);
                     ms.Position = 0;
                     imagePart1.FeedData(ms);
                 }
@@ -101,22 +99,20 @@ namespace SysKit.XCellKit
         /// <summary>
         /// Convert to English Metric Units (EMU)        
         /// </summary>
-        /// <param name="value"></param>
-        /// <param name="dpi"></param>
+        /// <param name="value">Points</param>
         /// <returns></returns>
-        private long convertPixelsToEMUs(int value, float dpi)
+        private long convertPixelsToEMUs(double value)
         {
             // to convert pixels into inches we use this formula
-            return (long)(INT_EMUsPerInch / dpi) * value;
+            return (long)(INT_EMUsPerInch * value) / 72;
         }
 
         private uint _pictureCounter;
         private Xdr.OneCellAnchor createImageAnchor(ImageDetails details)
         {
             var image = _images[details.ImageIndex];
-
-            long imgWidth = convertPixelsToEMUs(image.Width, image.HorizontalResolution);
-            long imgHeight = convertPixelsToEMUs(image.Height, image.VerticalResolution);
+            var imgWidth = convertPixelsToEMUs(image.Width * 0.75); // pixels to points
+            var imgHeight = convertPixelsToEMUs(image.Height * 0.75); // pixels to points
 
             // ReSharper disable once CompareOfFloatsByEqualityOperator
             if (details.ImageScaleFactor != 0)

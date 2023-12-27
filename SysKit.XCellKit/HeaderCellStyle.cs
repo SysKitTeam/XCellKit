@@ -1,6 +1,4 @@
-﻿using System;
-using Color = System.Drawing.Color;
-using Font = System.Drawing.Font;
+﻿using Color = SkiaSharp.SKColor;
 
 namespace SysKit.XCellKit
 {
@@ -8,6 +6,6 @@ namespace SysKit.XCellKit
     {
         public Color? BackgroundColor { get; set; }
         public Color? ForegroundColor { get; set; }
-        public Font Font { get; set; }
+        public XCellFont Font { get; set; }
     }
 }

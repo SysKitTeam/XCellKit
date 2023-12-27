@@ -369,7 +369,7 @@ namespace SysKit.XCellKit
 
         private void writeMergedCells(OpenXmlWriter writer)
         {
-            var mergedCellRanges = new Dictionary<SpreadsheetLocation, System.Drawing.Size>();
+            var mergedCellRanges = new Dictionary<SpreadsheetLocation, SkiaSharp.SKSize>();
             foreach (var row in _rows)
             {
                 for (var i = 0; i < row.Value.RowCells.Count; i++)
@@ -389,7 +389,7 @@ namespace SysKit.XCellKit
                 foreach (var cellRange in mergedCellRanges)
                 {
                     var cell1Name = SpreadsheetHelper.ExcelColumnFromNumber(cellRange.Key.ColumnIndex) + cellRange.Key.RowIndex;
-                    var cell2Name = SpreadsheetHelper.ExcelColumnFromNumber(cellRange.Key.ColumnIndex + cellRange.Value.Width) + (cellRange.Key.RowIndex + cellRange.Value.Height - 1);
+                    var cell2Name = SpreadsheetHelper.ExcelColumnFromNumber((int)(cellRange.Key.ColumnIndex + cellRange.Value.Width)) + (cellRange.Key.RowIndex + cellRange.Value.Height - 1);
                     var range = cell1Name + ":" + cell2Name;
                     var mergeCell = new MergeCell()
                     {
